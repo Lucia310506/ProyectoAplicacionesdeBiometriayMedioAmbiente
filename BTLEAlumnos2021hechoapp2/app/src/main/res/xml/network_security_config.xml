@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ANTES->DESPUÉS:
+    ANTES: no existía configuración de red y targetSdk 37 bloquea el tráfico
+           HTTP en claro (excepto con excepción explícita).
+    PROBLEMA (P2): PeticionarioREST habla con servidores de prácticas en
+           http:// (p.ej. 158.42.144.126:8080 o XAMPP local); sin esta
+           configuración esas peticiones fallan (o van sin cifrar).
+    AHORA: se permite tráfico en claro SOLO hacia los hosts de prácticas;
+           el resto del tráfico sigue exigiendo cifrado (HTTPS).
+-->
+<network-security-config>
+    <!-- base: todo el tráfico exige HTTPS -->
+    <base-config cleartextTrafficPermitted="false" />
+    <!-- excepción: solo estos hosts de prácticas pueden usar http:// -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">158.42.144.126</domain>
+        <domain includeSubdomains="false">localhost</domain>
+        <domain includeSubdomains="false">10.0.2.2</domain>
+        <domain includeSubdomains="false">192.168.1.2</domain>
+    </domain-config>
+</network-security-config>
