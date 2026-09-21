@@ -1,5 +1,5 @@
 
-package org.jordi.clienterestandroid;
+package com.example.ldiamur.btlealumnos2021app;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

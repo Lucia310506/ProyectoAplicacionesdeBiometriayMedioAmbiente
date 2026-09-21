@@ -335,7 +335,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
-                if (todoConcedido) {
+if (todoConcedido) {
                     Log.d(ETIQUETA_LOG, " onRequestPermissionsResult(): TODOS los permisos concedidos !!!!");
                     this.inicializarBlueTooth();
                 } else {

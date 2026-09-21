@@ -1,4 +1,4 @@
-package org.jordi.holamundoservicio;
+package com.example.ldiamur.btlealumnos2021app;
 
 import android.app.IntentService;
 import android.app.Service;
