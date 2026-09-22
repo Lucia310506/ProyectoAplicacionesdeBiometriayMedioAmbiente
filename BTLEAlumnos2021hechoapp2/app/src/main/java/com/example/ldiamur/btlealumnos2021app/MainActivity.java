@@ -10,6 +10,7 @@ import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Collections;
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -166,7 +168,11 @@ public class MainActivity extends AppCompatActivity {
         //Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado
           //      + " -> " + Utilidades.stringToUUID( dispositivoBuscado ) );
 
-        this.elEscanner.startScan( this.callbackDelEscaneo );
+        // A diferencia del escaneo general, aquí sí se aplica el filtro creado arriba.
+        this.elEscanner.startScan(
+                Collections.singletonList(sf),
+                new ScanSettings.Builder().build(),
+                this.callbackDelEscaneo);
     } // ()
 
     // --------------------------------------------------------------
@@ -195,8 +201,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado" );
         //this.buscarEsteDispositivoBTLE( Utilidades.stringToUUID( "EPSG-GTI-PROY-3A" ) );
 
-        //this.buscarEsteDispositivoBTLE( "EPSG-GTI-PROY-3A" );
-        this.buscarEsteDispositivoBTLE( "LUCIA" );
+        this.buscarEsteDispositivoBTLE( "GTI-3A" );
 
     } // ()
 
