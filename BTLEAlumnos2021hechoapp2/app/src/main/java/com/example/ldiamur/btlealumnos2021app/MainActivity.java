@@ -12,6 +12,7 @@ import android.bluetooth.le.ScanFilter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
@@ -192,16 +193,14 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     public void botonBuscarDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado" );
-        this.buscarTodosLosDispositivosBTLE();
+        iniciarServicioEscucha();
     } // ()
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     public void botonBuscarNuestroDispositivoBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado" );
-        //this.buscarEsteDispositivoBTLE( Utilidades.stringToUUID( "EPSG-GTI-PROY-3A" ) );
-
-        this.buscarEsteDispositivoBTLE( "GTI-3A" );
+        iniciarServicioEscucha();
 
     } // ()
 
@@ -209,7 +208,13 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     public void botonDetenerBusquedaDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton detener busqueda dispositivos BTLE Pulsado" );
-        this.detenerBusquedaDispositivosBTLE();
+        stopService(new Intent(this, ServicioEscuharBeacons.class));
+    } // ()
+
+    private void iniciarServicioEscucha() {
+        Intent intent = new Intent(this, ServicioEscuharBeacons.class);
+        intent.setAction(ServicioEscuharBeacons.ACCION_INICIAR);
+        ContextCompat.startForegroundService(this, intent);
     } // ()
 
     // --------------------------------------------------------------
