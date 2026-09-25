@@ -1,4 +1,10 @@
-
+/*
+ * Fichero: PeticionarioREST.java
+ * Autor: Lucia
+ * Descripción: Cliente HTTP para enviar y recibir información del servidor REST.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucia
+ */
 package com.example.ldiamur.btlealumnos2021app;
 
 import java.io.BufferedReader;
@@ -10,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import android.os.AsyncTask;
 import android.util.Log;
+import org.json.JSONObject;
 
 // ------------------------------------------------------------------------
 // ------------------------------------------------------------------------
@@ -46,6 +53,21 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     // --------------------------------------------------------------------
     public PeticionarioREST() {
         Log.d("clienterestandroid", "constructor()");
+    }
+
+    // tipo: Text, valor: R --> enviar_medicion() --x
+    public static void enviar_medicion(String tipo, double valor) {
+        try {
+            JSONObject cuerpo = new JSONObject();
+            cuerpo.put("tipo", tipo);
+            cuerpo.put("valor", valor);
+            new PeticionarioREST().hacerPeticionREST(
+                    "POST", ConfiguracionRest.URL_MEDICIONES, cuerpo.toString(),
+                    (codigo, respuesta) -> Log.d("clienterestandroid",
+                            "enviar_medicion(): código=" + codigo + " cuerpo=" + respuesta));
+        } catch (Exception error) {
+            Log.e("clienterestandroid", "enviar_medicion(): no se pudo crear el JSON", error);
+        }
     }
 
     // --------------------------------------------------------------------

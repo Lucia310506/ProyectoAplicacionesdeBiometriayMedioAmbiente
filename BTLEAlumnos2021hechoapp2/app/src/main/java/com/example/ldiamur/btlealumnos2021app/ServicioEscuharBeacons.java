@@ -1,3 +1,10 @@
+/*
+ * Fichero: ServicioEscuharBeacons.java
+ * Autor: Lucia
+ * Descripción: Servicio en segundo plano que escucha beacons y publica mediciones.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucia
+ */
 package com.example.ldiamur.btlealumnos2021app;
 
 import android.Manifest;
@@ -35,6 +42,8 @@ public class ServicioEscuharBeacons extends Service {
 
     private BluetoothLeScanner elEscanner;
     private ScanCallback callbackDelEscaneo;
+    private int ultimoTipoMedida = -1;
+    private int ultimoContador = -1;
 
     @Override
     public void onCreate() {
@@ -158,9 +167,21 @@ public class ServicioEscuharBeacons extends Service {
 
         if (tipoMedida == 11) {
             Log.d(ETIQUETA_LOG, "Servicio: CO2 = " + valor + " ppm (muestra " + contador + ")");
+            enviarMedicionNueva("CO2", valor, tipoMedida, contador);
         } else if (tipoMedida == 12) {
             Log.d(ETIQUETA_LOG, "Servicio: temperatura = " + valor + " °C (muestra " + contador + ")");
+            enviarMedicionNueva("TEMPERATURA", valor, tipoMedida, contador);
         }
+    }
+
+    // tipo: Text, valor: R, tipo_medida: N, contador: N --> enviarMedicionNueva() -->
+    private void enviarMedicionNueva(String tipo, int valor, int tipoMedida, int contador) {
+        if (ultimoTipoMedida == tipoMedida && ultimoContador == contador) {
+            return;
+        }
+        ultimoTipoMedida = tipoMedida;
+        ultimoContador = contador;
+        PeticionarioREST.enviar_medicion(tipo, valor);
     }
 
     private void detenerEscaneo() {

@@ -1,3 +1,8 @@
+-- Fichero: Estructura.sql
+-- Autor: Lucia
+-- Descripción: Estructura de la base de datos de mediciones.
+-- Fecha: 2026-09-25
+-- Copyright (c) 2026 Lucia
 -- phpMyAdmin SQL Dump
 -- version 5.2.3
 -- https://www.phpmyadmin.net/
@@ -18,7 +23,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `ldiamur_mediciones`
+-- Base de datos: `mediciones`
 --
 
 -- --------------------------------------------------------
@@ -29,9 +34,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `Mediciones` (
   `Id` int(11) NOT NULL,
-  `Tipo` text NOT NULL,
+  `Tipo` enum('CO2','TEMPERATURA') NOT NULL,
   `Valor` double NOT NULL,
-  `Fecha` datetime NOT NULL
+  `Fecha` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
