@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 25-09-2026 a las 11:15:28
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Servidor: localhost:3306
+-- Tiempo de generación: 25-09-2026 a las 18:15:40
+-- Versión del servidor: 10.11.14-MariaDB-0ubuntu0.24.04.1
+-- Versión de PHP: 8.4.24
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,31 +18,41 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `datos`
+-- Base de datos: `ldiamur_mediciones`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `medicion`
+-- Estructura de tabla para la tabla `Mediciones`
 --
 
-CREATE TABLE `medicion` (
-  `ID` int(11) NOT NULL,
+CREATE TABLE `Mediciones` (
+  `Id` int(11) NOT NULL,
   `Tipo` text NOT NULL,
   `Valor` double NOT NULL,
   `Fecha` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Índices para tablas volcadas
 --
 
 --
--- Indices de la tabla `medicion`
+-- Indices de la tabla `Mediciones`
 --
-ALTER TABLE `medicion`
-  ADD PRIMARY KEY (`ID`);
+ALTER TABLE `Mediciones`
+  ADD PRIMARY KEY (`Id`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `Mediciones`
+--
+ALTER TABLE `Mediciones`
+  MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

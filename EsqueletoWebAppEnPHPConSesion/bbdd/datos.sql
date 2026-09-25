@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 25-09-2026 a las 11:18:59
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Servidor: localhost:3306
+-- Tiempo de generación: 25-09-2026 a las 18:19:30
+-- Versión del servidor: 10.11.14-MariaDB-0ubuntu0.24.04.1
+-- Versión de PHP: 8.4.24
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,18 +18,18 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `datos`
+-- Base de datos: `ldiamur_mediciones`
 --
 
 --
--- Volcado de datos para la tabla `medicion`
+-- Volcado de datos para la tabla `Mediciones`
 --
 
-INSERT INTO `medicion` (`ID`, `Tipo`, `Valor`, `Fecha`) VALUES
-(1, 'temperatura', -23, '2026-09-25 11:16:35'),
-(2, 'co2', 10, '2026-09-25 11:17:11'),
-(3, 'temperatura', 50, '2026-09-25 11:17:49'),
-(4, 'co2', 14, '2026-09-25 11:18:09');
+INSERT INTO `Mediciones` (`Id`, `Tipo`, `Valor`, `Fecha`) VALUES
+(1, 'temperatura', -10, '2026-09-25 18:15:46'),
+(2, 'co2', 15, '2026-09-25 18:17:12'),
+(3, 'temperatura', 24, '2026-09-25 18:17:25'),
+(4, 'co2', 5, '2026-09-25 18:17:42');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
