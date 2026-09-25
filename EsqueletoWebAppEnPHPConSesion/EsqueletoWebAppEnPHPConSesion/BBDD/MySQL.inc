@@ -1,8 +1,8 @@
 <?php
 $servername = "localhost";
-$username = "ldiamur_ldiamur";
-$password = "marc@lucia@mar";
-$db = "ldiamur_proa";
+$username = "ldiamur_d";
+$password = "Drac06@rys";
+$db = "ldiamur_mediciones";
 
 //mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
