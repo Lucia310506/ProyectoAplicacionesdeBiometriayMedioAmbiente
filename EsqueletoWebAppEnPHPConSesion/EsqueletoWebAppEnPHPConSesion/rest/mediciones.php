@@ -1,50 +1,41 @@
 <?php
 /*
  * Fichero: mediciones.php
- * Autor: Lucia
- * Descripción: Ruta REST para crear y consultar mediciones ambientales.
+ * Autor: Lucía Díaz Murcia
+ * Descripción: Implementa las rutas REST GET y POST de mediciones.
  * Fecha: 2026-09-25
- * Copyright (c) 2026 Lucia
+ * Copyright (c) 2026 Lucía Díaz Murcia
  */
 
 require_once __DIR__ . '/../logica/mediciones.php';
 
-header('Content-Type: application/json; charset=utf-8');
-
-// peticion: Text --> responder_mediciones() -->
-function responder_mediciones(): void {
+// metodo: Text, cuerpo: Text --> atenderMediciones() --> (codigo: N, respuesta: Text)
+function atenderMediciones(string $metodo, string $cuerpo): array {
     try {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $cuerpo = json_decode(file_get_contents('php://input'), true);
-            if (!is_array($cuerpo) || !array_key_exists('tipo', $cuerpo)
-                || !array_key_exists('valor', $cuerpo) || !is_numeric($cuerpo['valor'])) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Se requieren tipo y valor numérico']);
-                return;
+        if ($metodo === 'POST') {
+            $datos = json_decode($cuerpo, true);
+            if (!is_array($datos) || !isset($datos['tipo']) || !isset($datos['valor']) || !is_numeric($datos['valor'])) {
+                return [400, ['error' => 'Se requieren tipo y valor numérico']];
             }
-
-            guardar_mediciones((string) $cuerpo['tipo'], (float) $cuerpo['valor']);
-            http_response_code(201);
-            echo json_encode(['resultado' => 'medición guardada']);
-            return;
+            guardarMediciones((string) $datos['tipo'], (float) $datos['valor']);
+            return [201, ['resultado' => 'medición guardada']];
         }
-
-        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-            echo json_encode(mostrar_mediciones());
-            return;
+        if ($metodo === 'GET') {
+            return [200, mostrarMediciones()];
         }
-
-        http_response_code(405);
-        header('Allow: GET, POST');
-        echo json_encode(['error' => 'Método no permitido']);
+        return [405, ['error' => 'Método no permitido']];
     } catch (InvalidArgumentException $error) {
-        http_response_code(422);
-        echo json_encode(['error' => $error->getMessage()]);
+        return [422, ['error' => $error->getMessage()]];
     } catch (Throwable $error) {
         error_log($error->getMessage());
-        http_response_code(500);
-        echo json_encode(['error' => 'Error interno del servidor']);
+        return [500, ['error' => 'Error interno del servidor']];
     }
 }
 
-responder_mediciones();
+if (!defined('PRUEBA_REST')) {
+    [$codigo, $respuesta] = atenderMediciones($_SERVER['REQUEST_METHOD'], file_get_contents('php://input'));
+    http_response_code($codigo);
+    header('Content-Type: application/json; charset=utf-8');
+    if ($codigo === 405) { header('Allow: GET, POST'); }
+    echo json_encode($respuesta);
+}

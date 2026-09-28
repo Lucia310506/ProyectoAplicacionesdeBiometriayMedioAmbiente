@@ -6,7 +6,13 @@
 // 2019-07-07
 //
 // --------------------------------------------------------------
-
+/*
+ * Fichero: HolaMundoIBeacon.ino
+ * Autor: Lucía Díaz Murcia
+ * Descripción:Programa principal que ejecuta la emisión del beacon.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ */
 // https://learn.sparkfun.com/tutorials/nrf52840-development-with-arduino-and-circuitpython
 
 // https://stackoverflow.com/questions/29246805/can-an-ibeacon-have-a-data-payload

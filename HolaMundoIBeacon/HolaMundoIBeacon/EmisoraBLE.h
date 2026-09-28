@@ -1,5 +1,11 @@
 // -*- mode: c++ -*-
-
+/*
+ * Fichero: EmisoraBLE.h
+ * Autor: Lucía Díaz Murcia
+ * Descripción: Controla el funcionamiento de la emisora.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ */
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
 // 2019-07-07

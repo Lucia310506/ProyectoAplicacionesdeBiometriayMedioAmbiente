@@ -1,9 +1,9 @@
 /*
  * Fichero: ServicioEscuharBeacons.java
- * Autor: Lucia
+ * Autor: Lucía Díaz Murcia
  * Descripción: Servicio en segundo plano que escucha beacons y publica mediciones.
  * Fecha: 2026-09-25
- * Copyright (c) 2026 Lucia
+ * Copyright (c) 2026 Lucía Díaz Murcia
  */
 package com.example.ldiamur.btlealumnos2021app;
 
@@ -181,7 +181,7 @@ public class ServicioEscuharBeacons extends Service {
         }
         ultimoTipoMedida = tipoMedida;
         ultimoContador = contador;
-        PeticionarioREST.enviar_medicion(tipo, valor);
+        PeticionarioREST.enviarMedicion(tipo, valor);
     }
 
     private void detenerEscaneo() {

@@ -1,5 +1,11 @@
 // -*- mode: c++ -*-
-
+/*
+ * Fichero: ServicioEnEmisora.h
+ * Autor: Lucía Díaz Murcia
+ * Descripción:Llama al método de la lógica.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ */
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
 // 2019-07-17

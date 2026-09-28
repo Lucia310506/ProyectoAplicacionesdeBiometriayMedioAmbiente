@@ -1,5 +1,11 @@
 // -*- mode: c++ -*-
-
+/*
+ * Fichero: LED.h
+ * Autor: Lucía Díaz Murcia
+ * Descripción: Controla el funcionamiento de la LED.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ */
 #ifndef LED_H_INCLUIDO
 #define LED_H_INCLUIDO
 

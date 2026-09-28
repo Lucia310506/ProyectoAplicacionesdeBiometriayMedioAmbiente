@@ -1,9 +1,9 @@
 /*
  * Fichero: PeticionarioREST.java
- * Autor: Lucia
+ * Autor: Lucía Díaz Murcia
  * Descripción: Cliente HTTP para enviar y recibir información del servidor REST.
  * Fecha: 2026-09-25
- * Copyright (c) 2026 Lucia
+ * Copyright (c) 2026 Lucía Díaz Murcia
  */
 package com.example.ldiamur.btlealumnos2021app;
 
@@ -38,8 +38,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     private int codigoRespuesta;
     private String cuerpoRespuesta = "";
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    // metodo: Text, url: Text, cuerpo: Text --> hacerPeticionREST() -->
     public void hacerPeticionREST (String metodo, String urlDestino, String cuerpo, RespuestaREST  laRespuesta) {
         this.elMetodo = metodo;
         this.urlDestino = urlDestino;
@@ -49,14 +48,13 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         this.execute(); // otro thread ejecutará doInBackground()
     }
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    // --> PeticionarioREST() -->
     public PeticionarioREST() {
         Log.d("clienterestandroid", "constructor()");
     }
 
-    // tipo: Text, valor: R --> enviar_medicion() --x
-    public static void enviar_medicion(String tipo, double valor) {
+    // tipo: Text, valor: R --> enviarMedicion() --x
+    public static void enviarMedicion(String tipo, double valor) {
         try {
             JSONObject cuerpo = new JSONObject();
             cuerpo.put("tipo", tipo);
@@ -64,14 +62,13 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
             new PeticionarioREST().hacerPeticionREST(
                     "POST", ConfiguracionRest.URL_MEDICIONES, cuerpo.toString(),
                     (codigo, respuesta) -> Log.d("clienterestandroid",
-                            "enviar_medicion(): código=" + codigo + " cuerpo=" + respuesta));
+                            "enviarMedicion(): código=" + codigo + " cuerpo=" + respuesta));
         } catch (Exception error) {
-            Log.e("clienterestandroid", "enviar_medicion(): no se pudo crear el JSON", error);
+            Log.e("clienterestandroid", "enviarMedicion(): no se pudo crear el JSON", error);
         }
     }
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    // --> doInBackground() --> B
     @Override
     protected Boolean doInBackground(Void... params) {
         Log.d("clienterestandroid", "doInBackground()");
@@ -79,9 +76,6 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         try {
 
             // envio la peticion
-
-            // pagina web para hacer pruebas: URL url = new URL("https://httpbin.org/html");
-            // ordinador del despatx 158.42.144.126 // OK URL url = new URL("http://158.42.144.126:8080");
 
             Log.d("clienterestandroid", "doInBackground() me conecto a >" + urlDestino + "<");
 
@@ -149,8 +143,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         return false; // doInBackground() NO termina bien
     } // ()
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    // resultado: B --> onPostExecute() -->
     protected void onPostExecute(Boolean comoFue) {
         // llamado tras doInBackground()
         Log.d("clienterestandroid", "onPostExecute() comoFue = " + comoFue);

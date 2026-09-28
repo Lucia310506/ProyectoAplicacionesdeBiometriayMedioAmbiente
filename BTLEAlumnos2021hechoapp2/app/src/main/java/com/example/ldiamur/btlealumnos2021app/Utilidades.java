@@ -4,9 +4,15 @@ package com.example.ldiamur.btlealumnos2021app;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.UUID;
-
+/*
+ * Fichero:Utilidades.java
+ * Autor: Lucía Díaz Murcia
+ * Descripción:Clase que permite realizar conversiones.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ */
 // -----------------------------------------------------------------------------------
-// @author: Jordi Bataller i Mascarell
+// @author: Jordi Bataller Mascarell
 // -----------------------------------------------------------------------------------
 public class Utilidades {
 

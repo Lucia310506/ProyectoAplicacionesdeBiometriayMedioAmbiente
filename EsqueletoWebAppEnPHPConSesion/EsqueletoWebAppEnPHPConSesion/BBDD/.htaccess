@@ -1,0 +1,6 @@
+# Fichero: .htaccess
+# Autor: Lucía Díaz Murcia
+# Descripción: Bloquea el acceso web directo a la configuración de base de datos.
+# Fecha: 2026-09-25
+# Copyright (c) 2026 Lucía Díaz Murcia
+Require all denied

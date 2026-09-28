@@ -32,7 +32,7 @@ SET time_zone = "+00:00";
 -- Estructura de tabla para la tabla `Mediciones`
 --
 
-CREATE TABLE `Mediciones` (
+CREATE TABLE `mediciones` (
   `Id` int(11) NOT NULL,
   `Tipo` enum('CO2','TEMPERATURA') NOT NULL,
   `Valor` double NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE `Mediciones` (
 --
 -- Indices de la tabla `Mediciones`
 --
-ALTER TABLE `Mediciones`
+ALTER TABLE `mediciones`
   ADD PRIMARY KEY (`Id`);
 
 --
@@ -56,7 +56,7 @@ ALTER TABLE `Mediciones`
 --
 -- AUTO_INCREMENT de la tabla `Mediciones`
 --
-ALTER TABLE `Mediciones`
+ALTER TABLE `mediciones`
   MODIFY `Id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 

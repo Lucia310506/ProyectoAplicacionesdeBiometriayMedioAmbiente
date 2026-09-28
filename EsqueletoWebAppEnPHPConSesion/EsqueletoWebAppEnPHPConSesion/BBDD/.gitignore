@@ -1,0 +1,6 @@
+# Fichero: .gitignore
+# Autor: Lucía Díaz Murcia
+# Descripción: Evita publicar credenciales de producción.
+# Fecha: 2026-09-25
+# Copyright (c) 2026 Lucía Díaz Murcia
+ConfiguracionProduccion.php
