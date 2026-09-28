@@ -2,7 +2,7 @@
 /*
  * Fichero: ServicioEnEmisora.h
  * Autor: Lucía Díaz Murcia
- * Descripción:Llama al método de la lógica.
+ * Descripción: Controla el servicio atribuyendole características.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */

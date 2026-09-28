@@ -1,4 +1,10 @@
-
+/*
+ * Fichero: MainActivity.java
+ * Autor: Lucía Díaz Murcia
+ * Descripción: Clase base de la app, que escanea los beacon, que pide permisos y filtra los beacons.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ */
 package com.example.ldiamur.btlealumnos2021app;
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -26,13 +32,7 @@ import androidx.core.content.ContextCompat;
 import java.util.List;
 import java.util.UUID;
 import java.util.Collections;
-/*
- * Fichero: MainActivity.java
- * Autor: Lucía Díaz Murcia
- * Descripción:Clase base de la app, que escanea los beacon, que pide permisos y filtra los beacons.
- * Fecha: 2026-09-25
- * Copyright (c) 2026 Lucía Díaz Murcia
- */
+
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
 

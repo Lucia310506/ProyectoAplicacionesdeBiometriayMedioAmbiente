@@ -1,14 +1,14 @@
-
-package com.example.ldiamur.btlealumnos2021app;
-
-import java.util.Arrays;
 /*
- * Fichero: TramaIbeacon.java
+ * Fichero: TramaIBeacon.java
  * Autor: Lucía Díaz Murcia
- * Descripción:Permite obtener los datos de los beacon..
+ * Descripción: Permite obtener los datos de los beacon.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
+package com.example.ldiamur.btlealumnos2021app;
+
+import java.util.Arrays;
+
 // -----------------------------------------------------------------------------------
 // @author: Jordi Bataller i Mascarell
 // -----------------------------------------------------------------------------------

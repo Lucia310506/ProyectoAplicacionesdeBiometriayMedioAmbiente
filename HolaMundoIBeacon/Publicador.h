@@ -1,8 +1,8 @@
 // -*- mode: c++ -*-
 /*
- * Fichero: Publicado.h
+ * Fichero: Publicador.h
  * Autor: Lucía Díaz Murcia
- * Descripción:Esta clase publica los datos de temperatura y CO2 en un beacon.
+ * Descripción: Esta clase publica los datos de temperatura y CO2 en un beacon.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */

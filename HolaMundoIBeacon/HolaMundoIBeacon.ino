@@ -9,7 +9,7 @@
 /*
  * Fichero: HolaMundoIBeacon.ino
  * Autor: Lucía Díaz Murcia
- * Descripción:Programa principal que ejecuta la emisión del beacon.
+ * Descripción: Programa principal que ejecuta la emisión del beacon.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */

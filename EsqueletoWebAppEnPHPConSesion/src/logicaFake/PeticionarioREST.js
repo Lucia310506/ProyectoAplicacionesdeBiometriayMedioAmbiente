@@ -10,7 +10,7 @@
 const URL_MEDICIONES = '../rest/mediciones.php';
 
 // mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- pedirMediciones() --x
-async function pedirMediciones() {
+async function mostrarMediciones() {
   const respuesta = await fetch(URL_MEDICIONES);
   const textoRespuesta = await respuesta.text();
   let mediciones;

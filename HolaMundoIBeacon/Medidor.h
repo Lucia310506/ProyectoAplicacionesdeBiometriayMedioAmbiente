@@ -2,7 +2,7 @@
 /*
  * Fichero: Medidor.h
  * Autor: Lucía Díaz Murcia
- * Descripción:Simula las mediciones.
+ * Descripción: Simula las mediciones.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
