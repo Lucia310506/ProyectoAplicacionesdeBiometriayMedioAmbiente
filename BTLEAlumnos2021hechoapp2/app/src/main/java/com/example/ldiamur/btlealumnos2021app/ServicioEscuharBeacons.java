@@ -181,7 +181,7 @@ public class ServicioEscuharBeacons extends Service {
         }
         ultimoTipoMedida = tipoMedida;
         ultimoContador = contador;
-        PeticionarioREST.enviarMedicion(tipo, valor);
+        PeticionarioREST.guardarMedicion(tipo, valor);
     }
 
     private void detenerEscaneo() {

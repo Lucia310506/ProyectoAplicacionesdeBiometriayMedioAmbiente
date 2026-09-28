@@ -50,7 +50,7 @@ function dibujarLinea(mediciones, color, desplazamiento, grafico) {
 async function actualizarMediciones() {
   try {
     mostrarEstado('Actualizando mediciones...', false);
-    const mediciones = await pedirMediciones();
+    const mediciones = await mostrarMediciones();
     dibujarGrafico(mediciones);
     if (mediciones.length > 0) {
       mostrarEstado(`Actualizado: ${mediciones.length} mediciones.`, false);

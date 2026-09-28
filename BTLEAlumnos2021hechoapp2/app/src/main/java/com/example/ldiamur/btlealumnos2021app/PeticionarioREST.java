@@ -53,8 +53,8 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         Log.d("clienterestandroid", "constructor()");
     }
 
-    // tipo: Text, valor: R --> enviarMedicion() --x
-    public static void enviarMedicion(String tipo, double valor) {
+    // tipo: Text, valor: R --> guardarMedicion() --x
+    public static void guardarMedicion(String tipo, double valor) {
         try {
             JSONObject cuerpo = new JSONObject();
             cuerpo.put("tipo", tipo);
