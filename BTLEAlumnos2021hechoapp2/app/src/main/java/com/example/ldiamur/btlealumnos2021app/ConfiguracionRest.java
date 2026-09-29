@@ -8,10 +8,14 @@
 package com.example.ldiamur.btlealumnos2021app;
 
 public final class ConfiguracionRest {
-    // Dirección pública HTTPS del servidor desplegado en Plesk.
-    public static final String URL_MEDICIONES =
-            "https://ldiamur.upv.edu.es/rest/mediciones.php";
+    // Dirección pública HTTPS de la ruta REST desplegada en Plesk.
+    static String URL_MEDICIONES =
+            "https://ldiamur.upv.edu.es/mediciones";
 
-    // --> ConfiguracionRest() -->
+    /*
+     * --------------------
+     * --> ConfiguracionRest() -->
+     * --------------------
+     */
     private ConfiguracionRest() { }
 }
