@@ -6,11 +6,11 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 
-// La ruta relativa conserva la misma procedencia HTTPS de Aplicacion.html.
+// Un único punto para XAMPP o Plesk. Relativo a ux/Aplicacion.html.
 const URL_MEDICIONES = '../rest/mediciones.php';
 
 // mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- pedirMediciones() --x
-async function mostrarMediciones() {
+async function pedirMediciones() {
   const respuesta = await fetch(URL_MEDICIONES);
   const textoRespuesta = await respuesta.text();
   let mediciones;
@@ -18,11 +18,15 @@ async function mostrarMediciones() {
     mediciones = JSON.parse(textoRespuesta);
   } catch (error) {
     throw new Error(
-      'El servidor no ha devuelto JSON. Comprueba que la URL sea ../rest/mediciones.php, no ../logica/mediciones.php.'
+      'El servidor no ha devuelto JSON. Comprueba Plesk, ConfiguracionProduccion.php y la URL ' + URL_MEDICIONES
     );
   }
   if (!respuesta.ok) {
     throw new Error(mediciones.error || 'No se pudieron obtener las mediciones');
   }
   return mediciones;
+}
+
+if (typeof module !== 'undefined') {
+  module.exports = { pedirMediciones, URL_MEDICIONES };
 }

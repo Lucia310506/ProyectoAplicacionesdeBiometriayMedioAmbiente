@@ -8,12 +8,13 @@
 package com.example.ldiamur.btlealumnos2021app;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import android.os.AsyncTask;
 import android.util.Log;
 import org.json.JSONObject;
@@ -93,17 +94,22 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
             URL url = new URL(urlDestino);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            connection.setRequestProperty("Accept", "application/json");
             connection.setRequestMethod(this.elMetodo);
             connection.setDoInput(true);
 
             if (!this.elMetodo.equals("GET") && this.elCuerpo != null) {
                 Log.d("clienterestandroid", "doInBackground(): no es get, pongo cuerpo");
+                byte[] cuerpoUtf8 = this.elCuerpo.getBytes(StandardCharsets.UTF_8);
                 connection.setDoOutput(true);
-                DataOutputStream dos = new DataOutputStream(connection.getOutputStream());
-                dos.writeBytes(this.elCuerpo);
-                dos.flush();
-                dos.close();
+                connection.setFixedLengthStreamingMode(cuerpoUtf8.length);
+                OutputStream salida = connection.getOutputStream();
+                salida.write(cuerpoUtf8);
+                salida.flush();
+                salida.close();
             }
 
             Log.d("clienterestandroid", "doInBackground(): petición enviada ");

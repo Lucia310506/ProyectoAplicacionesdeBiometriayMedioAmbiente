@@ -1,0 +1,6 @@
+# Fichero: .htaccess
+# Autor: Lucía Díaz Murcia
+# Descripción: Impide el acceso web directo a la lógica de negocio.
+# Fecha: 2026-09-25
+# Copyright (c) 2026 Lucía Díaz Murcia
+Require all denied

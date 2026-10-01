@@ -1,7 +1,8 @@
 # Fichero: .htaccess
 # Autor: Lucía Díaz Murcia
-# Descripción: Dirige la ruta REST /mediciones al controlador PHP.
+# Descripción: Publica la UX y dirige GET/POST /mediciones al controlador PHP.
 # Fecha: 2026-09-25
 # Copyright (c) 2026 Lucía Díaz Murcia
+DirectoryIndex ux/Aplicacion.html
 RewriteEngine On
-RewriteRule ^mediciones$ rest/mediciones.php [L]
+RewriteRule ^mediciones/?$ rest/mediciones.php [L,QSA]

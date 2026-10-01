@@ -22,15 +22,29 @@ function conectarBaseDatos(string $entorno = 'produccion'): PDO {
         ?: ($configuracion['base'] ?? ($entorno === 'pruebas' ? 'ldiamur_mediciones_test' : 'mediciones'));
     $usuario = $configuracion['usuario'] ?? getenv('MEDICIONES_DB_USER' . $sufijo);
     $password = $configuracion['password'] ?? getenv('MEDICIONES_DB_PASSWORD' . $sufijo);
-    if ($entorno === 'produccion' && (!$host || !$usuario || !$password
-        || str_starts_with($base, 'ESCRIBE_') || str_starts_with($usuario, 'ESCRIBE_'))) {
-        throw new RuntimeException('Falta configurar la conexión de producción en Plesk');
+    if ($entorno === 'produccion' && credencialesProduccionIncompletas($host, $base, $usuario, $password)) {
+        throw new RuntimeException(
+            'Falta ConfiguracionProduccion.php en Plesk. Copia ConfiguracionProduccion.ejemplo.php y escribe host, base, usuario y password.'
+        );
     }
     $host = $host ?: '127.0.0.1';
     $usuario = $usuario ?: 'root';
     $password = $password === false ? '' : $password;
     return new PDO("mysql:host={$host};dbname={$base};charset=utf8mb4", $usuario, $password,
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+}
+
+// host: Text, base: Text, usuario: Text, password: Text --> credencialesProduccionIncompletas() --> B
+function credencialesProduccionIncompletas($host, $base, $usuario, $password): bool {
+    if (!$host || !$usuario || $password === false || $password === null || $password === '') {
+        return true;
+    }
+    foreach ([$base, $usuario, $password] as $valor) {
+        if (is_string($valor) && str_starts_with($valor, 'ESCRIBE_')) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // --> obtenerEntornoBaseDatos() <--
