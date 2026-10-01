@@ -7,7 +7,7 @@
  */
 
 // Un único punto para XAMPP o Plesk. Relativo a ux/Aplicacion.html.
-const URL_MEDICIONES = '../rest/mediciones.php';
+const URL_MEDICIONES = '/mediciones';
 
 // mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- pedirMediciones() --x
 async function pedirMediciones() {

@@ -5,4 +5,4 @@
 # Copyright (c) 2026 Lucía Díaz Murcia
 DirectoryIndex ux/Aplicacion.html
 RewriteEngine On
-RewriteRule ^mediciones/?$ rest/mediciones.php [L,QSA]
+RewriteRule ^mediciones/?$ src/rest/mediciones.php [L,QSA]
