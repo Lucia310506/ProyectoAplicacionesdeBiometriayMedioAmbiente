@@ -21,14 +21,9 @@
     .error { color: #a01717; }
     .ok { color: #167042; }
     .carga { color: #1b4f72; }
-    #grafico { width: 100%; max-width: 900px; height: 280px; border: 1px solid #c5d7d1; border-radius: 8px; }
-    caption { text-align: left; font-weight: bold; margin-bottom: 8px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-    th, td { text-align: left; padding: 8px; border-bottom: 1px solid #d7e6e1; }
     @media (max-width: 600px) {
       main { margin: 16px auto; }
       section { padding: 16px; }
-      #grafico { height: 220px; }
     }
   </style>
 </head>
@@ -38,7 +33,6 @@
   <section aria-labelledby="titulo-mediciones">
     <h2 id="titulo-mediciones">Mediciones almacenadas</h2>
     <p id="estado" aria-live="polite">Cargando mediciones...</p>
-    <canvas id="grafico" width="900" height="280" role="img" aria-label="Gráfico de mediciones de CO2 y temperatura"></canvas>
     <table>
       <caption>Detalle de mediciones</caption>
       <thead>
