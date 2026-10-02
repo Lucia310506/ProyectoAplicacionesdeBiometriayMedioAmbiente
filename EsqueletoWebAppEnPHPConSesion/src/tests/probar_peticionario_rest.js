@@ -8,7 +8,7 @@
 
 const fs = require('fs');
 const vm = require('vm');
-const codigo = fs.readFileSync(__dirname + '/../ux/logicaFake/PeticionarioREST.js', 'utf8');
+const codigo = fs.readFileSync(__dirname + '/../logicaFake/PeticionarioREST.js', 'utf8');
 
 // condicion: B, mensaje: Text --> comprobar() -->
 function comprobar(condicion, mensaje) {

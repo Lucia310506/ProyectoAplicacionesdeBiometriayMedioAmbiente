@@ -1,35 +1,35 @@
 /*
  * Fichero: PeticionarioREST.java
  * Autor: Lucía Díaz Murcia
- * Descripción: Cliente HTTP para enviar y recibir información del servidor REST.
+ * Descripción: Peticionario HTTP del servidor REST de mediciones.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 package com.example.ldiamur.btlealumnos2021app;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import android.os.AsyncTask;
 import android.util.Log;
 import org.json.JSONObject;
 
-// ------------------------------------------------------------------------
-// ------------------------------------------------------------------------
 public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
+    /*
+     * --------------------
+     * codigo: N, cuerpo: Text --> callback() -->
+     * --------------------
+     */
     public interface RespuestaREST {
         void callback (int codigo, String cuerpo);
     }
 
-    // --------------------------------------------------------------------
-    // --------------------------------------------------------------------
     private String elMetodo;
     private String urlDestino;
     private String elCuerpo = null;
@@ -38,23 +38,35 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     private int codigoRespuesta;
     private String cuerpoRespuesta = "";
 
-    // metodo: Text, url: Text, cuerpo: Text --> hacerPeticionREST() -->
-    public void hacerPeticionREST (String metodo, String urlDestino, String cuerpo, RespuestaREST  laRespuesta) {
+    /*
+     * --------------------
+     * metodo: Text, url: Text, cuerpo: Text --> hacerPeticionREST() -->
+     * --------------------
+     */
+    public void hacerPeticionREST (String metodo, String urlDestino, String cuerpo, RespuestaREST laRespuesta) {
         this.elMetodo = metodo;
         this.urlDestino = urlDestino;
         this.elCuerpo = cuerpo;
         this.laRespuesta = laRespuesta;
 
-        this.execute(); // otro thread ejecutará doInBackground()
+        this.execute();
     }
 
-    // --> PeticionarioREST() -->
+    /*
+     * --------------------
+     * --> PeticionarioREST() -->
+     * --------------------
+     */
     public PeticionarioREST() {
         Log.d("clienterestandroid", "constructor()");
     }
 
-    // tipo: Text, valor: R --> guardarMedicion() --x
-    public static void guardarMedicion(String tipo, double valor) {
+    /*
+     * --------------------
+     * tipo: Text, valor: R --> enviarMedicion() --x
+     * --------------------
+     */
+    public static void enviarMedicion(String tipo, double valor) {
         try {
             JSONObject cuerpo = new JSONObject();
             cuerpo.put("tipo", tipo);
@@ -68,41 +80,39 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
-    // --> doInBackground() --> B
+    /*
+     * --------------------
+     * --> doInBackground() --> B
+     * --------------------
+     */
     @Override
     protected Boolean doInBackground(Void... params) {
         Log.d("clienterestandroid", "doInBackground()");
 
         try {
-
-            // envio la peticion
-
             Log.d("clienterestandroid", "doInBackground() me conecto a >" + urlDestino + "<");
 
             URL url = new URL(urlDestino);
-
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestProperty( "Content-Type", "application/json; charset-utf-8" );
+            connection.setConnectTimeout(15000);
+            connection.setReadTimeout(15000);
+            connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+            connection.setRequestProperty("Accept", "application/json");
             connection.setRequestMethod(this.elMetodo);
-            // connection.setRequestProperty("Accept", "*/*);
-
-            // connection.setUseCaches(false);
             connection.setDoInput(true);
 
-            if ( ! this.elMetodo.equals("GET") && this.elCuerpo != null ) {
+            if (!this.elMetodo.equals("GET") && this.elCuerpo != null) {
                 Log.d("clienterestandroid", "doInBackground(): no es get, pongo cuerpo");
+                byte[] cuerpoUtf8 = this.elCuerpo.getBytes(StandardCharsets.UTF_8);
                 connection.setDoOutput(true);
-                // si no es GET, pongo el cuerpo que me den en la peticin
-                DataOutputStream dos = new DataOutputStream (connection.getOutputStream());
-                dos.writeBytes(this.elCuerpo);
-                dos.flush();
-                dos.close();
+                connection.setFixedLengthStreamingMode(cuerpoUtf8.length);
+                OutputStream salida = connection.getOutputStream();
+                salida.write(cuerpoUtf8);
+                salida.flush();
+                salida.close();
             }
 
-            // ya he enviado la peticin
-            Log.d("clienterestandroid", "doInBackground(): peticin enviada ");
-
-            // ahora obtengo la respuesta
+            Log.d("clienterestandroid", "doInBackground(): petición enviada ");
 
             int rc = connection.getResponseCode();
             String rm = connection.getResponseMessage();
@@ -111,14 +121,18 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
             this.codigoRespuesta = rc;
 
             try {
-
-                InputStream is = connection.getInputStream();
+                InputStream is = rc >= HttpURLConnection.HTTP_BAD_REQUEST
+                        ? connection.getErrorStream() : connection.getInputStream();
+                if (is == null) {
+                    connection.disconnect();
+                    return true;
+                }
                 BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
                 Log.d("clienterestandroid", "leyendo cuerpo");
-                StringBuilder acumulador = new StringBuilder ();
+                StringBuilder acumulador = new StringBuilder();
                 String linea;
-                while ( (linea = br.readLine()) != null) {
+                while ((linea = br.readLine()) != null) {
                     Log.d("clienterestandroid", linea);
                     acumulador.append(linea);
                 }
@@ -130,26 +144,29 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
                 connection.disconnect();
 
             } catch (IOException ex) {
-                // dispara excepcin cuando la respuesta REST no tiene cuerpo y yo intento getInputStream()
-                Log.d("clienterestandroid", "doInBackground() : parece que no hay cuerpo en la respuesta");
+                Log.d("clienterestandroid", "doInBackground(): no se pudo leer el cuerpo", ex);
+                connection.disconnect();
             }
 
-            return true; // doInBackground() termina bien
+            return true;
 
         } catch (Exception ex) {
             Log.d("clienterestandroid", "doInBackground(): ocurrio alguna otra excepcion: " + ex.getMessage());
         }
 
-        return false; // doInBackground() NO termina bien
-    } // ()
-
-    // resultado: B --> onPostExecute() -->
-    protected void onPostExecute(Boolean comoFue) {
-        // llamado tras doInBackground()
-        Log.d("clienterestandroid", "onPostExecute() comoFue = " + comoFue);
-        this.laRespuesta.callback(this.codigoRespuesta, this.cuerpoRespuesta);
+        return false;
     }
 
-} // class
-
-
+    /*
+     * --------------------
+     * resultado: B --> onPostExecute() -->
+     * --------------------
+     */
+    @Override
+    protected void onPostExecute(Boolean comoFue) {
+        Log.d("clienterestandroid", "onPostExecute() comoFue = " + comoFue);
+        if (this.laRespuesta != null) {
+            this.laRespuesta.callback(this.codigoRespuesta, this.cuerpoRespuesta);
+        }
+    }
+}

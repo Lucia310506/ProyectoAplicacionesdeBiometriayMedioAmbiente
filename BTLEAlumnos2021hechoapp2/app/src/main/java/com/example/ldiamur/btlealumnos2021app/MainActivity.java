@@ -263,7 +263,14 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     private String[] permisosNecesarios() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Desde Android 12 (API 31) el escaneo y la conexión BTLE son permisos runtime
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                return new String[]{
+                        Manifest.permission.BLUETOOTH_SCAN,
+                        Manifest.permission.BLUETOOTH_CONNECT,
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.POST_NOTIFICATIONS
+                };
+            }
             return new String[]{
                     Manifest.permission.BLUETOOTH_SCAN,
                     Manifest.permission.BLUETOOTH_CONNECT,

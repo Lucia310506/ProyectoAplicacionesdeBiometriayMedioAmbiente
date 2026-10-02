@@ -23,25 +23,30 @@ El código de la App de Android esta códificado en java y se encuentra en la ca
     -ServicioEscucharBeacon.java -> Clase que hace que la app funcione en segundo plano para captar beacons. 
     -ConfiguracionRest.java -> Sirve para indicar la dirección a la que hay que buscar la bbdd.
 
-El código del cliente REST se encuentra en la carpeta rest:
-    -mediciones.php -> Endpoint de la API REST que atiende peticiones HTTP (GET y POST) para consultar o registrar nuevas mediciones.
-    -reglasREST.php -> Controla el enrutamiento de las peticiones REST y genera las respuestas en formato JSON.
+El código del servidor REST está en EsqueletoWebAppEnPHPConSesion/src/rest:
+    -mediciones.php -> Endpoint GET/POST /mediciones (también accesible como /rest/mediciones.php).
 
-El código de la lógica de negocio se encuentra en la carpeta logica:
-    -Logica.php -> Implementa las reglas de negocio reales, validando las lecturas recibidas y gestionando el almacenamiento y consulta a través de la base de datos.
+El código de la lógica de negocio está en EsqueletoWebAppEnPHPConSesion/src/logica:
+    -mediciones.php -> guardarMediciones(tipo, valor) y mostrarMediciones().
 
-El código de la lógica fake se encuentra en la carpeta logicaFake: 
-    -LogicaFake.php -> Simula la lógica de negocio devolviendo datos predefinidos de prueba sin requerir conexión a la base de datos real.
+La lógica fake web está en EsqueletoWebAppEnPHPConSesion/src/logicaFake:
+    -PeticionarioREST.js -> pedirMediciones() llama a GET /rest/mediciones.php.
 
-El código de la conexión con la BBDD se encuentra en la carpeta BBDD: 
-    -Conexion.php -> Establece y gestiona la conexión con la base de datos MySQL/MariaDB en el servidor Plesk.
-    -ConsultasBBDD.php -> Contiene las funciones con consultas preparadas (INSERT y SELECT) para interactuar con la tabla de mediciones.
-    -esquema.sql -> Script SQL con la definición de la base de datos y la tabla donde se almacenan las medidas (tipo, valor, fecha/hora).
+La UX del navegador está en EsqueletoWebAppEnPHPConSesion/src/ux:
+    -Aplicacion.html y Aplicacion.js -> gráfico de mediciones almacenadas.
 
-El código de la página web se encuentra en la carpeta web:
-    -index.html -> Interfaz de usuario para visualizar las medidas de temperatura y CO2 desde el navegador.
-    -estilos.css -> Estilos visuales para la presentación gráfica de los datos y tarjetas de medición.
-    -app.js -> Script JavaScript que realiza peticiones periódicas (GET) al servicio REST para actualizar las mediciones en tiempo real.
+La app Android usa lógica fake y peticionario REST separados:
+    -LogicaFake.java -> guardarMediciones(tipo, valor)
+    -PeticionarioREST.java -> enviarMedicion(tipo, valor) con POST
+
+La conexión Plesk está en EsqueletoWebAppEnPHPConSesion/src/BBDD:
+    -ConexionMediciones.php
+    -ConfiguracionProduccion.ejemplo.php (copiar a ConfiguracionProduccion.php en el servidor)
+
+SQL en EsqueletoWebAppEnPHPConSesion/bbdd:
+    -Estructura.sql, datos.sql, EstructuraPruebas.sql
+
+Publica en Plesk el directorio src. Instrucciones en src/00-Leeme.txt.
 
 # Flujo de funcionamiento
 1. **Emisión BLE (Arduino):** El microcontrolador ejecuta el bucle en `HolaMundoIBeacon.ino`, obtiene las medidas con `Medidor.h` y las publica mediante `Publicador.h` y `EmisoraBLE.h` emitiendo tramas iBeacon periódicas (codificando el tipo y contador en el Major, y el valor en el Minor).
