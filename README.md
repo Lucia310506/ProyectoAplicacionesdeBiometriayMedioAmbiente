@@ -53,3 +53,48 @@ Publica en Plesk el directorio src. Instrucciones en src/00-Leeme.txt.
 2. **Recepción y reenvío (App Android):** El servicio en segundo plano `ServicioEscuharBeacons` escanea y filtra los beacons "GTI-3A". Al recibir una medida, decodifica los datos con `TramaIBeacon.java` y realiza una petición HTTP POST en formato JSON usando `PeticionarioREST.java` hacia la URL del servidor Plesk definida en `ConfiguracionRest.java`.
 3. **Servicio y almacenamiento (Servidor Plesk):** El endpoint en la carpeta `rest` recibe la petición, delega la validación en la capa `logica` y registra la medición en MySQL mediante la capa `BBDD`.
 4. **Visualización (Página Web):** La página web consulta el endpoint REST mediante peticiones GET para obtener las últimas lecturas y mostrarlas de forma interactiva al usuario.
+
+# Como descargar arduino
+  Abrir la carpeta HolaMundoBeacon
+  Abrir el HolaMundoBeacon.ino con Arduino.
+  Se deben descargar las librerias necesarias para el microcontrolador correspondiente
+  Compliar el programa y abrir el puerto serie para que el microcontrolador emita beacons
+
+# Como instalar la app de Android
+ Abrir la carpeta BTLEAlumnos2021hechoapp2 directamente con Android studio
+ Esperara que se compile el gradle
+ Conectar el dispositivo al ordenador (Modo desarrollador, 7 veces darle al número de compilación).
+
+
+# Como desplegar la web en PLESK
+1. En Plesk, el directorio raíz del dominio, en mi caso ldiamur.upv.edu.es, debe  estar carpeta src y el .htaccess.
+
+2. Crea la base de datos en Plesk y ejecuta bbdd/Estructura.sql (y bbdd/datos.sql si quieres ejemplos).
+
+3. Escribe en src/BBDD/ConfiguracionProduccion.php
+   el host, nombre de la base, usuario y contraseña reales de Plesk.
+   ConfiguracionProduccion.php no se sube al repositorio.
+
+4. En un navegador:
+   https://ldiamur.upv.edu.es/ux/Aplicacion.html
+
+5. El navegador debe recibir el JSON con el GET
+   https://ldiamur.upv.edu.es/rest/mediciones.php   (GET debe devolver JSON)
+
+6. La app Android envía POST a:
+   https://ldiamur.upv.edu.es/rest/mediciones.php
+
+Estructura de pruebas:
+- mysql < bbdd/EstructuraPruebas.sql
+- MEDICIONES_ENTORNO=pruebas php src/tests/probar_base_datos.php
+
+
+# Comprobaciones que realizar para ver si estaba todo conectado
+ 1. Ver si el serial de Arduino esta abierto y ver los ciclos de emision.
+ 2. Ver en el LogCat de Android Studio si recibe los beacons.
+ 3. Ver en la base de datos de PLESK si se suben las nuevas medidas.(En este sprint si hay muchas se recomienda borrarlas que hay).
+ 4. Ver si en la web sale algun error en lugar del número total de mediciones. 
+ 5. Ver si las mediciones nuevas aparecen. 
+    En este último caso, la hay dos soluciones:
+        1. Revisar si el Serial no esta abierto
+        2. Revisar si el movil se ha apagado.
