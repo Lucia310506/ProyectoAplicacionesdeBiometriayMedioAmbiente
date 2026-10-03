@@ -98,3 +98,8 @@ Estructura de pruebas:
     En este último caso, la hay dos soluciones:
         1. Revisar si el Serial no esta abierto
         2. Revisar si el movil se ha apagado.
+## Autocomprobaciones de Android al arrancar
+
+Al abrir la app, `MainActivity` comprueba primero la lógica fake con casos válidos e inválidos. Después hace una petición de solo lectura `GET /mediciones` fuera del hilo principal y comprueba HTTP 200 y que el cuerpo sea un array JSON. Al terminar esta comprobación, continúa con los permisos y Bluetooth.
+
+En Android Studio, abre Logcat y filtra por `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST`. Si todo está bien verás mensajes `OK`; si falla, aparecerá `ERROR` con el detalle. El chequeo REST necesita que el servidor configurado en `ConfiguracionRest.java` esté disponible. No inserta filas de prueba en la base de datos.

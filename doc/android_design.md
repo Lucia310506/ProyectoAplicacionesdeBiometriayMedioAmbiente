@@ -40,8 +40,9 @@ El diseño de `LogicaFake.java` combina el contrato de la lógica (`guardarMedic
 
 ## Design Clarifications
 
-- `guardarMediciones(tipo, valor)` devuelve `void`, como indica la firma del diseño. Las entradas inválidas producen `IllegalArgumentException`; el servicio BLE captura el rechazo y solo envía por REST cuando la llamada de lógica finaliza correctamente.
-- Las pruebas instrumentadas deben verificar `/mediciones`, POST, JSON con solo tipo y valor, respuesta 201 y error HTTP; cada caso satisfactorio escribe un mensaje `OK` en LogCat.
+- `guardarMediciones(tipo, valor)` devuelve `void`, como indica la firma del diseño. Las entradas inválidas producen `IllegalArgumentException`; el servicio BLE captura el rechazo antes de enviar por REST.
+- Al iniciar la app, `MainActivity` ejecuta primero autocomprobaciones locales de lógica fake y registra `OK`/`ERROR` en LogCat. Luego comprueba `GET /mediciones` en segundo plano (HTTP 200 y cuerpo JSON array), registra el resultado y continúa con permisos/Bluetooth. La petición de red no bloquea el hilo principal.
+- Las pruebas instrumentadas del peticionario REST verifican `/mediciones`, POST, JSON con solo tipo y valor, respuesta 201 y error HTTP.
 
 ## General Rules
 
@@ -49,6 +50,3 @@ El diseño de `LogicaFake.java` combina el contrato de la lógica (`guardarMedic
 - **Function/Method Headers:** Cada función debe tener inmediatamente encima el diseño lógico en comentario delimitado por líneas `--------------------`.
 - **Code Readability:** Comentarios adicionales breves si explican una decisión necesaria.
 - **Automated Testing:** Servidor HTTP simulado para ruta, método, cuerpo JSON, respuesta 201 y errores HTTP.
-
-
-

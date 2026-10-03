@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat;
 import java.util.List;
 import java.util.UUID;
 import java.util.Collections;
+import org.json.JSONArray;
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -319,6 +320,58 @@ public class MainActivity extends AppCompatActivity {
     } // ()
 
 
+    /*
+     * --------------------
+     * --> comprobarLogicaFakeAlArrancar() -->
+     * --------------------
+     */
+    private void comprobarLogicaFakeAlArrancar() {
+        try {
+            LogicaFake.guardarMediciones("CO2", 500.0);
+            LogicaFake.guardarMediciones("TEMPERATURA", -19.0);
+            comprobarRechazoLogica("HUMEDAD", 50.0);
+            comprobarRechazoLogica("CO2", Double.NaN);
+            Log.i("TEST_LOGICAFake", "OK: pruebas de lógica fake superadas al iniciar");
+        } catch (Throwable error) {
+            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de lógica fake al iniciar", error);
+        }
+    }
+
+    /*
+     * --------------------
+     * tipo: Text, valor: R --> comprobarRechazoLogica() -->
+     * --------------------
+     */
+    private void comprobarRechazoLogica(String tipo, double valor) {
+        try {
+            LogicaFake.guardarMediciones(tipo, valor);
+            throw new AssertionError("La medición inválida debía rechazarse");
+        } catch (IllegalArgumentException esperado) {
+            // Rechazo esperado durante la autocomprobación.
+        }
+    }
+
+    /*
+     * --------------------
+     * --> comprobarRestAlArrancar() -->
+     * --------------------
+     */
+    private void comprobarRestAlArrancar() {
+        new PeticionarioREST().hacerPeticionREST(
+                "GET", ConfiguracionRest.URL_MEDICIONES, null,
+                (codigo, cuerpo) -> {
+                    try {
+                        if (codigo != 200) {
+                            throw new IllegalStateException("GET /mediciones devolvió HTTP " + codigo);
+                        }
+                        new JSONArray(cuerpo);
+                        Log.i("TEST_PETICIONARIO_REST", "OK: GET /mediciones devolvió HTTP 200 y JSON válido");
+                    } catch (Exception error) {
+                        Log.e("TEST_PETICIONARIO_REST", "ERROR: falló la comprobación REST al iniciar", error);
+                    }
+                    pedirPermisosNecesarios();
+                });
+    }
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @Override
@@ -328,7 +381,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
 
-        pedirPermisosNecesarios();
+        comprobarLogicaFakeAlArrancar();
+        comprobarRestAlArrancar();
 
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
@@ -375,5 +429,4 @@ if (todoConcedido) {
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------------------------------------------------
-
 
