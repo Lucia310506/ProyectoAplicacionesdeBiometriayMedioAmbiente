@@ -181,7 +181,12 @@ public class ServicioEscuharBeacons extends Service {
         }
         ultimoTipoMedida = tipoMedida;
         ultimoContador = contador;
-        LogicaFake.guardarMediciones(tipo, valor);
+        try {
+            LogicaFake.guardarMediciones(tipo, valor);
+            PeticionarioREST.enviarMedicion(tipo, valor);
+        } catch (IllegalArgumentException error) {
+            Log.e(ETIQUETA_LOG, "Medición descartada: " + error.getMessage());
+        }
     }
 
     private void detenerEscaneo() {
