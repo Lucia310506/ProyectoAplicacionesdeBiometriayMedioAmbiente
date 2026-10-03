@@ -31,8 +31,8 @@ async function probarPeticionarioRest() {
   };
   vm.createContext(contexto); vm.runInContext(codigo, contexto);
   const mediciones = await contexto.pedirMediciones();
-  comprobar(urlRecibida === '../rest/mediciones.php',
-    'La ruta GET debe ser el controlador REST de la misma web');
+  comprobar(urlRecibida === '/mediciones',
+    'La ruta GET debe ser /mediciones');
   comprobar(mediciones.length === 1 && mediciones[0].tipo === 'CO2', 'Debe devolver el JSON del servidor');
   contexto.fetch = async () => ({
     ok: false,

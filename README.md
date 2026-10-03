@@ -103,3 +103,11 @@ Estructura de pruebas:
 Al abrir la app, `MainActivity` comprueba primero la lógica fake con casos válidos e inválidos. Después hace una petición de solo lectura `GET /mediciones` fuera del hilo principal y comprueba HTTP 200 y que el cuerpo sea un array JSON. Al terminar esta comprobación, continúa con los permisos y Bluetooth.
 
 En Android Studio, abre Logcat y filtra por `TESTS_APP`. Verás primero `EJECUTAR TESTS`, después cada prueba que comienza y sus mensajes `OK`; al final aparecerá `RESULTADOS : LOGICA_FAKE=OK, REST=OK` o `ERROR` para el componente que falle. También se pueden filtrar los detalles por `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST`. El chequeo REST necesita que el servidor configurado en `ConfiguracionRest.java` esté disponible. No inserta filas de prueba en la base de datos.
+
+## Autocomprobaciones web al abrir la aplicación
+
+Al cargar `EsqueletoWebAppEnPHPConSesion/src/ux/Aplicacion.html`, antes de iniciar las consultas periódicas de la UX, se ejecutan los tests de `src/tests/pruebas_consola.js` en el hilo principal del navegador. La consola muestra `EJECUTAR TESTS`, cada caso, `OK`/`ERROR` y `RESULTADOS :`.
+
+La página prueba `PeticionarioREST.js` con respuestas simuladas. Después llama al corredor PHP, que usa el mismo entorno y base de datos que las lecturas reales. Inserta dos valores centinela aleatorios, valida `guardarMediciones()`/`mostrarMediciones()` y borra únicamente esas filas en un bloque de limpieza; no vacía la tabla. Las pruebas PHP/SQL corren en el servidor, mientras el navegador las coordina y muestra sus resultados.
+
+`src/tests/.htaccess` permite el acceso a la página y al corredor; este solo acepta POST del mismo origen. Las filas centinela se distinguen con valores aleatorios fuera del rango de sensores. La limpieza se intenta incluso si falla un test. Para evitar que un corte del proceso deje datos, el corredor informa cualquier error de limpieza en `RESULTADOS :`.
