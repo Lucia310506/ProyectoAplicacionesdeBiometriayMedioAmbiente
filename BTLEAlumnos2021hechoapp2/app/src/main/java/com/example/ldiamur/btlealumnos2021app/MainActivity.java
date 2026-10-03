@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String ETIQUETA_LOG = ">>>>";
 
     private static final int CODIGO_PETICION_PERMISOS = 11223344;
+    private boolean resultadoTestLogicaFake = false;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -326,28 +327,37 @@ public class MainActivity extends AppCompatActivity {
      * --------------------
      */
     private void comprobarLogicaFakeAlArrancar() {
+        resultadoTestLogicaFake = false;
         try {
+            Log.i("TESTS_APP", "Ejecutando test: guardar CO2 valido");
             LogicaFake.guardarMediciones("CO2", 500.0);
+            Log.i("TESTS_APP", "OK: guardar CO2 valido");
+
+            Log.i("TESTS_APP", "Ejecutando test: guardar TEMPERATURA valida");
             LogicaFake.guardarMediciones("TEMPERATURA", -19.0);
-            comprobarRechazoLogica("HUMEDAD", 50.0);
-            comprobarRechazoLogica("CO2", Double.NaN);
-            Log.i("TEST_LOGICAFake", "OK: pruebas de lógica fake superadas al iniciar");
+            Log.i("TESTS_APP", "OK: guardar TEMPERATURA valida");
+
+            comprobarRechazoLogica("HUMEDAD", 50.0, "rechazar tipo no admitido");
+            comprobarRechazoLogica("CO2", Double.NaN, "rechazar valor NaN");
+            resultadoTestLogicaFake = true;
+            Log.i("TEST_LOGICAFake", "OK: pruebas de logica fake superadas al iniciar");
         } catch (Throwable error) {
-            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de lógica fake al iniciar", error);
+            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de logica fake al iniciar", error);
         }
     }
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> comprobarRechazoLogica() -->
+     * tipo: Text, valor: R, nombre: Text --> comprobarRechazoLogica() -->
      * --------------------
      */
-    private void comprobarRechazoLogica(String tipo, double valor) {
+    private void comprobarRechazoLogica(String tipo, double valor, String nombre) {
+        Log.i("TESTS_APP", "Ejecutando test: " + nombre);
         try {
             LogicaFake.guardarMediciones(tipo, valor);
-            throw new AssertionError("La medición inválida debía rechazarse");
+            throw new AssertionError("La medicion invalida debia rechazarse");
         } catch (IllegalArgumentException esperado) {
-            // Rechazo esperado durante la autocomprobación.
+            Log.i("TESTS_APP", "OK: " + nombre);
         }
     }
 
@@ -357,18 +367,24 @@ public class MainActivity extends AppCompatActivity {
      * --------------------
      */
     private void comprobarRestAlArrancar() {
+        Log.i("TESTS_APP", "Ejecutando test REST: GET /mediciones, HTTP 200 y JSON array");
         new PeticionarioREST().hacerPeticionREST(
                 "GET", ConfiguracionRest.URL_MEDICIONES, null,
                 (codigo, cuerpo) -> {
+                    boolean resultadoRest = false;
                     try {
                         if (codigo != 200) {
-                            throw new IllegalStateException("GET /mediciones devolvió HTTP " + codigo);
+                            throw new IllegalStateException("GET /mediciones devolvio HTTP " + codigo);
                         }
                         new JSONArray(cuerpo);
-                        Log.i("TEST_PETICIONARIO_REST", "OK: GET /mediciones devolvió HTTP 200 y JSON válido");
+                        resultadoRest = true;
+                        Log.i("TEST_PETICIONARIO_REST", "OK: GET /mediciones devolvio HTTP 200 y JSON valido");
                     } catch (Exception error) {
-                        Log.e("TEST_PETICIONARIO_REST", "ERROR: falló la comprobación REST al iniciar", error);
+                        Log.e("TEST_PETICIONARIO_REST", "ERROR: fallo la comprobacion REST al iniciar", error);
                     }
+                    Log.i("TESTS_APP", "RESULTADOS : LOGICA_FAKE="
+                            + (resultadoTestLogicaFake ? "OK" : "ERROR")
+                            + ", REST=" + (resultadoRest ? "OK" : "ERROR"));
                     pedirPermisosNecesarios();
                 });
     }
@@ -380,6 +396,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
+
+        Log.i("TESTS_APP", "EJECUTAR TESTS");
 
         comprobarLogicaFakeAlArrancar();
         comprobarRestAlArrancar();
@@ -429,4 +447,3 @@ if (todoConcedido) {
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------------------------------------------------
-

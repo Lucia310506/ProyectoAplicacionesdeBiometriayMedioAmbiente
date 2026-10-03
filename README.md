@@ -102,4 +102,4 @@ Estructura de pruebas:
 
 Al abrir la app, `MainActivity` comprueba primero la lógica fake con casos válidos e inválidos. Después hace una petición de solo lectura `GET /mediciones` fuera del hilo principal y comprueba HTTP 200 y que el cuerpo sea un array JSON. Al terminar esta comprobación, continúa con los permisos y Bluetooth.
 
-En Android Studio, abre Logcat y filtra por `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST`. Si todo está bien verás mensajes `OK`; si falla, aparecerá `ERROR` con el detalle. El chequeo REST necesita que el servidor configurado en `ConfiguracionRest.java` esté disponible. No inserta filas de prueba en la base de datos.
+En Android Studio, abre Logcat y filtra por `TESTS_APP`. Verás primero `EJECUTAR TESTS`, después cada prueba que comienza y sus mensajes `OK`; al final aparecerá `RESULTADOS : LOGICA_FAKE=OK, REST=OK` o `ERROR` para el componente que falle. También se pueden filtrar los detalles por `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST`. El chequeo REST necesita que el servidor configurado en `ConfiguracionRest.java` esté disponible. No inserta filas de prueba en la base de datos.
