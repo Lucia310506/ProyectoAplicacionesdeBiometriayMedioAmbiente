@@ -34,7 +34,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> esperarDisponible() --> Nulo
+// --> esperarDisponible() -->
 // Espera a que el monitor serie esté conectado.
 // --------------------
   void esperarDisponible() {
@@ -49,7 +49,7 @@ public:
   // .........................................................
   template<typename T>
 // --------------------
-// mensaje: T --> escribir() --> Nulo
+// mensaje: T --> escribir() -->
 // Escribe el mensaje en el puerto serie.
 // --------------------
   void escribir (T mensaje) {

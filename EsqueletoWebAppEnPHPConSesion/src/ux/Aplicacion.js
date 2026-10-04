@@ -7,7 +7,7 @@
  */
 
 // --------------------
-// texto: Text, clase: Text --> mostrarEstado() --> Nulo
+// texto: Text, clase: Text --> mostrarEstado() -->
 // Actualiza el mensaje visible y su estilo.
 // --------------------
 
@@ -25,7 +25,7 @@ function mostrarEstado(texto, clase) {
 let ultimasMediciones = [];
 
 // --------------------
-// mediciones: Mediciones --> dibujarLista() --> Nulo
+// mediciones: Mediciones --> dibujarLista() -->
 // Ordena y representa las últimas diez filas sin interpretar HTML externo.
 // --------------------
 
@@ -68,7 +68,7 @@ function dibujarLista(mediciones) {
 }
 
 // --------------------
-// --> actualizarMediciones() --> Nulo
+// --> actualizarMediciones() -->
 // Consulta REST, representa los datos y refleja carga, éxito o error.
 // --------------------
 
@@ -88,7 +88,7 @@ async function actualizarMediciones() {
 }
 
 // --------------------
-// --> iniciarAplicacion() --> Nulo
+// --> iniciarAplicacion() -->
 // Hace la primera actualización y programa la consulta periódica.
 // --------------------
 

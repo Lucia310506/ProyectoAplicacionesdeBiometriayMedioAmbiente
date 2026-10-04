@@ -132,7 +132,7 @@ public:
 	// BleSecurityMode::SECMODE_OPEN  , BleSecurityMode::SECMODE_NO_ACCESS
 	// .........................................................
 // --------------------
-// lectura: Permiso, escritura: Permiso --> asignarPermisos() --> Nulo
+// lectura: Permiso, escritura: Permiso --> asignarPermisos() -->
 // Configura los permisos de acceso de la característica.
 // --------------------
 	void asignarPermisos( SecureMode_t  permisoRead, SecureMode_t  permisoWrite ) {
@@ -143,7 +143,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// tamaño: N --> asignarTamanyoDatos() --> Nulo
+// tamaño: N --> asignarTamanyoDatos() -->
 // Limita el tamaño máximo del valor GATT.
 // --------------------
 	void asignarTamanyoDatos( uint8_t tam ) {
@@ -157,7 +157,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// propiedades/permisos/tamaño --> asignarPropiedadesPermisosYTamanyoDatos() --> Nulo
+// propiedades/permisos/tamaño --> asignarPropiedadesPermisosYTamanyoDatos() -->
 // Aplica de forma conjunta la configuración de la característica.
 // --------------------
 	void asignarPropiedadesPermisosYTamanyoDatos( uint8_t props,
@@ -203,7 +203,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// callback: escritura --> instalarCallbackCaracteristicaEscrita() --> Nulo
+// callback: escritura --> instalarCallbackCaracteristicaEscrita() -->
 // Asocia la función que recibirá las escrituras GATT.
 // --------------------
 	void instalarCallbackCaracteristicaEscrita( CallbackCaracteristicaEscrita cb ) {
@@ -213,7 +213,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// --> activar() --> Nulo
+// --> activar() -->
 // Registra la característica en la pila BLE.
 // --------------------
 	void activar() {
@@ -264,7 +264,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> escribeUUID() --> Nulo
+// --> escribeUUID() -->
 // Imprime el UUID del servicio para depuración.
 // --------------------
   void escribeUUID() {
@@ -278,7 +278,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// característica: Caracteristica --> anyadirCaracteristica() --> Nulo
+// característica: Caracteristica --> anyadirCaracteristica() -->
 // Añade la característica para activarla junto al servicio.
 // --------------------
   void anyadirCaracteristica( Caracteristica & car ) {
@@ -288,7 +288,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> activarServicio() --> Nulo
+// --> activarServicio() -->
 // Activa el servicio GATT y las características registradas.
 // --------------------
   void activarServicio( ) {

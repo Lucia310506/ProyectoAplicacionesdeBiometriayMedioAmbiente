@@ -14,7 +14,8 @@ public final class ConfiguracionRest {
 
     /*
      * --------------------
-     * --> ConfiguracionRest() -->
+     * --> ConfiguracionRest() --> ConfiguracionRest
+     * Evita instancias de la clase que solo contiene configuración.
      * --------------------
      */
     private ConfiguracionRest() { }

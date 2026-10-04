@@ -8,13 +8,13 @@
 (async function () {
   const grupos = { web: [], logica: [], baseDatos: [] };
 
-  // condicion: B, mensaje: Text --> comprobar() --> Nulo
+  // condicion: B, mensaje: Text --> comprobar() -->
   // Falla el caso actual con una explicación breve.
   function comprobar(condicion, mensaje) {
     if (!condicion) throw new Error(mensaje);
   }
 
-  // nombre: Text, prueba: Función --> caso() --> Nulo
+  // nombre: Text, prueba: Función --> caso() -->
   // Ejecuta un caso y guarda su resultado sin detener la batería.
   async function caso(nombre, prueba) {
     console.log('Ejecutando test: ' + nombre);

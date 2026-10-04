@@ -14,6 +14,7 @@ public class LogicaFake {
     /*
      * --------------------
      * tipo: Text, valor: R --> guardarMediciones() -->
+     * Valida el tipo y el valor antes de aceptar la medición simulada.
      * --------------------
      */
     public static void guardarMediciones(String tipo, double valor) {

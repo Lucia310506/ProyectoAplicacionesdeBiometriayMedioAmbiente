@@ -32,6 +32,7 @@ public class PeticionarioRESTTest {
     /*
      * --------------------
      * --> enviarMedicion() -->
+     * Verifica método POST, ruta y cuerpo JSON.
      * --------------------
      */
     @Test
@@ -64,6 +65,7 @@ public class PeticionarioRESTTest {
     /*
      * --------------------
      * --> hacerPeticionREST() -->
+     * Comprueba el procesamiento de respuestas HTTP 201 y 500.
      * --------------------
      */
     @Test
@@ -85,6 +87,7 @@ public class PeticionarioRESTTest {
     /*
      * --------------------
      * url: Text --> esperarCodigo() --> N
+     * Espera de forma acotada y devuelve el código recibido.
      * --------------------
      */
     private int esperarCodigo(String url) throws InterruptedException {

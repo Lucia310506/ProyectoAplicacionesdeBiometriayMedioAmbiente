@@ -61,7 +61,7 @@ namespace Globales {
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------
-// --> inicializarPlaquita() --> Nulo
+// --> inicializarPlaquita() -->
 // Punto de inicialización de la placa antes de activar BLE.
 // --------------------
 void inicializarPlaquita () {
@@ -74,7 +74,7 @@ void inicializarPlaquita () {
 // setup()
 // --------------------------------------------------------------
 // --------------------
-// --> setup() --> Nulo
+// --> setup() -->
 // Inicializa serie, emisora BLE y medidor al arrancar la placa.
 // --------------------
 void setup() {
@@ -116,7 +116,7 @@ void setup() {
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------
-// --> lucecitas() --> Nulo
+// --> lucecitas() -->
 // Ejecuta la secuencia visual de señalización del ciclo.
 // --------------------
 inline void lucecitas() {
@@ -142,7 +142,7 @@ namespace Loop {
 // ..............................................................
 // ..............................................................
 // --------------------
-// --> loop() --> Nulo
+// --> loop() -->
 // Lee y publica CO2 y temperatura en cada ciclo del firmware.
 // --------------------
 void loop () {

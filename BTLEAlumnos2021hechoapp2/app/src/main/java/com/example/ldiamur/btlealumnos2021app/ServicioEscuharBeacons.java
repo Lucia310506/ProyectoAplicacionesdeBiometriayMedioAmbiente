@@ -46,6 +46,12 @@ public class ServicioEscuharBeacons extends Service {
     private int ultimoContador = -1;
 
     @Override
+    /*
+     * --------------------
+     * --> onCreate() -->
+     * Prepara las notificaciones y el escáner del servicio.
+     * --------------------
+     */
     public void onCreate() {
         super.onCreate();
         crearCanalNotificacion();
@@ -54,11 +60,23 @@ public class ServicioEscuharBeacons extends Service {
     }
 
     @Override
+    /*
+     * --------------------
+     * intent: Intent, flags: N, id: N --> onStartCommand() --> N
+     * Inicia la escucha y mantiene el servicio activo.
+     * --------------------
+     */
     public int onStartCommand(Intent intent, int flags, int startId) {
         iniciarEscaneo();
         return START_STICKY;
     }
 
+    /*
+     * --------------------
+     * --> prepararEscaner() -->
+     * Obtiene el escáner BLE o detiene el servicio si no hay Bluetooth.
+     * --------------------
+     */
     private void prepararEscaner() {
         BluetoothAdapter adaptador = BluetoothAdapter.getDefaultAdapter();
         if (adaptador == null) {
@@ -69,6 +87,12 @@ public class ServicioEscuharBeacons extends Service {
         elEscanner = adaptador.getBluetoothLeScanner();
     }
 
+    /*
+     * --------------------
+     * --> tengoPermisoEscaneo() --> B
+     * Comprueba el permiso requerido por la versión Android.
+     * --------------------
+     */
     private boolean tengoPermisoEscaneo() {
         String permiso = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
                 ? Manifest.permission.BLUETOOTH_SCAN
@@ -76,6 +100,12 @@ public class ServicioEscuharBeacons extends Service {
         return ContextCompat.checkSelfPermission(this, permiso) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /*
+     * --------------------
+     * --> iniciarEscaneo() -->
+     * Configura el filtro GTI-3A y arranca el escaneo BLE.
+     * --------------------
+     */
     private void iniciarEscaneo() {
         if (elEscanner == null || !tengoPermisoEscaneo()) {
             Log.e(ETIQUETA_LOG, "No se puede iniciar el escaneo: falta Bluetooth o permiso");
@@ -87,12 +117,24 @@ public class ServicioEscuharBeacons extends Service {
 
         callbackDelEscaneo = new ScanCallback() {
             @Override
+            /*
+             * --------------------
+             * tipo: N, resultado: ScanResult --> onScanResult() -->
+             * Entrega cada anuncio recibido al analizador de beacons.
+             * --------------------
+             */
             public void onScanResult(int callbackType, ScanResult resultado) {
                 super.onScanResult(callbackType, resultado);
                 procesarBeacon(resultado);
             }
 
             @Override
+            /*
+             * --------------------
+             * resultados: ScanResult[] --> onBatchScanResults() -->
+             * Procesa todos los anuncios entregados en lote.
+             * --------------------
+             */
             public void onBatchScanResults(List<ScanResult> resultados) {
                 super.onBatchScanResults(resultados);
                 for (ScanResult resultado : resultados) {
@@ -101,6 +143,12 @@ public class ServicioEscuharBeacons extends Service {
             }
 
             @Override
+            /*
+             * --------------------
+             * error: N --> onScanFailed() -->
+             * Registra el error comunicado por el escáner BLE.
+             * --------------------
+             */
             public void onScanFailed(int errorCode) {
                 super.onScanFailed(errorCode);
                 Log.e(ETIQUETA_LOG, "Error al escanear beacons: " + errorCode);
@@ -118,6 +166,12 @@ public class ServicioEscuharBeacons extends Service {
         Log.d(ETIQUETA_LOG, "Servicio: escuchando beacons " + NOMBRE_BEACON);
     }
 
+    /*
+     * --------------------
+     * resultado: ScanResult --> procesarBeacon() -->
+     * Valida y decodifica el tipo, contador y valor del anuncio.
+     * --------------------
+     */
     private void procesarBeacon(ScanResult resultado) {
         if (resultado.getScanRecord() == null || resultado.getScanRecord().getBytes().length < 30) {
             return;
@@ -160,6 +214,7 @@ public class ServicioEscuharBeacons extends Service {
                 + " ( " + trama.getTxPower() + " )");
         Log.d(ETIQUETA_LOG, " ****************************************************");
 
+        // Major empaqueta tipo en el byte alto y contador en el bajo; Minor se interpreta con signo.
         int major = Utilidades.bytesToInt(trama.getMajor());
         int tipoMedida = major >> 8;
         int contador = major & 0xff;
@@ -174,7 +229,12 @@ public class ServicioEscuharBeacons extends Service {
         }
     }
 
-    // tipo: Text, valor: R, tipo_medida: N, contador: N --> enviarMedicionNueva() -->
+    /*
+     * --------------------
+     * tipo: Text, valor: Z, tipoMedida: N, contador: N --> enviarMedicionNueva() -->
+     * Evita duplicados y delega la medición a lógica fake y REST.
+     * --------------------
+     */
     private void enviarMedicionNueva(String tipo, int valor, int tipoMedida, int contador) {
         if (ultimoTipoMedida == tipoMedida && ultimoContador == contador) {
             return;
@@ -189,6 +249,12 @@ public class ServicioEscuharBeacons extends Service {
         }
     }
 
+    /*
+     * --------------------
+     * --> detenerEscaneo() -->
+     * Detiene el escáner y libera el callback activo.
+     * --------------------
+     */
     private void detenerEscaneo() {
         if (elEscanner != null && callbackDelEscaneo != null) {
             elEscanner.stopScan(callbackDelEscaneo);
@@ -196,6 +262,12 @@ public class ServicioEscuharBeacons extends Service {
         }
     }
 
+    /*
+     * --------------------
+     * --> crearCanalNotificacion() -->
+     * Crea el canal requerido por la notificación persistente.
+     * --------------------
+     */
     private void crearCanalNotificacion() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel canal = new NotificationChannel(
@@ -204,6 +276,12 @@ public class ServicioEscuharBeacons extends Service {
         }
     }
 
+    /*
+     * --------------------
+     * --> iniciarPrimerPlano() -->
+     * Muestra la notificación que mantiene el servicio en primer plano.
+     * --------------------
+     */
     private void iniciarPrimerPlano() {
         Notification.Builder creador = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 ? new Notification.Builder(this, CANAL_ID)
@@ -217,12 +295,24 @@ public class ServicioEscuharBeacons extends Service {
     }
 
     @Override
+    /*
+     * --------------------
+     * --> onDestroy() -->
+     * Detiene la escucha antes de destruir el servicio.
+     * --------------------
+     */
     public void onDestroy() {
         detenerEscaneo();
         super.onDestroy();
     }
 
     @Override
+    /*
+     * --------------------
+     * intent: Intent --> onBind() --> IBinder|Nulo
+     * Indica que el servicio no ofrece vinculación directa.
+     * --------------------
+     */
     public IBinder onBind(Intent intent) {
         return null;
     }

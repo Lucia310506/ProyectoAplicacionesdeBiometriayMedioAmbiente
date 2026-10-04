@@ -6,11 +6,11 @@ El componente ejecuta pruebas automatizadas aisladas contra la base de pruebas: 
 
 ### Interfaces lógicas
 
-- `condicion: B, mensaje: Text --> comprobar() --> Nulo`
-- `--> probarBaseDatos() --> Nulo`
-- `--> probarRest() --> Nulo`
-- `--> probarPeticionarioRest() --> Nulo`
-- `--> probarUx() --> Nulo`
+- `condicion: B, mensaje: Text --> comprobar() -->`
+- `--> probarBaseDatos() -->`
+- `--> probarRest() -->`
+- `--> probarPeticionarioRest() -->`
+- `--> probarUx() -->`
 
 ## Design Clarifications
 

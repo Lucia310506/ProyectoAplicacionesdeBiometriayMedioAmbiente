@@ -65,7 +65,7 @@ public:
   // ............................................................
   // ............................................................
   // --------------------
-// --> encenderEmisora() --> Nulo
+// --> encenderEmisora() -->
 // Activa la emisora BLE una vez inicializada la placa.
 // --------------------
 
@@ -77,7 +77,7 @@ public:
   // ............................................................
   // ............................................................
   // --------------------
-// medida: CO2, contador: N, espera: ms --> publicarCO2() --> Nulo
+// medida: CO2, contador: N, espera: ms --> publicarCO2() -->
 // Emite CO2 y detiene el anuncio al terminar el intervalo.
 // --------------------
 
@@ -119,7 +119,7 @@ public:
   // ............................................................
   // ............................................................
   // --------------------
-// medida: temperatura, contador: N, espera: ms --> publicarTemperatura() --> Nulo
+// medida: temperatura, contador: N, espera: ms --> publicarTemperatura() -->
 // Emite temperatura y detiene el anuncio al terminar el intervalo.
 // --------------------
 

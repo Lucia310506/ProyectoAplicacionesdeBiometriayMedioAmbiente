@@ -87,7 +87,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> encenderEmisora() --> Nulo
+// --> encenderEmisora() -->
 // Inicializa Bluefruit y detiene cualquier anuncio previo.
 // --------------------
   void encenderEmisora() {
@@ -101,7 +101,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// callbacks: conexión --> encenderEmisora() --> Nulo
+// callbacks: conexión --> encenderEmisora() -->
 // Activa la emisora e instala los callbacks de conexión.
 // --------------------
   void encenderEmisora( CallbackConexionEstablecida cbce,
@@ -117,7 +117,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> detenerAnuncio() --> Nulo
+// --> detenerAnuncio() -->
 // Detiene la radio solo si está anunciando.
 // --------------------
   void detenerAnuncio() {
@@ -143,7 +143,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// uuid: Bytes, major: N, minor: Z, rssi: N --> emitirAnuncioIBeacon() --> Nulo
+// uuid: Bytes, major: N, minor: Z, rssi: N --> emitirAnuncioIBeacon() -->
 // Configura el paquete iBeacon y comienza a anunciarlo.
 // Major contiene tipo/contador; Minor conserva el valor con signo.
 // --------------------
@@ -239,7 +239,7 @@ public:
 	const uint8_t tamanyoCarga = strlen( carga );
   */
 // --------------------
-// carga: Bytes, longitud: N --> emitirAnuncioIBeaconLibre() --> Nulo
+// carga: Bytes, longitud: N --> emitirAnuncioIBeaconLibre() -->
 // Publica una carga libre truncada al espacio de datos iBeacon.
 // --------------------
   void emitirAnuncioIBeaconLibre( const char * carga, const uint8_t tamanyoCarga ) {
@@ -372,7 +372,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// callback: conexión --> instalarCallbackConexionEstablecida() --> Nulo
+// callback: conexión --> instalarCallbackConexionEstablecida() -->
 // Registra la notificación de conexión BLE.
 // --------------------
   void instalarCallbackConexionEstablecida( CallbackConexionEstablecida cb ) {
@@ -382,7 +382,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// callback: desconexión --> instalarCallbackConexionTerminada() --> Nulo
+// callback: desconexión --> instalarCallbackConexionTerminada() -->
 // Registra la notificación de cierre de conexión BLE.
 // --------------------
   void instalarCallbackConexionTerminada( CallbackConexionTerminada cb ) {

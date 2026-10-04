@@ -18,10 +18,10 @@ La UX utiliza la lógica fake web y la ruta `GET /mediciones`; `pedirMediciones(
 
 ### Interfaces lógicas
 
-- `texto: Text, clase: Text --> mostrarEstado() --> Nulo`
-- `mediciones: Mediciones --> dibujarGrafico() --> Nulo`
-- `--> actualizarMediciones() --> Nulo`
-- `--> iniciarAplicacion() --> Nulo`
+- `texto: Text, clase: Text --> mostrarEstado() -->`
+- `mediciones: Mediciones --> dibujarGrafico() -->`
+- `--> actualizarMediciones() -->`
+- `--> iniciarAplicacion() -->`
 
 ## Design Clarifications
 

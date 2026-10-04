@@ -10,7 +10,7 @@
 require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
 
 // --------------------
-// tipo: Text, valor: R --> guardarMediciones() --> Nulo
+// tipo: Text, valor: R --> guardarMediciones() -->
 // Valida la medición y la inserta usando una consulta preparada.
 // --------------------
 

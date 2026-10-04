@@ -1,113 +1,102 @@
-# ProyectoAplicacionesdeBiometriayMedioAmbiente
-El proyecto consta de diferentes partes de la arquitectura:
- -Un Microcontrolador que emite beacons, que esta escrito en c++
- -Una aplicacion en java
- -Una base de datos
- -Una página web que muestra las medidas
+# Proyecto de biometría y medio ambiente
 
-# Estructura de carpetas
-El código de Arduino se encuentra en la carpeta "HolaMundoIBeacon" que consta de:
-    -HolaMundoIBeacon.ino -> Programa funcional que ejecuta el hilo principal para enviar el beacon con las medidas de temperatura y CO2.
-    -LED.h -> Controla el funcionamiento de la LED para indicar que el código funciona
-    -Medidor.h -> Simula las medidas de CO2 y temperatura
-    -EmisoraBLE.h -> Controla la emisora y la emisión del beacon
-    -ServicioEnEmisora.h -> Controla el servicio atribuyendole características. La clase Característica está en su interior.
-    -PuertoSerie.h -> Controla el ciclo de vida del puerto Serie. 
-    -Publicador.h ->    Encapsula la emisora y envía las medidas (codifca major/minor).
+## De qué va el proyecto
 
-El código de la App de Android esta códificado en java y se encuentra en la carpeta BTLEAlumnos2021hechoapp2 y tiene las siguientes clases:
-    -MainActivity.java -> Clase que controla el funcionamiento de la app, pide permisos, filtra y detiene la captación de beacons.
-    -TramaIBeacon.java -> Clase que permite obtener los datos del beacon.
-    -Utilidades.java -> Clase de apoyo para convertir entre tipos.
-    -PeticionarioREST.java -> Clase que ejerce el papel de cliente REST, que envia los datos para que lleguen a la base de datos.
-    -ServicioEscucharBeacon.java -> Clase que hace que la app funcione en segundo plano para captar beacons. 
-    -ConfiguracionRest.java -> Sirve para indicar la dirección a la que hay que buscar la bbdd.
+El proyecto mide CO2 y temperatura. El Arduino manda las mediciones por Bluetooth, la aplicación Android las recibe y las guarda en una base de datos MySQL usando el servidor PHP. La página web muestra las mediciones guardadas.
 
-El código del servidor REST está en EsqueletoWebAppEnPHPConSesion/src/rest:
-    -mediciones.php -> Endpoint GET/POST /mediciones (también accesible como /rest/mediciones.php).
+## Carpetas del proyecto
 
-El código de la lógica de negocio está en EsqueletoWebAppEnPHPConSesion/src/logica:
-    -mediciones.php -> guardarMediciones(tipo, valor) y mostrarMediciones().
+- HolaMundoIBeacon: programa del Arduino y pruebas de inicio.
+- BTLEAlumnos2021hechoapp2: aplicación Android.
+- EsqueletoWebAppEnPHPConSesion: página web, servidor PHP y base de datos.
+- doc: diseños y documentación de las partes del proyecto.
 
-La lógica fake web está en EsqueletoWebAppEnPHPConSesion/src/logicaFake:
-    -PeticionarioREST.js -> pedirMediciones() llama a GET /rest/mediciones.php.
+Dentro de la carpeta del servidor:
 
-La UX del navegador está en EsqueletoWebAppEnPHPConSesion/src/ux:
-    -Aplicacion.html y Aplicacion.js -> gráfico de mediciones almacenadas.
+- src/rest: rutas REST para guardar y consultar mediciones.
+- src/logica: reglas para validar y guardar las mediciones.
+- src/BBDD: conexión y configuración de la base de datos.
+- src/logicaFake: cliente REST que usa la web.
+- src/ux: página web.
+- src/tests: pruebas del proyecto.
+- bbdd: archivos para crear y rellenar las tablas de MySQL.
 
-La app Android usa lógica fake y peticionario REST separados:
-    -LogicaFake.java -> guardarMediciones(tipo, valor)
-    -PeticionarioREST.java -> enviarMedicion(tipo, valor) con POST
+## Cómo funciona
 
-La conexión Plesk está en EsqueletoWebAppEnPHPConSesion/src/BBDD:
-    -ConexionMediciones.php
-    -ConfiguracionProduccion.ejemplo.php (copiar a ConfiguracionProduccion.php en el servidor)
+1. El Arduino prepara una medición y la manda por Bluetooth.
+2. Android recibe el beacon y comprueba sus datos.
+3. Android manda el tipo y el valor al servidor.
+4. PHP comprueba los datos y los guarda en MySQL.
+5. La web pide las mediciones al servidor y las muestra.
 
-SQL en EsqueletoWebAppEnPHPConSesion/bbdd:
-    -Estructura.sql, datos.sql, EstructuraPruebas.sql
+## Arduino
 
-Publica en Plesk el directorio src. Instrucciones en src/00-Leeme.txt.
+1. Abre HolaMundoIBeacon.ino con Arduino IDE.
+2. Selecciona la placa del proyecto y comprueba que tienes instalada la librería Bluefruit.
+3. Compila y carga el programa.
+4. Abre el monitor serie a 115200 baudios. Al iniciar, se ejecutan una vez las pruebas de test.h. Verás EJECUTAR TESTS ARDUINO y el resultado.
+5. Cuando terminan las pruebas, el Arduino empieza a enviar los beacons.
 
-# Flujo de funcionamiento
-1. **Emisión BLE (Arduino):** El microcontrolador ejecuta el bucle en `HolaMundoIBeacon.ino`, obtiene las medidas con `Medidor.h` y las publica mediante `Publicador.h` y `EmisoraBLE.h` emitiendo tramas iBeacon periódicas (codificando el tipo y contador en el Major, y el valor en el Minor).
-2. **Recepción y reenvío (App Android):** El servicio en segundo plano `ServicioEscuharBeacons` escanea y filtra los beacons "GTI-3A". Al recibir una medida, decodifica los datos con `TramaIBeacon.java` y realiza una petición HTTP POST en formato JSON usando `PeticionarioREST.java` hacia la URL del servidor Plesk definida en `ConfiguracionRest.java`.
-3. **Servicio y almacenamiento (Servidor Plesk):** El endpoint en la carpeta `rest` recibe la petición, delega la validación en la capa `logica` y registra la medición en MySQL mediante la capa `BBDD`.
-4. **Visualización (Página Web):** La página web consulta el endpoint REST mediante peticiones GET para obtener las últimas lecturas y mostrarlas de forma interactiva al usuario.
+## Android
 
-# Como descargar arduino
-  Abrir la carpeta HolaMundoBeacon
-  Abrir el HolaMundoBeacon.ino con Arduino.
-  Se deben descargar las librerias necesarias para el microcontrolador correspondiente
-  Compliar el programa y abrir el puerto serie para que el microcontrolador emita beacons
+1. Abre BTLEAlumnos2021hechoapp2 en Android Studio y espera a que termine de preparar el proyecto.
+2. Si usas otro servidor, cambia la dirección en ConfiguracionRest.java.
+3. Ejecuta la aplicación en un móvil compatible y acepta los permisos que pide.
 
-# Como instalar la app de Android
- Abrir la carpeta BTLEAlumnos2021hechoapp2 directamente con Android studio
- Esperara que se compile el gradle
- Conectar el dispositivo al ordenador (Modo desarrollador, 7 veces darle al número de compilación).
+Al abrirse, la aplicación ejecuta las pruebas de la lógica y comprueba la conexión REST. Los resultados aparecen en Logcat. Puedes buscar TESTS_APP, TEST_LOGICAFake o TEST_PETICIONARIO_REST.
 
+También hay pruebas en app/src/androidTest. PeticionarioRESTTest necesita MockWebServer, que ahora mismo no está añadido en app/build.gradle.kts.
 
-# Como desplegar la web en PLESK
-1. En Plesk, el directorio raíz del dominio, en mi caso ldiamur.upv.edu.es, debe  estar carpeta src y el .htaccess.
+## Web y base de datos
 
-2. Crea la base de datos en Plesk y ejecuta bbdd/Estructura.sql (y bbdd/datos.sql si quieres ejemplos).
+### Crear la base de datos
 
-3. Escribe en src/BBDD/ConfiguracionProduccion.php
-   el host, nombre de la base, usuario y contraseña reales de Plesk.
-   ConfiguracionProduccion.php no se sube al repositorio.
+1. Crea una base de datos en MySQL.
+2. Ejecuta EsqueletoWebAppEnPHPConSesion/bbdd/Estructura.sql para crear la tabla.
+3. Si quieres añadir mediciones de ejemplo, ejecuta también bbdd/datos.sql.
 
-4. En un navegador:
-   https://ldiamur.upv.edu.es/ux/Aplicacion.html
+### Configurar la conexión
 
-5. El navegador debe recibir el JSON con el GET
-   https://ldiamur.upv.edu.es/rest/mediciones.php   (GET debe devolver JSON)
+En src/BBDD está el archivo ConfiguracionProduccion.txt. Ahí tienes una plantilla con los datos que necesita la conexión. Rellénala con los datos de tu servidor MySQL.
 
-6. La app Android envía POST a:
-   https://ldiamur.upv.edu.es/rest/mediciones.php
+El servidor PHP no lee el archivo de texto. Tienes que crear en esa misma carpeta un archivo llamado ConfiguracionProduccion.php con esos datos. La estructura que debe tener es:
 
-Estructura de pruebas:
-- mysql < bbdd/EstructuraPruebas.sql
-- MEDICIONES_ENTORNO=pruebas php src/tests/probar_base_datos.php
+    <?php
+    return [
+        'host' => 'ESCRIBE_EL_HOST',
+        'base' => 'ESCRIBE_EL_NOMBRE_DE_LA_BASE',
+        'usuario' => 'ESCRIBE_EL_USUARIO',
+        'password' => 'ESCRIBE_LA_CONTRASEÑA'
+    ];
 
+ConfiguracionProduccion.php está ignorado para que no se publiquen tus claves. Por eso no aparecerá al subir el proyecto y tendrás que crearlo también en el servidor. No pongas contraseñas reales en el archivo .txt ni lo subas a un sitio público.
 
-# Comprobaciones que realizar para ver si estaba todo conectado
- 1. Ver si el serial de Arduino esta abierto y ver los ciclos de emision.
- 2. Ver en el LogCat de Android Studio si recibe los beacons.
- 3. Ver en la base de datos de PLESK si se suben las nuevas medidas.(En este sprint si hay muchas se recomienda borrarlas que hay).
- 4. Ver si en la web sale algun error en lugar del número total de mediciones. 
- 5. Ver si las mediciones nuevas aparecen. 
-    En este último caso, la hay dos soluciones:
-        1. Revisar si el Serial no esta abierto
-        2. Revisar si el movil se ha apagado.
-## Autocomprobaciones de Android al arrancar
+### Subir la web
 
-Al abrir la app, `MainActivity` comprueba primero la lógica fake con casos válidos e inválidos. Después hace una petición de solo lectura `GET /mediciones` fuera del hilo principal y comprueba HTTP 200 y que el cuerpo sea un array JSON. Al terminar esta comprobación, continúa con los permisos y Bluetooth.
+1. Copia el contenido de EsqueletoWebAppEnPHPConSesion al servidor.
+2. Crea ConfiguracionProduccion.php con los datos de la base de datos del servidor.
+3. Comprueba que el servidor tiene PHP, PDO MySQL y Apache con mod_rewrite.
+4. Abre src/ux/Aplicacion.html. La ruta para consultar y guardar mediciones es /mediciones.
+5. En Android, pon la dirección completa del servidor en ConfiguracionRest.java.
 
-En Android Studio, abre Logcat y filtra por `TESTS_APP`. Verás primero `EJECUTAR TESTS`, después cada prueba que comienza y sus mensajes `OK`; al final aparecerá `RESULTADOS : LOGICA_FAKE=OK, REST=OK` o `ERROR` para el componente que falle. También se pueden filtrar los detalles por `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST`. El chequeo REST necesita que el servidor configurado en `ConfiguracionRest.java` esté disponible. No inserta filas de prueba en la base de datos.
+La web consulta con GET. Android guarda una medición con POST. Si se guarda bien, el servidor responde con el código 201.
 
-## Autocomprobaciones web al abrir la aplicación
+## Pruebas
 
-Al cargar `EsqueletoWebAppEnPHPConSesion/src/ux/Aplicacion.html`, antes de iniciar las consultas periódicas de la UX, se ejecutan los tests de `src/tests/pruebas_consola.js` en el hilo principal del navegador. La consola muestra `EJECUTAR TESTS`, cada caso, `OK`/`ERROR` y `RESULTADOS :`.
+### Al abrir la web
 
-La página prueba `PeticionarioREST.js` con respuestas simuladas. Después llama al corredor PHP, que usa el mismo entorno y base de datos que las lecturas reales. Inserta dos valores centinela aleatorios, valida `guardarMediciones()`/`mostrarMediciones()` y borra únicamente esas filas en un bloque de limpieza; no vacía la tabla. Las pruebas PHP/SQL corren en el servidor, mientras el navegador las coordina y muestra sus resultados.
+Cuando abres Aplicacion.html, la web ejecuta las pruebas y luego empieza a consultar las mediciones. Abre la consola del navegador para ver EJECUTAR TESTS, el resultado de cada prueba y el resumen.
 
-`src/tests/.htaccess` permite el acceso a la página y al corredor; este solo acepta POST del mismo origen. Las filas centinela se distinguen con valores aleatorios fuera del rango de sensores. La limpieza se intenta incluso si falla un test. Para evitar que un corte del proceso deje datos, el corredor informa cualquier error de limpieza en `RESULTADOS :`.
+Las pruebas comprueban el cliente REST de la web, la lógica PHP y la conexión con la base de datos. Las pruebas de base de datos guardan dos mediciones temporales y luego borran solo esas dos. No borran las mediciones normales.
+
+### Pruebas PHP
+
+Hay dos pruebas para ejecutar aparte: probar_base_datos.php y probar_rest.php. Estas pruebas borran todas las filas de la tabla mediciones antes y después. Úsalas solo con una base de datos de pruebas vacía. No las ejecutes con la base de datos que usa la web o que tiene mediciones que quieras conservar.
+
+### Pruebas JavaScript
+
+Los archivos probar_peticionario_rest.js y probar_ux.js comprueban partes de la web con respuestas de ejemplo. No necesitan conectarse a MySQL.
+
+## Diseños
+
+En doc están los diseños de las partes del proyecto. component_map.md muestra cómo se relacionan los diseños con las carpetas y archivos.
