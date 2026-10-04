@@ -1,122 +1,110 @@
 /*
  * Fichero: pruebas_consola.js
  * Autor: Lucía Díaz Murcia
- * Descripción: Ejecuta las pruebas web al iniciar Aplicacion.html y muestra resultados con console.log.
- * Fecha: 2026-10-03
+ * Descripción: Ejecuta autocomprobaciones web al abrir Aplicacion.html.
+ * Fecha: 2026-10-04
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
+(async function () {
+  const grupos = { web: [], logica: [], baseDatos: [] };
 
-(function () {
-  const resultados = { fake: [], logica: [], baseDatos: [] };
-
+  // condicion: B, mensaje: Text --> comprobar() --> Nulo
+  // Falla el caso actual con una explicación breve.
   function comprobar(condicion, mensaje) {
     if (!condicion) throw new Error(mensaje);
   }
 
-  async function ejecutarCaso(grupo, nombre, comprobacion) {
+  // nombre: Text, prueba: Función --> caso() --> Nulo
+  // Ejecuta un caso y guarda su resultado sin detener la batería.
+  async function caso(nombre, prueba) {
     console.log('Ejecutando test: ' + nombre);
     try {
-      await comprobacion();
-      resultados[grupo].push({ nombre, estado: 'OK' });
+      await prueba();
+      grupos.web.push({ nombre, estado: 'OK' });
       console.log('OK: ' + nombre);
     } catch (error) {
-      resultados[grupo].push({ nombre, estado: 'ERROR', detalle: error.message });
+      grupos.web.push({ nombre, estado: 'ERROR' });
       console.log('ERROR: ' + nombre + ' — ' + error.message);
     }
   }
 
-  async function ejecutarTestsFakeWeb() {
-    const fetchOriginal = window.fetch;
-    let urlSolicitada = '';
+  // --> probarPeticionarioREST() -->
+  // Simula las respuestas y restaura fetch original incluso ante fallos.
+  async function probarPeticionarioREST() {
+    const fetchReal = window.fetch;
+    let ruta = '';
     try {
       window.fetch = async (url) => {
-        urlSolicitada = url;
-        return {
-          ok: true,
-          text: async () => JSON.stringify([
-            { id: 1, tipo: 'CO2', valor: 500, fecha: '2026-09-25T10:30:00' }
-          ])
-        };
+        ruta = url;
+        return { ok: true, text: async () => '[{"id":1,"tipo":"CO2","valor":500,"fecha":"2026-09-25T10:30:00"}]' };
       };
-      await ejecutarCaso('fake', 'PeticionarioREST devuelve mediciones de GET /mediciones', async () => {
-        const mediciones = await pedirMediciones();
-        comprobar(urlSolicitada === '/mediciones', 'La ruta solicitada no es /mediciones');
-        comprobar(mediciones.length === 1 && mediciones[0].tipo === 'CO2', 'No devolvió las mediciones JSON esperadas');
+      await caso('PeticionarioREST devuelve mediciones de GET /mediciones', async () => {
+        const datos = await pedirMediciones();
+        comprobar(ruta === '/mediciones' && datos.length === 1 && datos[0].tipo === 'CO2',
+          'Ruta o JSON inesperado');
       });
 
-      window.fetch = async () => ({
-        ok: false,
-        text: async () => JSON.stringify({ error: 'Error HTTP simulado' })
-      });
-      await ejecutarCaso('fake', 'PeticionarioREST informa errores HTTP', async () => {
-        let mensaje = '';
-        try { await pedirMediciones(); } catch (error) { mensaje = error.message; }
-        comprobar(mensaje === 'Error HTTP simulado', 'No propagó el error HTTP');
-      });
-
-      window.fetch = async () => { throw new Error('Error de red simulado'); };
-      await ejecutarCaso('fake', 'PeticionarioREST informa errores de red', async () => {
-        let mensaje = '';
-        try { await pedirMediciones(); } catch (error) { mensaje = error.message; }
-        comprobar(mensaje === 'Error de red simulado', 'No propagó el error de red');
-      });
+      for (const [nombre, respuesta, errorEsperado] of [
+        ['HTTP', { ok: false, text: async () => '{"error":"HTTP simulado"}' }, 'HTTP simulado'],
+        ['red', null, 'Red simulada']
+      ]) {
+        await caso('PeticionarioREST informa errores de ' + nombre, async () => {
+          window.fetch = respuesta ? async () => respuesta : async () => { throw new Error(errorEsperado); };
+          try {
+            await pedirMediciones();
+            throw new Error('No se notificó el error');
+          } catch (error) {
+            comprobar(error.message === errorEsperado, 'Mensaje de error inesperado');
+          }
+        });
+      }
     } finally {
-      window.fetch = fetchOriginal;
+      window.fetch = fetchReal;
     }
   }
 
-  async function ejecutarTestsServidor() {
-    console.log('Ejecutando tests PHP de lógica de negocio y base de datos');
-    let tiempoLimite;
+  // --> probarServidor() -->
+  // Pide al servidor sus pruebas de lógica y BD; este borra sus filas centinela.
+  async function probarServidor() {
+    console.log('Ejecutando tests PHP y base de datos');
     try {
-      const controlador = new AbortController();
-      tiempoLimite = window.setTimeout(() => controlador.abort(), 15000);
       const respuesta = await window.fetch('../tests/ejecutar_tests_consola.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify({ ejecutar: true }),
-        signal: controlador.signal
+        signal: AbortSignal.timeout(15000)
       });
-      window.clearTimeout(tiempoLimite);
       const resultado = await respuesta.json();
-
-      if (!respuesta.ok && !resultado.tests) {
-        throw new Error(resultado.error || 'El servidor rechazó la ejecución');
-      }
+      if (!respuesta.ok && !resultado.tests) throw new Error(resultado.error || 'Solicitud rechazada');
       (resultado.tests || []).forEach((test) => {
-        const grupo = test.grupo === 'logica' ? 'logica' : 'baseDatos';
-        resultados[grupo].push(test);
+        grupos[test.grupo === 'logica' ? 'logica' : 'baseDatos'].push(test);
         console.log(test.estado + ': ' + test.nombre + (test.detalle ? ' — ' + test.detalle : ''));
       });
     } catch (error) {
-      window.clearTimeout(tiempoLimite);
-      resultados.logica.push({ nombre: 'Pruebas PHP de lógica de negocio', estado: 'ERROR', detalle: error.message });
-      resultados.baseDatos.push({ nombre: 'Pruebas de base de datos', estado: 'ERROR', detalle: error.message });
+      grupos.logica.push({ nombre: 'Pruebas PHP de lógica', estado: 'ERROR' });
+      grupos.baseDatos.push({ nombre: 'Pruebas de base de datos', estado: 'ERROR' });
       console.log('ERROR: pruebas PHP/BD — ' + error.message);
     }
   }
 
+  // --> imprimirResultados() -->
+  // Muestra el resumen final de cada grupo de pruebas.
   function imprimirResultados() {
-    const grupos = [
-      ['LOGICA_FAKE_WEB', resultados.fake],
-      ['LOGICA_NEGOCIO_PHP', resultados.logica],
-      ['BASE_DATOS_MEDICIONES', resultados.baseDatos]
-    ];
     console.log('RESULTADOS :');
-    grupos.forEach(([nombre, tests]) => {
-      const estado = tests.length > 0 && tests.every((test) => test.estado === 'OK') ? 'OK' : 'ERROR';
-      console.log(nombre + '=' + estado + ' (' + tests.filter((test) => test.estado === 'OK').length + '/' + tests.length + ')');
-    });
+    for (const [nombre, pruebas] of [
+      ['LOGICA_FAKE_WEB', grupos.web],
+      ['LOGICA_NEGOCIO_PHP', grupos.logica],
+      ['BASE_DATOS_MEDICIONES', grupos.baseDatos]
+    ]) {
+      const ok = pruebas.filter((prueba) => prueba.estado === 'OK').length;
+      console.log(nombre + '=' + (pruebas.length && ok === pruebas.length ? 'OK' : 'ERROR')
+        + ' (' + ok + '/' + pruebas.length + ')');
+    }
   }
 
-  async function iniciarTests() {
-    console.log('EJECUTAR TESTS');
-    await ejecutarTestsFakeWeb();
-    await ejecutarTestsServidor();
-    imprimirResultados();
-  }
-
-  window.promesasPruebasInicio = iniciarTests();
+  console.log('EJECUTAR TESTS');
+  await probarPeticionarioREST();
+  await probarServidor();
+  imprimirResultados();
 }());
-

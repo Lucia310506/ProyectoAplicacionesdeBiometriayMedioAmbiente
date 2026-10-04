@@ -10,7 +10,11 @@
 ini_set('display_errors', '0');
 require_once __DIR__ . '/../logica/mediciones.php';
 
+// --------------------
 // metodo: Text, cuerpo: Text --> atenderMediciones() --> (codigo: N, respuesta: Dict|Nulo)
+// Valida el contrato HTTP y delega lectura/escritura a la lógica.
+// --------------------
+
 function atenderMediciones(string $metodo, string $cuerpo): array {
     try {
         if ($metodo === 'OPTIONS') {
