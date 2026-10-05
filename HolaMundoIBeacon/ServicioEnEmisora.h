@@ -23,7 +23,7 @@
 // ----------------------------------------------------
 template< typename T >
 // --------------------
-// datos: T[], longitud: N --> alReves() --> T[]
+// p: T[], n: Z --> alReves() --> T[]
 // Invierte los elementos del array en el mismo espacio de memoria.
 // --------------------
 T *  alReves( T * p, int n ) {
@@ -40,7 +40,7 @@ T *  alReves( T * p, int n ) {
 // ----------------------------------------------------
 // ----------------------------------------------------
 // --------------------
-// texto: Text, salida: Bytes, longitud: N --> stringAUint8AlReves() --> Bytes
+// pString: Texto, pUint: [N], tamMax: Z --> stringAUint8AlReves() --> [N]
 // Copia el UUID textual en orden inverso y limita la longitud al buffer.
 // --------------------
 uint8_t * stringAUint8AlReves( const char * pString, uint8_t * pUint, int tamMax ) {
@@ -92,7 +92,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// nombre: Text --> Caracteristica() --> Caracteristica
+// nombreCaracteristica_: Texto --> Caracteristica() --> 
 // Construye un UUID de característica a partir de su nombre.
 // --------------------
 	Caracteristica( const char * nombreCaracteristica_ )
@@ -105,7 +105,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// nombre: Text, propiedades/permisos/tamaño --> Caracteristica() --> Caracteristica
+// nombreCaracteristica_: Texto, props:N,permisoRead:SecureMode_t,permisoWrite:SecureMode_t --> Caracteristica() -->
 // Construye la característica y configura su contrato GATT.
 // --------------------
 	Caracteristica( const char * nombreCaracteristica_ ,
@@ -122,6 +122,8 @@ public:
   private:
 	// .........................................................
 	// CHR_PROPS_WRITE , CHR_PROPS_READ ,  CHR_PROPS_NOTIFY 
+  //
+	//props: N->asignarPropiedades() ->
 	// .........................................................
 	void asignarPropiedades ( uint8_t props ) {
 	  // no puedo escribir AUN si el constructor llama a esto: Serial.println( " laCaracteristica.setProperties( props ); ");
@@ -132,7 +134,7 @@ public:
 	// BleSecurityMode::SECMODE_OPEN  , BleSecurityMode::SECMODE_NO_ACCESS
 	// .........................................................
 // --------------------
-// lectura: Permiso, escritura: Permiso --> asignarPermisos() -->
+// permisoRead: SecureMode_t, permisoWrite: SecureMode_t --> asignarPermisos() -->
 // Configura los permisos de acceso de la característica.
 // --------------------
 	void asignarPermisos( SecureMode_t  permisoRead, SecureMode_t  permisoWrite ) {
@@ -143,7 +145,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// tamaño: N --> asignarTamanyoDatos() -->
+// tam: N --> asignarTamanyoDatos() -->
 // Limita el tamaño máximo del valor GATT.
 // --------------------
 	void asignarTamanyoDatos( uint8_t tam ) {
@@ -157,7 +159,8 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// propiedades/permisos/tamaño --> asignarPropiedadesPermisosYTamanyoDatos() -->
+// props:N,permisoRead:SecureMode_t
+//permisoWrite:SecureMode_t tam:N   --> asignarPropiedadesPermisosYTamanyoDatos() -->
 // Aplica de forma conjunta la configuración de la característica.
 // --------------------
 	void asignarPropiedadesPermisosYTamanyoDatos( uint8_t props,
@@ -173,7 +176,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// datos: Text --> escribirDatos() --> N
+// str: Texto --> escribirDatos() --> N
 // Escribe el valor actual en la característica.
 // --------------------
 	uint16_t escribirDatos( const char * str ) {
@@ -190,7 +193,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// datos: Text --> notificarDatos() --> N
+// str: Texto --> notificarDatos() --> N
 // Notifica el valor a los clientes suscritos.
 // --------------------
 	uint16_t notificarDatos( const char * str ) {
@@ -203,7 +206,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// callback: escritura --> instalarCallbackCaracteristicaEscrita() -->
+// cb: CallbackCaracteristicaEscrita --> instalarCallbackCaracteristicaEscrita() -->
 // Asocia la función que recibirá las escrituras GATT.
 // --------------------
 	void instalarCallbackCaracteristicaEscrita( CallbackCaracteristicaEscrita cb ) {
@@ -213,7 +216,7 @@ public:
 	// .........................................................
 	// .........................................................
 // --------------------
-// --> activar() -->
+// activar() -->
 // Registra la característica en la pila BLE.
 // --------------------
 	void activar() {
@@ -251,7 +254,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// nombre: Text --> ServicioEnEmisora() --> ServicioEnEmisora
+// nombreServicio_: Texto --> ServicioEnEmisora() -->
 // Construye un servicio GATT desde su UUID textual.
 // --------------------
   ServicioEnEmisora( const char * nombreServicio_ )
@@ -264,7 +267,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> escribeUUID() -->
+// --> escribeUUID() 
 // Imprime el UUID del servicio para depuración.
 // --------------------
   void escribeUUID() {
@@ -278,7 +281,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// característica: Caracteristica --> anyadirCaracteristica() -->
+// car: Caracteristica --> anyadirCaracteristica() -->
 // Añade la característica para activarla junto al servicio.
 // --------------------
   void anyadirCaracteristica( Caracteristica & car ) {
@@ -288,7 +291,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> activarServicio() -->
+// --> activarServicio() 
 // Activa el servicio GATT y las características registradas.
 // --------------------
   void activarServicio( ) {
@@ -308,7 +311,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> operator BLEService&() --> BLEService&
+//  operator BLEService&() --> BLEService&
 // Permite pasar el servicio a las funciones de Bluefruit.
 // --------------------
   operator BLEService&() {

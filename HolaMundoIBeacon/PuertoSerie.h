@@ -23,7 +23,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// baudios: N --> PuertoSerie() --> PuertoSerie
+// baudios: N --> PuertoSerie() --> 
 // Abre el puerto serie a la velocidad indicada.
 // --------------------
   PuertoSerie (long baudios) {
@@ -34,7 +34,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> esperarDisponible() -->
+// esperarDisponible() 
 // Espera a que el monitor serie esté conectado.
 // --------------------
   void esperarDisponible() {
@@ -47,7 +47,7 @@ public:
 
   // .........................................................
   // .........................................................
-  template<typename T>
+  template<typename T> //Cualquier tipo
 // --------------------
 // mensaje: T --> escribir() -->
 // Escribe el mensaje en el puerto serie.

@@ -45,7 +45,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// nombre: Text, fabricante: N, potencia: Z --> EmisoraBLE() --> EmisoraBLE
+// nombreEmisora_: Text0, fabricante: N, txPower_: Z --> EmisoraBLE() --> EmisoraBLE
 // Guarda los parámetros de emisión sin activar el hardware.
 // --------------------
   EmisoraBLE( const char * nombreEmisora_, const uint16_t fabricanteID_,
@@ -87,7 +87,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> encenderEmisora() -->
+// --> encenderEmisora() 
 // Inicializa Bluefruit y detiene cualquier anuncio previo.
 // --------------------
   void encenderEmisora() {
@@ -101,7 +101,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// callbacks: conexión --> encenderEmisora() -->
+// cbce:callbacks, cbce:callbacks  --> encenderEmisora() 
 // Activa la emisora e instala los callbacks de conexión.
 // --------------------
   void encenderEmisora( CallbackConexionEstablecida cbce,
@@ -117,7 +117,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// --> detenerAnuncio() -->
+// --> detenerAnuncio() 
 // Detiene la radio solo si está anunciando.
 // --------------------
   void detenerAnuncio() {
@@ -143,7 +143,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// uuid: Bytes, major: N, minor: Z, rssi: N --> emitirAnuncioIBeacon() -->
+// beaconUUID: N, major: Z, minor: Z, rssi: N --> emitirAnuncioIBeacon() -->
 // Configura el paquete iBeacon y comienza a anunciarlo.
 // Major contiene tipo/contador; Minor conserva el valor con signo.
 // --------------------
@@ -239,7 +239,7 @@ public:
 	const uint8_t tamanyoCarga = strlen( carga );
   */
 // --------------------
-// carga: Bytes, longitud: N --> emitirAnuncioIBeaconLibre() -->
+// carga: texto, tamanyoCarga: N --> emitirAnuncioIBeaconLibre() <--
 // Publica una carga libre truncada al espacio de datos iBeacon.
 // --------------------
   void emitirAnuncioIBeaconLibre( const char * carga, const uint8_t tamanyoCarga ) {
@@ -305,7 +305,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// servicio: Servicio --> anyadirServicio() --> B
+// servicio: ServicioEnEmisora --> anyadirServicio() --> B
 // Registra un servicio GATT con la emisora.
 // --------------------
   bool anyadirServicio( ServicioEnEmisora & servicio ) {
@@ -328,7 +328,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// servicio: Servicio --> anyadirServicioConSusCaracteristicas() --> B
+// servicio: ServicioEnEmisora --> anyadirServicioConSusCaracteristicas() --> B
 // Añade el servicio GATT sin características adicionales.
 // --------------------
   bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio ) { 
@@ -338,7 +338,7 @@ public:
   // .........................................................
   template <typename ... T>
 // --------------------
-// servicio: Servicio, características: Caracteristica[] --> anyadirServicioConSusCaracteristicas() --> B
+// servicio: ServicioEnEmisora, características: Caracteristica[], restoCaracteristicas:T --> anyadirServicioConSusCaracteristicas() --> B
 // Registra las características antes de añadir el servicio.
 // --------------------
   bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio,
@@ -354,7 +354,7 @@ public:
   // .........................................................
   template <typename ... T>
 // --------------------
-// servicio: Servicio, características: Caracteristica[] --> anyadirServicioConSusCaracteristicasYActivar() --> B
+// servicio: ServicioEnEmisora, restoCaracteristicas: T --> anyadirServicioConSusCaracteristicasYActivar() --> B
 // Añade las características y activa el servicio GATT.
 // --------------------
   bool anyadirServicioConSusCaracteristicasYActivar( ServicioEnEmisora & servicio,
@@ -372,7 +372,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// callback: conexión --> instalarCallbackConexionEstablecida() -->
+// cb: CallbackConexionEstablecida --> instalarCallbackConexionEstablecida() 
 // Registra la notificación de conexión BLE.
 // --------------------
   void instalarCallbackConexionEstablecida( CallbackConexionEstablecida cb ) {
@@ -382,7 +382,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// callback: desconexión --> instalarCallbackConexionTerminada() -->
+// cb: CallbackConexionTerminada --> instalarCallbackConexionTerminada() 
 // Registra la notificación de cierre de conexión BLE.
 // --------------------
   void instalarCallbackConexionTerminada( CallbackConexionTerminada cb ) {
@@ -392,7 +392,7 @@ public:
   // .........................................................
   // .........................................................
 // --------------------
-// identificador: N --> getConexion() --> BLEConnection
+// connHandle: N --> getConexion() --> BLEConnection
 // Recupera la conexión asociada al identificador BLE.
 // --------------------
   BLEConnection * getConexion( uint16_t connHandle ) {
