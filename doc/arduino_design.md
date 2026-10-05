@@ -40,7 +40,4 @@ El sketch coordina `Medidor`, `Publicador`, `EmisoraBLE`, `ServicioEnEmisora`, `
 - **Programming Language:** C++ para Arduino.
 - **Function/Method Headers:** Cada cabecera debe incluir el diseño lógico en un bloque de comentario delimitado por líneas `--------------------`.
 - **Code Readability:** Código claro y autoexplicativo; comentarios inline mínimos.
-- **Automated Testing:** Generar pruebas unitarias o de integración para toda función crítica; verificar HolaMundoIBeacon/tests/test_firmware.cpp con un compilador C++11 y compilar el sketch para revisar la integración BLE.
-## Pruebas del firmware
-
-HolaMundoIBeacon/tests/test_firmware.cpp comprueba las lecturas simuladas sin hardware. La emisión por radio BLE requiere compilar y ejecutar el sketch en la placa.
+- **Automated Testing:** Este proyecto no incluye pruebas automáticas para el firmware Arduino. La comprobación del envío BLE se realiza cargando el sketch en la placa.

@@ -45,7 +45,6 @@ namespace Globales {
 #include "EmisoraBLE.h"
 #include "Publicador.h"
 #include "Medidor.h"
-#include "test.h"
 
 
 // --------------------------------------------------------------
@@ -80,10 +79,6 @@ void inicializarPlaquita () {
 void setup() {
 
   Globales::elPuerto.esperarDisponible();
-
-  // Ejecuta las comprobaciones antes de iniciar el servicio de emisión.
-  ejecutarTestsArduino();
-
   // 
   // 
   // 
