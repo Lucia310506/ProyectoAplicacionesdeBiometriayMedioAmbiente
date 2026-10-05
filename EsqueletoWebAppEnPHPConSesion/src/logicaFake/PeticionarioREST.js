@@ -9,7 +9,11 @@
 // Un único punto para XAMPP o Plesk. Relativo a ux/Aplicacion.html.
 const URL_MEDICIONES = '/mediciones';
 
+// --------------------
 // mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- pedirMediciones() --x
+// Solicita el GET y valida el JSON y el estado HTTP.
+// --------------------
+
 async function pedirMediciones() {
   const respuesta = await fetch(URL_MEDICIONES);
   const textoRespuesta = await respuesta.text();

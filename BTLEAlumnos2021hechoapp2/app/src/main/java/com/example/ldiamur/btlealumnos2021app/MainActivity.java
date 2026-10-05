@@ -32,6 +32,7 @@ import androidx.core.content.ContextCompat;
 import java.util.List;
 import java.util.UUID;
 import java.util.Collections;
+import org.json.JSONArray;
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String ETIQUETA_LOG = ">>>>";
 
     private static final int CODIGO_PETICION_PERMISOS = 11223344;
+    private boolean resultadoTestLogicaFake = false;
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
@@ -52,6 +54,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> buscarTodosLosDispositivosBTLE() -->
+     * Inicia un escaneo BLE general y registra su callback.
+     * --------------------
+     */
     private void buscarTodosLosDispositivosBTLE() {
         Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empieza ");
 
@@ -59,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
         this.callbackDelEscaneo = new ScanCallback() {
             @Override
+            /*
+             * --------------------
+             * tipo: N, resultado: ScanResult --> onScanResult() -->
+             * Procesa cada dispositivo BLE detectado.
+             * --------------------
+             */
             public void onScanResult( int callbackType, ScanResult resultado ) {
                 super.onScanResult(callbackType, resultado);
                 Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
@@ -67,6 +81,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            /*
+             * --------------------
+             * resultados: ScanResult[] --> onBatchScanResults() -->
+             * Recibe los resultados BLE agrupados por el sistema.
+             * --------------------
+             */
             public void onBatchScanResults(List<ScanResult> results) {
                 super.onBatchScanResults(results);
                 Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onBatchScanResults() ");
@@ -74,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            /*
+             * --------------------
+             * error: N --> onScanFailed() -->
+             * Registra el motivo por el que falló el escaneo.
+             * --------------------
+             */
             public void onScanFailed(int errorCode) {
                 super.onScanFailed(errorCode);
                 Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanFailed() ");
@@ -89,6 +115,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * resultado: ScanResult --> mostrarInformacionDispositivoBTLE() -->
+     * Extrae y registra los campos del beacon recibido.
+     * --------------------
+     */
     private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
 
         BluetoothDevice bluetoothDevice = resultado.getDevice();
@@ -137,6 +169,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * nombre: Text --> buscarEsteDispositivoBTLE() -->
+     * Inicia un escaneo filtrado por nombre de dispositivo.
+     * --------------------
+     */
     private void buscarEsteDispositivoBTLE(final String dispositivoBuscado ) {
         Log.d(ETIQUETA_LOG, " buscarEsteDispositivoBTLE(): empieza ");
 
@@ -147,6 +185,12 @@ public class MainActivity extends AppCompatActivity {
 
         this.callbackDelEscaneo = new ScanCallback() {
             @Override
+            /*
+             * --------------------
+             * tipo: N, resultado: ScanResult --> onScanResult() -->
+             * Procesa cada dispositivo BLE detectado.
+             * --------------------
+             */
             public void onScanResult( int callbackType, ScanResult resultado ) {
                 super.onScanResult(callbackType, resultado);
                 Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanResult() ");
@@ -155,6 +199,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            /*
+             * --------------------
+             * resultados: ScanResult[] --> onBatchScanResults() -->
+             * Recibe los resultados BLE agrupados por el sistema.
+             * --------------------
+             */
             public void onBatchScanResults(List<ScanResult> results) {
                 super.onBatchScanResults(results);
                 Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onBatchScanResults() ");
@@ -162,6 +212,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            /*
+             * --------------------
+             * error: N --> onScanFailed() -->
+             * Registra el motivo por el que falló el escaneo.
+             * --------------------
+             */
             public void onScanFailed(int errorCode) {
                 super.onScanFailed(errorCode);
                 Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanFailed() ");
@@ -184,6 +240,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> detenerBusquedaDispositivosBTLE() -->
+     * Detiene el escaneo BLE activo.
+     * --------------------
+     */
     private void detenerBusquedaDispositivosBTLE() {
 
         if ( this.callbackDelEscaneo == null ) {
@@ -197,6 +259,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * vista: View --> botonBuscarDispositivosBTLEPulsado() -->
+     * Inicia el servicio persistente de escucha BLE desde la interfaz.
+     * --------------------
+     */
     public void botonBuscarDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado" );
         iniciarServicioEscucha();
@@ -204,6 +272,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * vista: View --> botonBuscarNuestroDispositivoBTLEPulsado() -->
+     * Inicia la escucha del beacon configurado.
+     * --------------------
+     */
     public void botonBuscarNuestroDispositivoBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado" );
         iniciarServicioEscucha();
@@ -212,11 +286,23 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * vista: View --> botonDetenerBusquedaDispositivosBTLEPulsado() -->
+     * Detiene el servicio que escucha beacons.
+     * --------------------
+     */
     public void botonDetenerBusquedaDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton detener busqueda dispositivos BTLE Pulsado" );
         stopService(new Intent(this, ServicioEscuharBeacons.class));
     } // ()
 
+    /*
+     * --------------------
+     * --> iniciarServicioEscucha() -->
+     * Arranca el servicio Android en primer plano para mantener la escucha.
+     * --------------------
+     */
     private void iniciarServicioEscucha() {
         Intent intent = new Intent(this, ServicioEscuharBeacons.class);
         intent.setAction(ServicioEscuharBeacons.ACCION_INICIAR);
@@ -225,6 +311,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> inicializarBlueTooth() -->
+     * Inicializa el adaptador y escáner cuando hay permisos.
+     * --------------------
+     */
     private void inicializarBlueTooth() {
         // Sin permisos, las llamadas Bluetooth lanzan SecurityException (crash)
         if ( !tengoLosPermisosNecesarios() ) {
@@ -261,6 +353,13 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> permisosNecesarios() --> Text[]
+     * Elige los permisos Bluetooth/localización según la versión Android.
+     * --------------------
+     */
+    /// --------------------------PERMISOS---------------------------------///
     private String[] permisosNecesarios() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -286,6 +385,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> tengoLosPermisosNecesarios() --> B
+     * Comprueba que todos los permisos requeridos estén concedidos.
+     * --------------------
+     */
     private boolean tengoLosPermisosNecesarios() {
         for (String permiso : this.permisosNecesarios()) {
             if (ContextCompat.checkSelfPermission(this, permiso) != PackageManager.PERMISSION_GRANTED) {
@@ -299,6 +404,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> pedirPermisosNecesarios() -->
+     * Solicita permisos pendientes o inicializa Bluetooth si ya están concedidos.
+     * --------------------
+     */
     private void pedirPermisosNecesarios() {
         Log.d(ETIQUETA_LOG, " pedirPermisosNecesarios(): comprobando permisos ");
 
@@ -319,16 +430,95 @@ public class MainActivity extends AppCompatActivity {
     } // ()
 
 
+    /*
+     * --------------------
+     * --> comprobarLogicaFakeAlArrancar() -->
+     * Ejecuta las validaciones locales de lógica y registra su resultado.
+     * --------------------
+     */
+    private void comprobarLogicaFakeAlArrancar() {
+        resultadoTestLogicaFake = false;
+        try {
+            Log.i("TESTS_APP", "Ejecutando test: guardar CO2 valido");
+            LogicaFake.guardarMediciones("CO2", 500.0);
+            Log.i("TESTS_APP", "OK: guardar CO2 valido");
+
+            Log.i("TESTS_APP", "Ejecutando test: guardar TEMPERATURA valida");
+            LogicaFake.guardarMediciones("TEMPERATURA", -19.0);
+            Log.i("TESTS_APP", "OK: guardar TEMPERATURA valida");
+
+            comprobarRechazoLogica("HUMEDAD", 50.0, "rechazar tipo no admitido");
+            comprobarRechazoLogica("CO2", Double.NaN, "rechazar valor NaN");
+            resultadoTestLogicaFake = true;
+            Log.i("TEST_LOGICAFake", "OK: pruebas de logica fake superadas al iniciar");
+        } catch (Throwable error) {
+            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de logica fake al iniciar", error);
+        }
+    }
+
+    /*
+     * --------------------
+     * tipo: Text, valor: R, nombre: Text --> comprobarRechazoLogica() -->
+     * Confirma que la lógica rechaza la medición inválida.
+     * --------------------
+     */
+    private void comprobarRechazoLogica(String tipo, double valor, String nombre) {
+        Log.i("TESTS_APP", "Ejecutando test: " + nombre);
+        try {
+            LogicaFake.guardarMediciones(tipo, valor);
+            throw new AssertionError("La medicion invalida debia rechazarse");
+        } catch (IllegalArgumentException esperado) {
+            Log.i("TESTS_APP", "OK: " + nombre);
+        }
+    }
+
+    /*
+     * --------------------
+     * --> comprobarRestAlArrancar() -->
+     * Comprueba en segundo plano que REST devuelve JSON válido.
+     * --------------------
+     */
+    private void comprobarRestAlArrancar() {
+        Log.i("TESTS_APP", "Ejecutando test REST: GET /mediciones, HTTP 200 y JSON array");
+        new PeticionarioREST().hacerPeticionREST(
+                "GET", ConfiguracionRest.URL_MEDICIONES, null,
+                (codigo, cuerpo) -> {
+                    boolean resultadoRest = false;
+                    try {
+                        if (codigo != 200) {
+                            throw new IllegalStateException("GET /mediciones devolvio HTTP " + codigo);
+                        }
+                        new JSONArray(cuerpo);
+                        resultadoRest = true;
+                        Log.i("TEST_PETICIONARIO_REST", "OK: GET /mediciones devolvio HTTP 200 y JSON valido");
+                    } catch (Exception error) {
+                        Log.e("TEST_PETICIONARIO_REST", "ERROR: fallo la comprobacion REST al iniciar", error);
+                    }
+                    Log.i("TESTS_APP", "RESULTADOS : LOGICA_FAKE="
+                            + (resultadoTestLogicaFake ? "OK" : "ERROR")
+                            + ", REST=" + (resultadoRest ? "OK" : "ERROR"));
+                    pedirPermisosNecesarios();
+                });
+    }
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @Override
+    /*
+     * --------------------
+     * estado: Bundle --> onCreate() -->
+     * Configura la pantalla y ejecuta las comprobaciones de inicio.
+     * --------------------
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
 
-        pedirPermisosNecesarios();
+        Log.i("TESTS_APP", "EJECUTAR TESTS");
+
+        comprobarLogicaFakeAlArrancar();
+        comprobarRestAlArrancar();
 
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
 
@@ -336,6 +526,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * código: N, permisos: Text[], resultados: N[] --> onRequestPermissionsResult() -->
+     * Continúa la inicialización si el usuario concede los permisos.
+     * --------------------
+     */
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult( requestCode, permissions, grantResults);
@@ -375,5 +571,3 @@ if (todoConcedido) {
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 // --------------------------------------------------------------
-
-

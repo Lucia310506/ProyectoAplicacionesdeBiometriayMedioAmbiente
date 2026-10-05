@@ -12,6 +12,8 @@ import static org.junit.Assert.assertTrue;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import android.util.Log;
+
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
 import com.squareup.okhttp.mockwebserver.RecordedRequest;
@@ -25,10 +27,12 @@ import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class PeticionarioRESTTest {
+    private static final String ETIQUETA = "TEST_PETICIONARIO_REST";
 
     /*
      * --------------------
      * --> enviarMedicion() -->
+     * Verifica método POST, ruta y cuerpo JSON.
      * --------------------
      */
     @Test
@@ -51,6 +55,7 @@ public class PeticionarioRESTTest {
             assertEquals(2, cuerpo.length());
             assertEquals("CO2", cuerpo.getString("tipo"));
             assertEquals(500, cuerpo.getDouble("valor"), 0.0);
+            Log.i(ETIQUETA, "OK: POST /mediciones con JSON de tipo y valor");
         } finally {
             ConfiguracionRest.URL_MEDICIONES = urlAnterior;
             servidor.shutdown();
@@ -60,6 +65,7 @@ public class PeticionarioRESTTest {
     /*
      * --------------------
      * --> hacerPeticionREST() -->
+     * Comprueba el procesamiento de respuestas HTTP 201 y 500.
      * --------------------
      */
     @Test
@@ -72,6 +78,7 @@ public class PeticionarioRESTTest {
 
             servidor.enqueue(new MockResponse().setResponseCode(500).setBody("{\"error\":\"fallo\"}"));
             assertEquals(500, esperarCodigo(servidor.url("/mediciones").toString()));
+            Log.i(ETIQUETA, "OK: respuestas HTTP 201 y 500 procesadas");
         } finally {
             servidor.shutdown();
         }
@@ -80,6 +87,7 @@ public class PeticionarioRESTTest {
     /*
      * --------------------
      * url: Text --> esperarCodigo() --> N
+     * Espera de forma acotada y devuelve el código recibido.
      * --------------------
      */
     private int esperarCodigo(String url) throws InterruptedException {

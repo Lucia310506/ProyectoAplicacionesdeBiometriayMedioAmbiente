@@ -51,6 +51,12 @@ public:
 
   // ............................................................
   // ............................................................
+  // --------------------
+// --> Publicador()
+// Prepara el beacon sin activar la radio durante la construcción.
+// --------------------
+
+  // Prepara el beacon sin activar la radio durante la construcción.
   Publicador( ) {
 	// ATENCION: no hacerlo aquí. (*this).laEmisora.encenderEmisora();
 	// Pondremos un método para llamarlo desde el setup() más tarde
@@ -58,12 +64,24 @@ public:
 
   // ............................................................
   // ............................................................
+  // --------------------
+// --> encenderEmisora() -->
+// Activa la emisora BLE una vez inicializada la placa.
+// --------------------
+
+  // Activa la emisora BLE una vez inicializada la placa.
   void encenderEmisora() {
 	(*this).laEmisora.encenderEmisora();
   } // ()
 
   // ............................................................
   // ............................................................
+  // --------------------
+// medida: CO2, contador: N, espera: ms --> publicarCO2() -->
+// Emite CO2 y detiene el anuncio al terminar el intervalo.
+// --------------------
+
+  // Emite CO2 y detiene el anuncio al terminar el intervalo.
   void publicarCO2( int16_t valorCO2, uint8_t contador,
 					long tiempoEspera ) {
 
@@ -100,6 +118,12 @@ public:
 
   // ............................................................
   // ............................................................
+  // --------------------
+// medida: temperatura, contador: N, espera: ms --> publicarTemperatura() -->
+// Emite temperatura y detiene el anuncio al terminar el intervalo.
+// --------------------
+
+  // Emite temperatura y detiene el anuncio al terminar el intervalo.
   void publicarTemperatura( int16_t valorTemperatura,
 							uint8_t contador, long tiempoEspera ) {
 

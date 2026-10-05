@@ -21,12 +21,13 @@ import org.json.JSONObject;
 
 public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
-    /*
-     * --------------------
-     * codigo: N, cuerpo: Text --> callback() -->
-     * --------------------
-     */
     public interface RespuestaREST {
+        /*
+         * --------------------
+         * codigo: N, cuerpo: Text --> callback() -->
+         * Entrega al cliente el estado HTTP y el cuerpo de respuesta.
+         * --------------------
+         */
         void callback (int codigo, String cuerpo);
     }
 
@@ -40,7 +41,8 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * metodo: Text, url: Text, cuerpo: Text --> hacerPeticionREST() -->
+     * método: Text, URL: Text, cuerpo: Text, callback: RespuestaREST --> hacerPeticionREST() -->
+     * Configura y lanza la petición HTTP en segundo plano.
      * --------------------
      */
     public void hacerPeticionREST (String metodo, String urlDestino, String cuerpo, RespuestaREST laRespuesta) {
@@ -54,7 +56,8 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * --> PeticionarioREST() -->
+     * --> PeticionarioREST() --> PeticionarioREST
+     * Construye el cliente HTTP asíncrono.
      * --------------------
      */
     public PeticionarioREST() {
@@ -63,7 +66,8 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> enviarMedicion() --x
+     * tipo: Text, valor: R --> enviarMedicion() -->
+     * Forma el JSON y envía una medición al endpoint REST.
      * --------------------
      */
     public static void enviarMedicion(String tipo, double valor) {
@@ -80,12 +84,13 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
+    @Override
     /*
      * --------------------
-     * --> doInBackground() --> B
+     * parámetros: Void[] --> doInBackground() --> B
+     * Ejecuta la conexión y lee la respuesta fuera del hilo principal.
      * --------------------
      */
-    @Override
     protected Boolean doInBackground(Void... params) {
         Log.d("clienterestandroid", "doInBackground()");
 
@@ -157,12 +162,13 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         return false;
     }
 
+    @Override
     /*
      * --------------------
      * resultado: B --> onPostExecute() -->
+     * Entrega la respuesta HTTP al callback tras finalizar la petición.
      * --------------------
      */
-    @Override
     protected void onPostExecute(Boolean comoFue) {
         Log.d("clienterestandroid", "onPostExecute() comoFue = " + comoFue);
         if (this.laRespuesta != null) {

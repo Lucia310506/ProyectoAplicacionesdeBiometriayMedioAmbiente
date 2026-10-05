@@ -7,7 +7,11 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 
+// --------------------
 // entorno: Text --> conectarBaseDatos() --> PDO
+// Resuelve credenciales del entorno y construye la conexión PDO.
+// --------------------
+
 function conectarBaseDatos(string $entorno = 'produccion'): PDO {
     $sufijo = $entorno === 'pruebas' ? '_TEST' : ($entorno === 'produccion' ? '_PROD' : '');
     $configuracion = [];
@@ -34,7 +38,11 @@ function conectarBaseDatos(string $entorno = 'produccion'): PDO {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
 }
 
+// --------------------
 // host: Text, base: Text, usuario: Text, password: Text --> credencialesProduccionIncompletas() --> B
+// Detecta credenciales ausentes o marcadores de plantilla antes de conectar.
+// --------------------
+
 function credencialesProduccionIncompletas($host, $base, $usuario, $password): bool {
     if (!$host || !$usuario || $password === false || $password === null || $password === '') {
         return true;
@@ -47,7 +55,11 @@ function credencialesProduccionIncompletas($host, $base, $usuario, $password): b
     return false;
 }
 
-// --> obtenerEntornoBaseDatos() <--
+// --------------------
+// --> obtenerEntornoBaseDatos() --> Text
+// Devuelve el entorno seleccionado o producción por defecto.
+// --------------------
+
 function obtenerEntornoBaseDatos(): string {
     return getenv('MEDICIONES_ENTORNO') ?: 'produccion';
 }

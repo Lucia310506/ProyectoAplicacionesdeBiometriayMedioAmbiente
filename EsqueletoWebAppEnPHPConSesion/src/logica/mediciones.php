@@ -9,7 +9,11 @@
 //BD: MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
 require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
 
+// --------------------
 // tipo: Text, valor: R --> guardarMediciones() -->
+// Valida la medición y la inserta usando una consulta preparada.
+// --------------------
+
 function guardarMediciones(string $tipo, float $valor): void {
     if (!in_array($tipo, ['CO2', 'TEMPERATURA'], true)) {
         throw new InvalidArgumentException('tipo debe ser CO2 o TEMPERATURA');
@@ -28,7 +32,11 @@ function guardarMediciones(string $tipo, float $valor): void {
     ejecutarPrimeraConsultaValida($conexion, $consultasInsert, $parametros);
 }
 
+// --------------------
 // mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- mostrarMediciones() <--
+// Lee y normaliza las filas para devolver el contrato compartido.
+// --------------------
+
 function mostrarMediciones(): array {
     $conexion = conectarBaseDatos(obtenerEntornoBaseDatos());
     $consultasSelect = [
@@ -50,7 +58,11 @@ function mostrarMediciones(): array {
     return $mediciones;
 }
 
+// --------------------
 // conexion: PDO, consultas: [Text], parametros: Dict|Nulo --> ejecutarPrimeraConsultaValida() --> [Dict]
+// Ejecuta la primera variante compatible con el esquema desplegado.
+// --------------------
+
 function ejecutarPrimeraConsultaValida(PDO $conexion, array $consultas, ?array $parametros): array {
     $ultimoError = null;
     foreach ($consultas as $consulta) {
@@ -65,7 +77,11 @@ function ejecutarPrimeraConsultaValida(PDO $conexion, array $consultas, ?array $
     throw $ultimoError ?? new RuntimeException('No se pudo ejecutar la consulta de mediciones');
 }
 
+// --------------------
 // fila: Dict --> normalizarFilaMedicion() --> (id: N, tipo: Text, valor: R, fecha: DateTime)
+// Normaliza tipos y nombres de columna antes de entregar una medición.
+// --------------------
+
 function normalizarFilaMedicion(array $fila): array {
     return [
         'id' => (int) ($fila['id'] ?? $fila['Id'] ?? 0),

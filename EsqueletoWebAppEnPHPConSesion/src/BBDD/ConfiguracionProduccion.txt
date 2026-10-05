@@ -1,0 +1,20 @@
+CONFIGURACION DE PRODUCCION
+
+Rellena estos datos con los de tu servidor MySQL. No pongas aquí una contraseña real si vas a compartir o subir este archivo.
+
+host: ESCRIBE_EL_HOST_DE_MYSQL
+base: ESCRIBE_EL_NOMBRE_DE_LA_BASE
+usuario: ESCRIBE_EL_USUARIO
+password: ESCRIBE_LA_CONTRASENA
+
+El servidor PHP no lee este archivo de texto. Usa estos mismos datos para crear ConfiguracionProduccion.php en esta carpeta, con este formato:
+
+<?php
+return [
+    'host' => 'ESCRIBE_EL_HOST_DE_MYSQL',
+    'base' => 'ESCRIBE_EL_NOMBRE_DE_LA_BASE',
+    'usuario' => 'ESCRIBE_EL_USUARIO',
+    'password' => 'ESCRIBE_LA_CONTRASENA'
+];
+
+ConfiguracionProduccion.php está ignorado por Git para proteger las claves. Debes crearlo también en el servidor, porque no se sube con el resto del proyecto.

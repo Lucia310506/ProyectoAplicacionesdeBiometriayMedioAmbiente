@@ -45,6 +45,7 @@ namespace Globales {
 #include "EmisoraBLE.h"
 #include "Publicador.h"
 #include "Medidor.h"
+#include "test.h"
 
 
 // --------------------------------------------------------------
@@ -59,6 +60,10 @@ namespace Globales {
 
 // --------------------------------------------------------------
 // --------------------------------------------------------------
+// --------------------
+// --> inicializarPlaquita() -->
+// Punto de inicialización de la placa antes de activar BLE.
+// --------------------
 void inicializarPlaquita () {
 
   // de momento nada
@@ -68,9 +73,16 @@ void inicializarPlaquita () {
 // --------------------------------------------------------------
 // setup()
 // --------------------------------------------------------------
+// --------------------
+// --> setup() -->
+// Inicializa serie, emisora BLE y medidor al arrancar la placa.
+// --------------------
 void setup() {
 
   Globales::elPuerto.esperarDisponible();
+
+  // Ejecuta las comprobaciones antes de iniciar el servicio de emisión.
+  ejecutarTestsArduino();
 
   // 
   // 
@@ -103,6 +115,10 @@ void setup() {
 
 // --------------------------------------------------------------
 // --------------------------------------------------------------
+// --------------------
+// --> lucecitas() -->
+// Ejecuta la secuencia visual de señalización del ciclo.
+// --------------------
 inline void lucecitas() {
   using namespace Globales;
 
@@ -125,6 +141,10 @@ namespace Loop {
 
 // ..............................................................
 // ..............................................................
+// --------------------
+// --> loop() -->
+// Lee y publica CO2 y temperatura en cada ciclo del firmware.
+// --------------------
 void loop () {
 
   using namespace Loop;

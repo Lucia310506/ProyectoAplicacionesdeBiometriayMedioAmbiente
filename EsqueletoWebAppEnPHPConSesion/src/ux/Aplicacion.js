@@ -6,7 +6,11 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 
+// --------------------
 // texto: Text, clase: Text --> mostrarEstado() -->
+// Actualiza el mensaje visible y su estilo.
+// --------------------
+
 function mostrarEstado(texto, clase) {
   const estado = document.getElementById('estado');
 
@@ -20,7 +24,11 @@ function mostrarEstado(texto, clase) {
 
 let ultimasMediciones = [];
 
-// mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] --> dibujarLista() -->
+// --------------------
+// mediciones: Mediciones --> dibujarLista() -->
+// Ordena y representa las últimas diez filas sin interpretar HTML externo.
+// --------------------
+
 function dibujarLista(mediciones) {
   const cuerpo = document.getElementById('cuerpo-mediciones');
 
@@ -59,7 +67,11 @@ function dibujarLista(mediciones) {
   });
 }
 
+// --------------------
 // --> actualizarMediciones() -->
+// Consulta REST, representa los datos y refleja carga, éxito o error.
+// --------------------
+
 async function actualizarMediciones() {
   try {
     mostrarEstado('Cargando mediciones...', 'carga');
@@ -75,7 +87,11 @@ async function actualizarMediciones() {
   }
 }
 
+// --------------------
 // --> iniciarAplicacion() -->
+// Hace la primera actualización y programa la consulta periódica.
+// --------------------
+
 function iniciarAplicacion() {
   actualizarMediciones();
   setInterval(actualizarMediciones, 5000);
@@ -83,5 +99,13 @@ function iniciarAplicacion() {
 
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  iniciarAplicacion();
+  const pruebasInicio = window.promesasPruebasInicio;
+  if (pruebasInicio && typeof pruebasInicio.then === 'function') {
+    pruebasInicio.then(iniciarAplicacion).catch((error) => {
+      console.log('ERROR: fallo inesperado al ejecutar tests de inicio — ' + error.message);
+      iniciarAplicacion();
+    });
+  } else {
+    iniciarAplicacion();
+  }
 }
