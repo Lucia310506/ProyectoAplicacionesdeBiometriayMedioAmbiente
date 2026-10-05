@@ -41,7 +41,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * método: Text, URL: Text, cuerpo: Text, callback: RespuestaREST --> hacerPeticionREST() -->
+     * metodo: Texto, URL: Texto, cuerpo: Texto, laRespuesta: RespuestaREST --> hacerPeticionREST() -->
      * Configura y lanza la petición HTTP en segundo plano.
      * --------------------
      */
@@ -165,7 +165,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     @Override
     /*
      * --------------------
-     * resultado: B --> onPostExecute() -->
+     * comoFue: B --> onPostExecute() <--
      * Entrega la respuesta HTTP al callback tras finalizar la petición.
      * --------------------
      */

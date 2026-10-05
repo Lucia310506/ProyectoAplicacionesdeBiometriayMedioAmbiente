@@ -31,7 +31,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getPrefijo() --> Bytes
+     * --> getPrefijo() --> [Bytes]
      * Devuelve los bytes iniciales del anuncio.
      * --------------------
      */
@@ -43,7 +43,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getUUID() --> Bytes
+     * --> getUUID() --> [Bytes]
      * Devuelve el UUID contenido en el beacon.
      * --------------------
      */
@@ -55,7 +55,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getMajor() --> Bytes
+     * --> getMajor() --> [Bytes]
      * Devuelve los bytes Major del beacon.
      * --------------------
      */
@@ -67,7 +67,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getMinor() --> Bytes
+     * --> getMinor() --> [Bytes]
      * Devuelve los bytes Minor del beacon.
      * --------------------
      */
@@ -79,7 +79,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getTxPower() --> Z
+     * --> getTxPower() --> Byte
      * Devuelve la potencia transmitida en la trama.
      * --------------------
      */
@@ -91,7 +91,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getLosBytes() --> Bytes
+     * --> getLosBytes() --> [Bytes]
      * Devuelve la trama BLE completa recibida.
      * --------------------
      */
@@ -103,7 +103,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getAdvFlags() --> Bytes
+     * --> getAdvFlags() --> [Bytes]
      * Devuelve las banderas del anuncio BLE.
      * --------------------
      */
@@ -115,7 +115,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getAdvHeader() --> Bytes
+     * --> getAdvHeader() --> [Bytes]
      * Devuelve la cabecera de datos de anuncio.
      * --------------------
      */
@@ -127,7 +127,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getCompanyID() --> Bytes
+     * --> getCompanyID() --> [Bytes]
      * Devuelve el identificador del fabricante.
      * --------------------
      */
@@ -139,7 +139,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getiBeaconType() --> Z
+     * --> getiBeaconType() --> byte
      * Devuelve el tipo de anuncio iBeacon.
      * --------------------
      */
@@ -151,7 +151,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * --> getiBeaconLength() --> Z
+     * --> getiBeaconLength() --> byte
      * Devuelve la longitud declarada de datos iBeacon.
      * --------------------
      */
@@ -163,7 +163,7 @@ public class TramaIBeacon {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * bytes: Bytes --> TramaIBeacon() --> TramaIBeacon
+     * bytes: [Bytes] --> TramaIBeacon() -->
      * Separa la trama recibida en sus campos iBeacon.
      * --------------------
      */

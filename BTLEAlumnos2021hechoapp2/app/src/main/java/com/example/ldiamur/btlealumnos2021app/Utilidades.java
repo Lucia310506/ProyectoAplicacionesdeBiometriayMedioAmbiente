@@ -20,7 +20,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * texto: Text --> stringToBytes() --> Bytes
+     * texto: Texto --> stringToBytes() --> [Bytes]
      * Convierte el texto en su representación de bytes.
      * --------------------
      */
@@ -33,7 +33,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * uuid: Text --> stringToUUID() --> UUID
+     * uuid: Texto --> stringToUUID() --> UUID
      * Interpreta los 16 caracteres del UUID del proyecto.
      * --------------------
      */
@@ -59,7 +59,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * uuid: UUID --> uuidToString() --> Text
+     * uuid: UUID --> uuidToString() --> Texto
      * Convierte el UUID en una cadena de sus bytes.
      * --------------------
      */
@@ -71,7 +71,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * uuid: UUID --> uuidToHexString() --> Text
+     * uuid: UUID --> uuidToHexString() --> Texto
      * Representa los bytes del UUID en hexadecimal.
      * --------------------
      */
@@ -83,7 +83,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * bytes: Bytes --> bytesToString() --> Text
+     * bytes: [Bytes] --> bytesToString() --> Texto
      * Convierte los bytes en caracteres.
      * --------------------
      */
@@ -103,7 +103,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * dos valores: N --> dosLongToBytes() --> Bytes
+     * masSignificativos y menosSignificativos: Z --> dosLongToBytes() --> [Bytes]
      * Une dos enteros de 64 bits en una secuencia de 16 bytes.
      * --------------------
      */
@@ -119,7 +119,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * bytes: Bytes --> bytesToInt() --> Z
+     * bytes: [Bytes] --> bytesToInt() --> Z
      * Interpreta los bytes como entero con signo.
      * --------------------
      */
@@ -132,7 +132,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * bytes: Bytes --> bytesToLong() --> Z
+     * bytes: [Bytes] --> bytesToLong() --> Z
      * Interpreta los bytes como entero largo con signo.
      * --------------------
      */
@@ -144,7 +144,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * bytes: Bytes --> bytesToIntOK() --> Z
+     * bytes: [Bytes] --> bytesToIntOK() --> Z
      * Convierte hasta cuatro bytes acumulando su valor numérico.
      * --------------------
      */
@@ -188,7 +188,7 @@ public class Utilidades {
     // -------------------------------------------------------------------------------
     /*
      * --------------------
-     * bytes: Bytes --> bytesToHexString() --> Text
+     * bytes: [Bytes] --> bytesToHexString() --> Texto
      * Formatea cada byte en hexadecimal para depuración.
      * --------------------
      */

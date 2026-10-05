@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * --> buscarTodosLosDispositivosBTLE() -->
+     * buscarTodosLosDispositivosBTLE() -->
      * Inicia un escaneo BLE general y registra su callback.
      * --------------------
      */
@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             /*
              * --------------------
-             * tipo: N, resultado: ScanResult --> onScanResult() -->
+             * tipo: N, resultado: ScanResult --> onScanResult()
              * Procesa cada dispositivo BLE detectado.
              * --------------------
              */
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             /*
              * --------------------
-             * resultados: ScanResult[] --> onBatchScanResults() -->
+             * resultados: ScanResult[] --> onBatchScanResults()
              * Recibe los resultados BLE agrupados por el sistema.
              * --------------------
              */
@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             /*
              * --------------------
-             * error: N --> onScanFailed() -->
+             * error: N --> onScanFailed()
              * Registra el motivo por el que falló el escaneo.
              * --------------------
              */
@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * resultado: ScanResult --> mostrarInformacionDispositivoBTLE() -->
+     * resultado: ScanResult --> mostrarInformacionDispositivoBTLE()
      * Extrae y registra los campos del beacon recibido.
      * --------------------
      */
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * nombre: Text --> buscarEsteDispositivoBTLE() -->
+     * dispositivoBuscado: Texto --> buscarEsteDispositivoBTLE() -->
      * Inicia un escaneo filtrado por nombre de dispositivo.
      * --------------------
      */
@@ -187,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             /*
              * --------------------
-             * tipo: N, resultado: ScanResult --> onScanResult() -->
+             * tipo: N, resultado: ScanResult --> onScanResult()
              * Procesa cada dispositivo BLE detectado.
              * --------------------
              */
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             /*
              * --------------------
-             * resultados: ScanResult[] --> onBatchScanResults() -->
+             * resultados: ScanResult[] --> onBatchScanResults()
              * Recibe los resultados BLE agrupados por el sistema.
              * --------------------
              */
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             /*
              * --------------------
-             * error: N --> onScanFailed() -->
+             * error: N --> onScanFailed()
              * Registra el motivo por el que falló el escaneo.
              * --------------------
              */
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * vista: View --> botonBuscarDispositivosBTLEPulsado() -->
+     * v: vista --> botonBuscarDispositivosBTLEPulsado() <--
      * Inicia el servicio persistente de escucha BLE desde la interfaz.
      * --------------------
      */
@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * vista: View --> botonBuscarNuestroDispositivoBTLEPulsado() -->
+     * v: vista --> botonBuscarNuestroDispositivoBTLEPulsado() <--
      * Inicia la escucha del beacon configurado.
      * --------------------
      */
@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * vista: View --> botonDetenerBusquedaDispositivosBTLEPulsado() -->
+     * v: vista --> botonDetenerBusquedaDispositivosBTLEPulsado() <--
      * Detiene el servicio que escucha beacons.
      * --------------------
      */
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * --> inicializarBlueTooth() -->
+     *  inicializarBlueTooth() -->
      * Inicializa el adaptador y escáner cuando hay permisos.
      * --------------------
      */
@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * --> permisosNecesarios() --> Text[]
+     *  permisosNecesarios() --> Texto[]
      * Elige los permisos Bluetooth/localización según la versión Android.
      * --------------------
      */
@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * --> tengoLosPermisosNecesarios() --> B
+     *  tengoLosPermisosNecesarios() --> B
      * Comprueba que todos los permisos requeridos estén concedidos.
      * --------------------
      */
@@ -432,7 +432,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      * --------------------
-     * --> comprobarLogicaFakeAlArrancar() -->
+     *  comprobarLogicaFakeAlArrancar() -->
      * Ejecuta las validaciones locales de lógica y registra su resultado.
      * --------------------
      */
@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      * --------------------
-     * tipo: Text, valor: R, nombre: Text --> comprobarRechazoLogica() -->
+     * tipo: Texto, valor: R, nombre: Texto --> comprobarRechazoLogica() -->
      * Confirma que la lógica rechaza la medición inválida.
      * --------------------
      */
@@ -505,7 +505,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     /*
      * --------------------
-     * estado: Bundle --> onCreate() -->
+     * savedInstanceState: Bundle --> onCreate()
      * Configura la pantalla y ejecuta las comprobaciones de inicio.
      * --------------------
      */
@@ -528,7 +528,7 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * código: N, permisos: Text[], resultados: N[] --> onRequestPermissionsResult() -->
+     * código: N, permisos: Texto[], resultados: Z[] --> onRequestPermissionsResult()
      * Continúa la inicialización si el usuario concede los permisos.
      * --------------------
      */

@@ -48,7 +48,7 @@ public class ServicioEscuharBeacons extends Service {
     @Override
     /*
      * --------------------
-     * --> onCreate() -->
+     * --> onCreate()
      * Prepara las notificaciones y el escáner del servicio.
      * --------------------
      */
@@ -297,7 +297,7 @@ public class ServicioEscuharBeacons extends Service {
     @Override
     /*
      * --------------------
-     * --> onDestroy() -->
+     * --> onDestroy() 
      * Detiene la escucha antes de destruir el servicio.
      * --------------------
      */
