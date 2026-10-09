@@ -9,14 +9,15 @@
 ### Interfaces lógicas
 
 ```text
-mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
-             <-- mostrarMediciones() <--
-
-GET /mediciones
-mostrarMediciones() --> [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
-
-mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
-             <-- pedirMediciones() --x
+Aplicacion.js
+   │ mostrarMediciones()
+   ▼
+LogicaFake.js
+   │ pedirMediciones()
+   ▼
+PeticionarioREST.js ── GET /mediciones ──► REST
+   │ devuelve Mediciones
+   └──────────────────────────────► LogicaFake.js ──► Aplicacion.js
 ```
 
 `PeticionarioREST.js` solicita `GET /mediciones` y devuelve la lista recibida. La URL REST se configura en un único sitio para alternar entre XAMPP y Plesk.
@@ -37,7 +38,7 @@ La lógica fake web simula la interfaz de lógica negocio para la UX; el peticio
 
 ### Ubicación de implementación
 
-`EsqueletoWebAppEnPHPConSesion/src/logicaFake/PeticionarioREST.js` (cliente REST); `src/ux/Aplicacion.js` consume `pedirMediciones()`.
+`EsqueletoWebAppEnPHPConSesion/src/logicaFake/PeticionarioREST.js` (cliente REST) y `LogicaFake.js` (fachada de dominio). `src/ux/Aplicacion.js` consume únicamente `mostrarMediciones()`.
 
 ### Diseño global del módulo `PeticionarioREST.js`
 
@@ -54,7 +55,7 @@ El módulo JavaScript no mantiene estado de instancia. Define una constante para
 |---|---|---|
 | `async pedirMediciones(): Promise<Medicion[]>` | `--> pedirMediciones() --x Medicion[]` | Ejecuta GET a `/mediciones`, lee el cuerpo como texto, lo analiza como JSON, informa errores de JSON/HTTP y devuelve la lista. |
 
-La UX consume esta operación; la ruta es relativa al servidor donde se sirve `Aplicacion.html`.
+`LogicaFake.js` consume esta operación; la ruta es relativa al servidor donde se sirve `Aplicacion.html`. La UX desconoce la operación HTTP.
 
 ### Contrato de respuesta y errores
 
@@ -63,8 +64,9 @@ La respuesta correcta es un arreglo JSON (incluido `[]` si no hay lecturas). La 
 ### Secuencia de consulta
 
 ```text
-actualizarMediciones()
-  → pedirMediciones()
+Aplicacion.js: actualizarMediciones()
+  → LogicaFake.js: mostrarMediciones()
+  → PeticionarioREST.js: pedirMediciones()
   → fetch('/mediciones')
   → response.text()
   → JSON.parse(texto)

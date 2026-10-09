@@ -105,10 +105,22 @@ flowchart LR
 - El firmware actual usa lecturas simuladas (`CO2 = 18`, `TEMPERATURA = 8`); la arquitectura aún no representa la lectura calibrada de un sensor físico.
 - Android configura el destino en `ConfiguracionRest.URL_MEDICIONES`. El móvil debe alcanzar esa URL por red.
 - PHP elige producción por defecto. Las pruebas web exigen `MEDICIONES_ENTORNO=pruebas` y credenciales de una base de pruebas independiente.
-- Las pruebas Android usan conexiones HTTP simuladas. Las pruebas web simulan el cliente en JavaScript y, para la parte PHP, usan MySQL de pruebas. Arduino comprueba sus valores simulados y escribe en Serial.
+- El botón Android conserva pruebas de REST simuladas. `PeticionarioRESTTest` añade pruebas instrumentadas con MockWebServer local para GET y POST. Las pruebas web simulan el cliente en JavaScript y, para la parte PHP, usan MySQL de pruebas. Arduino comprueba sus valores simulados y escribe en Serial.
 - La página y la API comparten el origen en la configuración esperada para que las peticiones del navegador y el endpoint de pruebas respeten same-origin.
 
 ### Estructura por componentes
+
+La carpeta `src/` de la raíz organiza los componentes que pide el diseño. Cada carpeta incluye un mapa a la fuente que se ejecuta dentro de su proyecto nativo.
+
+```text
+src/
+  communication/             Mapa a los clientes y al endpoint REST
+  business_logic/             Mapa a las reglas de negocio
+  frontend_business_logic/    Mapa a la fachada LogicaFake web
+  gui/                        Mapa a las interfaces web, Android y Arduino
+```
+
+Las fuentes ejecutables siguen dentro de las carpetas de Android Studio, Arduino IDE y la aplicación PHP para que cada proyecto conserve su configuración y se pueda desplegar por separado.
 
 ```text
 HolaMundoIBeacon/
@@ -180,7 +192,7 @@ El archivo PHP no se incluye en el repositorio porque contiene credenciales. Cr�
 4. Para comprobar la lógica y el cliente REST simulado, pulsa **Ejecutar todas las pruebas**. Las pruebas no se ejecutan al iniciar la aplicación. En Logcat filtra por `TESTS_APP`, `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST` para ver inicio, casos y resumen.
 5. Para iniciar la escucha BLE, utiliza los botones de búsqueda de la aplicación; para acabarla, pulsa detener. Una medición real que supere la validación se envía al servidor configurado.
 
-Las pruebas REST del botón usan conexiones simuladas para probar GET, POST, respuesta HTTP 201 y error HTTP. No insertan datos en MySQL ni necesitan `MockWebServer` o dependencias Gradle de pruebas externas.
+Las pruebas REST del botón usan conexiones simuladas para probar GET, POST, respuesta HTTP 201 y error HTTP. No insertan datos en MySQL. Para probar el cliente HTTP real contra un servidor local, la prueba instrumentada `PeticionarioRESTTest` usa MockWebServer; se ejecuta con un emulador o teléfono conectado desde Android Studio o con la tarea `:app:connectedDebugAndroidTest`. Solo la configuración `debug` permite HTTP hacia `localhost`; el resto de destinos sigue requiriendo HTTPS.
 
 ## Web
 

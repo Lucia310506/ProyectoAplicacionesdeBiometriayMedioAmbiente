@@ -1,6 +1,13 @@
 # Mapa de componentes y correspondencia con las fuentes
 
-Este repositorio integrado conserva las raíces de proyecto nativas de Arduino IDE, Android Studio y la aplicación PHP. La lista siguiente localiza el código real de cada diseño. **No afirma que estas rutas satisfagan literalmente una estructura única de `src/xxx/` en la raíz del repositorio**; una migración de esa estructura requiere reubicar o adaptar los tres proyectos y sus instrucciones de compilación/publicación.
+Este repositorio integrado conserva las raíces de proyecto nativas de Arduino IDE, Android Studio y la aplicación PHP. La carpeta raíz `src/` contiene ahora las áreas exigidas por componente y un mapa hacia las fuentes reales, que permanecen en sus proyectos nativos para conservar compilación y despliegue.
+
+| Carpeta raíz | Componente | Mapa |
+|---|---|---|
+| `src/communication/` | Comunicación HTTP | `src/communication/README.md` |
+| `src/business_logic/` | Lógica de negocio | `src/business_logic/README.md` |
+| `src/frontend_business_logic/` | Lógica de negocio de interfaz | `src/frontend_business_logic/README.md` |
+| `src/gui/` | Interfaz de usuario | `src/gui/README.md` |
 
 | Diseño | Implementación |
 |---|---|
@@ -15,7 +22,7 @@ Este repositorio integrado conserva las raíces de proyecto nativas de Arduino I
 | `web_ux_design.md` | `EsqueletoWebAppEnPHPConSesion/src/ux/` |
 | `database_design.md` | `EsqueletoWebAppEnPHPConSesion/bbdd/` |
 | `database_connection_design.md` | `EsqueletoWebAppEnPHPConSesion/src/BBDD/` |
-| `tests_design.md` | `EsqueletoWebAppEnPHPConSesion/src/tests/` y `BTLEAlumnos2021hechoapp2/app/src/` pruebas |
+| `tests_design.md` | `EsqueletoWebAppEnPHPConSesion/src/tests/`, `BTLEAlumnos2021hechoapp2/app/src/main/` (botón) y `app/src/androidTest/` (MockWebServer) |
 
 ## Mapa detallado de fuentes
 
@@ -53,5 +60,5 @@ Botón Android → validación de dominio + batería REST simulada → Logcat
 Botón Arduino → bandera de interrupción → loop() → test.h → Serial
 ```
 
-Los directorios `src/xxx/` requeridos literalmente por la plantilla no se han duplicado: las implementaciones ya viven en las raíces históricas anteriores. Este mapa documenta la equivalencia sin mover código fuente ni romper Gradle, rutas PHP o el sketch Arduino.
+Las carpetas raíz cumplen la organización literal por componente. Cada README de `src/` apunta a la implementación que permanece dentro de su proyecto ejecutable; no se mantienen copias paralelas del código fuente.
 

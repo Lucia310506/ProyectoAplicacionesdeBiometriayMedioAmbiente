@@ -4,12 +4,18 @@ appcompat = "1.6.1"
 material = "1.10.0"
 activityKtx = "1.8.0"
 constraintlayout = "2.1.4"
+androidxTestRunner = "1.6.2"
+androidxTestJunit = "1.2.1"
+mockwebserver = "4.12.0"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtx" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidxTestRunner" }
+androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxTestJunit" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -184,10 +184,11 @@ Contiene conexiones simuladas y una batería asíncrona GET, POST y error HTTP. 
 - El cliente REST admite GET para consumidores que lo necesiten, pero la lógica fake Android no expone ni recibe callbacks HTTP. La aplicación actual usa el cliente para POST; los datos persistidos y la fecha se generan en el servidor.
 - Las pruebas de `MainActivity` se ejecutan al pulsar el botón de la pantalla, no al iniciar la app. La lógica fake se comprueba en el hilo principal y los casos REST simulados corren en segundo plano; el resumen aparece en LogCat.
 - El botón ejecuta la batería REST con conexiones simuladas: GET `/mediciones`, POST con solo tipo y valor, respuesta 201 y error HTTP; así no escribe en la base de datos real.
+- `PeticionarioRESTTest` es una prueba instrumentada separada que usa MockWebServer para ejercitar el `HttpURLConnection` real contra localhost. Comprueba GET/POST, ruta, JSON, respuesta y callback en el hilo principal; requiere SDK Android y un emulador/teléfono conectado.
 
 ## General Rules
 
 - **Programming Language:** Java para Android.
 - **Function/Method Headers:** Cada función debe tener inmediatamente encima el diseño lógico en comentario delimitado por líneas `--------------------`.
 - **Code Readability:** Comentarios adicionales breves si explican una decisión necesaria.
-- **Automated Testing:** Servidor HTTP simulado para ruta, método, cuerpo JSON, respuesta 201 y errores HTTP.
+- **Automated Testing:** El botón usa conexiones simuladas para los casos rápidos; `PeticionarioRESTTest` usa MockWebServer local para verificar el cliente HTTP real.

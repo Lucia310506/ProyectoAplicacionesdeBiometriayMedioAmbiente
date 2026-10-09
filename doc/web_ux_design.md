@@ -4,7 +4,7 @@
 
 ### Responsabilidad
 
-Presentar estado de carga, error o éxito y representar las mediciones recibidas en una tabla. La capa visual no construye peticiones HTTP: consume `pedirMediciones()` desde la lógica fake web.
+Presentar estado de carga, error o éxito y representar las mediciones recibidas en una tabla. La capa visual no construye peticiones HTTP: consume `mostrarMediciones()` desde la lógica fake web.
 
 ### Fuente de datos REST
 
@@ -39,6 +39,9 @@ La UX llama a `LogicaFake.mostrarMediciones()` y recibe `[ (id: N, tipo: Text, v
 │ iniciarAplicacion() → actualizarMediciones()                          │
 │ mostrarEstado(texto, clase)   dibujarLista(mediciones)                 │
 └───────────────────────────────┬──────────────────────────────────────┘
+                                │ mostrarMediciones()
+                                ▼
+                       LogicaFake.js
                                 │ pedirMediciones()
                                 ▼
                        PeticionarioREST.js → GET /mediciones
@@ -71,7 +74,7 @@ El refresco cada cinco segundos se inicia junto con la primera petición. Si una
 
 ### Dependencias y límites
 
-- Depende de `pedirMediciones()` y de que el HTML incluya los identificadores DOM esperados.
+- Depende de `mostrarMediciones()` y de que el HTML incluya los identificadores DOM esperados. La UX no llama directamente al cliente REST.
 - La tabla muestra un máximo de diez filas; la API devuelve la lista completa.
 - El intervalo de cinco segundos se configura directamente en `iniciarAplicacion()`.
 - El botón de pruebas ejecuta la batería de consola, no se inicia al cargar la aplicación.

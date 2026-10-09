@@ -60,8 +60,8 @@ flowchart LR
 ### Secuencia de consulta web
 
 1. `Aplicacion.html` carga la UX y `iniciarAplicacion()` realiza una consulta inicial; después programa la actualización cada cinco segundos.
-2. `actualizarMediciones()` muestra estado de carga y llama a `pedirMediciones()`.
-3. El cliente solicita GET `/mediciones`, valida el estado HTTP y analiza la respuesta JSON.
+2. `actualizarMediciones()` muestra estado de carga y llama a `LogicaFake.mostrarMediciones()`.
+3. `LogicaFake.mostrarMediciones()` delega en `PeticionarioREST.pedirMediciones()`, que solicita GET `/mediciones`, valida el estado HTTP y analiza la respuesta JSON.
 4. El endpoint delega la lectura a `mostrarMediciones()`, que consulta MySQL y normaliza filas.
 5. La UX muestra las mediciones recibidas (hasta las diez más recientes) o el estado de error.
 

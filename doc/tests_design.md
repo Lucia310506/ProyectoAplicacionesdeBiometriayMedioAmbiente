@@ -95,8 +95,8 @@ Las funciones auxiliares y las clases comprobadas se describen en `arduino_desig
 - Para que la batería web sea completa, el botón debe abrirse desde el mismo origen del servidor PHP; no basta con abrir el HTML como archivo local.
 - Debe configurarse una base exclusiva para pruebas antes de ejecutar la parte PHP. La limpieza elimina todas las filas de `mediciones` de esa base.
 - Si falta conexión/configuración PHP, los casos de lógica, REST o BD se registran como error; los casos JavaScript simulados pueden seguir siendo útiles.
-- Las pruebas Android de red usan `HttpURLConnection` falso y prueban el cliente sin depender de disponibilidad de la API.
-- La batería Android se activa desde el botón de la aplicación. No contiene una clase `PeticionarioRESTTest` ni usa `MockWebServer`; la referencia del informe de auditoría a esa dependencia no corresponde a los archivos Gradle y pruebas actuales.
+- Las pruebas Android del botón usan `HttpURLConnection` simulado, sin depender de la disponibilidad de la API.
+- `PeticionarioRESTTest` es una prueba instrumentada independiente que usa `MockWebServer` local para verificar GET, POST, URL, cuerpo JSON y callback. Se ejecuta desde Android Studio o con `:app:connectedDebugAndroidTest` cuando hay un dispositivo o emulador conectado.
 - La prueba Arduino solo comprueba los valores constantes del `Medidor` actual; no valida sensor físico, cobertura BLE ni recepción en el teléfono.
 
 ## Design Clarifications
