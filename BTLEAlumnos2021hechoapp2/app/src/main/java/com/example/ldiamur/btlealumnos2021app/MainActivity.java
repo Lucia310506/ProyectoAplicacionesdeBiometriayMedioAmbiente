@@ -1,7 +1,7 @@
 /*
  * Fichero: MainActivity.java
  * Autor: Lucía Díaz Murcia
- * Descripción: Clase base de la app, que escanea los beacon, que pide permisos y filtra los beacons.
+ * Descripción: Clase principal que ejecuta las comprobaciones y gestiona los permisos de Bluetooth.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
@@ -11,27 +11,16 @@ package com.example.ldiamur.btlealumnos2021app;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.Collections;
 import org.json.JSONArray;
 
 // ------------------------------------------------------------------
@@ -45,218 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int CODIGO_PETICION_PERMISOS = 11223344;
     private boolean resultadoTestLogicaFake = false;
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    private BluetoothLeScanner elEscanner;
-
-    private ScanCallback callbackDelEscaneo = null;
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    /*
-     * --------------------
-     * buscarTodosLosDispositivosBTLE() -->
-     * Inicia un escaneo BLE general y registra su callback.
-     * --------------------
-     */
-    private void buscarTodosLosDispositivosBTLE() {
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empieza ");
-
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): instalamos scan callback ");
-
-        this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            /*
-             * --------------------
-             * tipo: N, resultado: ScanResult --> onScanResult()
-             * Procesa cada dispositivo BLE detectado.
-             * --------------------
-             */
-            public void onScanResult( int callbackType, ScanResult resultado ) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
-
-                mostrarInformacionDispositivoBTLE( resultado );
-            }
-
-            @Override
-            /*
-             * --------------------
-             * resultados: ScanResult[] --> onBatchScanResults()
-             * Recibe los resultados BLE agrupados por el sistema.
-             * --------------------
-             */
-            public void onBatchScanResults(List<ScanResult> results) {
-                super.onBatchScanResults(results);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onBatchScanResults() ");
-
-            }
-
-            @Override
-            /*
-             * --------------------
-             * error: N --> onScanFailed()
-             * Registra el motivo por el que falló el escaneo.
-             * --------------------
-             */
-            public void onScanFailed(int errorCode) {
-                super.onScanFailed(errorCode);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanFailed() ");
-
-            }
-        };
-
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empezamos a escanear ");
-
-        this.elEscanner.startScan( this.callbackDelEscaneo);
-
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    /*
-     * --------------------
-     * resultado: ScanResult --> mostrarInformacionDispositivoBTLE()
-     * Extrae y registra los campos del beacon recibido.
-     * --------------------
-     */
-    private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
-
-        BluetoothDevice bluetoothDevice = resultado.getDevice();
-        byte[] bytes = resultado.getScanRecord().getBytes();
-        int rssi = resultado.getRssi();
-
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        Log.d(ETIQUETA_LOG, " ****** DISPOSITIVO DETECTADO BTLE ****************** ");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        Log.d(ETIQUETA_LOG, " nombre = " + bluetoothDevice.getName());
-        Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
-
-        /*
-        ParcelUuid[] puuids = bluetoothDevice.getUuids();
-        if ( puuids.length >= 1 ) {
-            //Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].getUuid());
-           // Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].toString());
-        }*/
-
-        Log.d(ETIQUETA_LOG, " dirección = " + bluetoothDevice.getAddress());
-        Log.d(ETIQUETA_LOG, " rssi = " + rssi );
-
-        Log.d(ETIQUETA_LOG, " bytes = " + new String(bytes));
-        Log.d(ETIQUETA_LOG, " bytes (" + bytes.length + ") = " + Utilidades.bytesToHexString(bytes));
-
-        TramaIBeacon tib = new TramaIBeacon(bytes);
-
-        Log.d(ETIQUETA_LOG, " ----------------------------------------------------");
-        Log.d(ETIQUETA_LOG, " prefijo  = " + Utilidades.bytesToHexString(tib.getPrefijo()));
-        Log.d(ETIQUETA_LOG, "          advFlags = " + Utilidades.bytesToHexString(tib.getAdvFlags()));
-        Log.d(ETIQUETA_LOG, "          advHeader = " + Utilidades.bytesToHexString(tib.getAdvHeader()));
-        Log.d(ETIQUETA_LOG, "          companyID = " + Utilidades.bytesToHexString(tib.getCompanyID()));
-        Log.d(ETIQUETA_LOG, "          iBeacon type = " + Integer.toHexString(tib.getiBeaconType()));
-        Log.d(ETIQUETA_LOG, "          iBeacon length 0x = " + Integer.toHexString(tib.getiBeaconLength()) + " ( "
-                + tib.getiBeaconLength() + " ) ");
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToHexString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " major  = " + Utilidades.bytesToHexString(tib.getMajor()) + "( "
-                + Utilidades.bytesToInt(tib.getMajor()) + " ) ");
-        Log.d(ETIQUETA_LOG, " minor  = " + Utilidades.bytesToHexString(tib.getMinor()) + "( "
-                + Utilidades.bytesToInt(tib.getMinor()) + " ) ");
-        Log.d(ETIQUETA_LOG, " txPower  = " + Integer.toHexString(tib.getTxPower()) + " ( " + tib.getTxPower() + " )");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    /*
-     * --------------------
-     * dispositivoBuscado: Texto --> buscarEsteDispositivoBTLE() -->
-     * Inicia un escaneo filtrado por nombre de dispositivo.
-     * --------------------
-     */
-    private void buscarEsteDispositivoBTLE(final String dispositivoBuscado ) {
-        Log.d(ETIQUETA_LOG, " buscarEsteDispositivoBTLE(): empieza ");
-
-        Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): instalamos scan callback ");
-
-
-        // super.onScanResult(ScanSettings.SCAN_MODE_LOW_LATENCY, result); para ahorro de energía
-
-        this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            /*
-             * --------------------
-             * tipo: N, resultado: ScanResult --> onScanResult()
-             * Procesa cada dispositivo BLE detectado.
-             * --------------------
-             */
-            public void onScanResult( int callbackType, ScanResult resultado ) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanResult() ");
-
-                mostrarInformacionDispositivoBTLE( resultado );
-            }
-
-            @Override
-            /*
-             * --------------------
-             * resultados: ScanResult[] --> onBatchScanResults()
-             * Recibe los resultados BLE agrupados por el sistema.
-             * --------------------
-             */
-            public void onBatchScanResults(List<ScanResult> results) {
-                super.onBatchScanResults(results);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onBatchScanResults() ");
-
-            }
-
-            @Override
-            /*
-             * --------------------
-             * error: N --> onScanFailed()
-             * Registra el motivo por el que falló el escaneo.
-             * --------------------
-             */
-            public void onScanFailed(int errorCode) {
-                super.onScanFailed(errorCode);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanFailed() ");
-
-            }
-        };
-
-        ScanFilter sf = new ScanFilter.Builder().setDeviceName( dispositivoBuscado ).build();
-
-        Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado );
-        //Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado
-          //      + " -> " + Utilidades.stringToUUID( dispositivoBuscado ) );
-
-        // A diferencia del escaneo general, aquí sí se aplica el filtro creado arriba.
-        this.elEscanner.startScan(
-                Collections.singletonList(sf),
-                new ScanSettings.Builder().build(),
-                this.callbackDelEscaneo);
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    /*
-     * --------------------
-     * --> detenerBusquedaDispositivosBTLE() -->
-     * Detiene el escaneo BLE activo.
-     * --------------------
-     */
-    private void detenerBusquedaDispositivosBTLE() {
-
-        if ( this.callbackDelEscaneo == null ) {
-            return;
-        }
-
-        this.elEscanner.stopScan( this.callbackDelEscaneo );
-        this.callbackDelEscaneo = null;
-
-    } // ()
-
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     /*
@@ -314,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
     /*
      * --------------------
      *  inicializarBlueTooth() -->
-     * Inicializa el adaptador y escáner cuando hay permisos.
+     * Habilita Bluetooth cuando ya se han concedido los permisos.
      * --------------------
      */
     private void inicializarBlueTooth() {
@@ -340,15 +117,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): habilitado =  " + bta.isEnabled() );
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): estado =  " + bta.getState() );
-
-        Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): obtenemos escaner btle ");
-
-        this.elEscanner = bta.getBluetoothLeScanner();
-
-        if ( this.elEscanner == null ) {
-            Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): Socorro: NO hemos obtenido escaner btle  !!!!");
-
-        }
     } // ()
 
     // --------------------------------------------------------------
@@ -567,7 +335,5 @@ if (todoConcedido) {
     } // ()
 
 } // class
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// --------------------------------------------------------------
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------

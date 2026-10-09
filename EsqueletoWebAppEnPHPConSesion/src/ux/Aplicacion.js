@@ -22,8 +22,6 @@ function mostrarEstado(texto, clase) {
   estado.className = clase;
 }
 
-let ultimasMediciones = [];
-
 // --------------------
 // mediciones: Mediciones --> dibujarLista() -->
 // Ordena y representa las últimas diez filas sin interpretar HTML externo.

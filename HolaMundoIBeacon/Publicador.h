@@ -85,9 +85,7 @@ public:
   void publicarCO2( int16_t valorCO2, uint8_t contador,
 					long tiempoEspera ) {
 
-	//
 	// 1. empezamos anuncio
-	//
 	uint16_t major = (MedicionesID::CO2 << 8) + contador;
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
@@ -105,14 +103,10 @@ public:
 	Globales::elPuerto.escribir( "\n" );
 	*/
 
-	//
 	// 2. esperamos el tiempo que nos digan
-	//
 	esperar( tiempoEspera );
 
-	//
 	// 3. paramos anuncio
-	//
 	(*this).laEmisora.detenerAnuncio();
   } // ()
 

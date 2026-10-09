@@ -1,10 +1,8 @@
 // -*-c++-*-
 
 // --------------------------------------------------------------
-//
 // Jordi Bataller i Mascarell
 // 2019-07-07
-//
 // --------------------------------------------------------------
 /*
  * Fichero: HolaMundoIBeacon.ino
@@ -77,29 +75,11 @@ void inicializarPlaquita () {
 void setup() {
 
   Globales::elPuerto.esperarDisponible();
-  // 
-  // 
-  // 
   inicializarPlaquita();
 
   // Suspend Loop() to save power
-  // suspendLoop();
-
-  // 
-  // 
-  // 
   Globales::elPublicador.encenderEmisora();
-
-  // Globales::elPublicador.laEmisora.pruebaEmision();
-  
-  // 
-  // 
-  // 
   Globales::elMedidor.iniciarMedidor();
-
-  // 
-  // 
-  // 
   esperar( 1000 );
 
   Globales::elPuerto.escribir( "---- setup(): fin ---- \n " );
@@ -149,29 +129,20 @@ void loop () {
 
 
   lucecitas();
-
-  // 
   // mido y publico
-  // 
   int valorCO2 = elMedidor.medirCO2();
   
   elPublicador.publicarCO2( valorCO2,
 							cont,
 							2000 // intervalo de emisión
 							);
-  
-  // 
   // mido y publico
-  // 
   int valorTemperatura = elMedidor.medirTemperatura();
   
   elPublicador.publicarTemperatura( valorTemperatura, 
 									cont,
 									2000 // intervalo de emisión
 									);
-  // 
-  // 
-  // 
   elPuerto.escribir( "---- loop(): acaba **** " );
   elPuerto.escribir( cont );
   elPuerto.escribir( "\n" );

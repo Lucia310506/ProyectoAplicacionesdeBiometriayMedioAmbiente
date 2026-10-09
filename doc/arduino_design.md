@@ -4,7 +4,7 @@
 
 ### Responsabilidad
 
-El firmware lee temperatura y CO2 simulados, representa cada lectura en una trama BLE iBeacon y publica las tramas periódicamente. La emisora, servicio, puerto serie, LED, medición y codificación están encapsulados en el sketch y las clases auxiliares.
+El firmware lee temperatura y CO2 simulados, representa cada lectura en una trama BLE iBeacon y publica las tramas periódicamente. La emisora, el puerto serie, el LED, la medición y la codificación están encapsulados en el sketch y las clases auxiliares.
 
 ### Tipos lógicos
 
@@ -28,7 +28,7 @@ El firmware lee temperatura y CO2 simulados, representa cada lectura en una tram
 
 ### Estado y dependencias
 
-El sketch coordina `Medidor`, `Publicador`, `EmisoraBLE`, `ServicioEnEmisora`, `PuertoSerie` y `LED`. El publicador transforma las medidas en campos de beacon; la emisora se ocupa del transporte BLE.
+El sketch coordina `Medidor`, `Publicador`, `EmisoraBLE`, `PuertoSerie` y `LED`. El publicador transforma las medidas en campos del iBeacon; la emisora configura y transmite el anuncio BLE.
 
 ## Design Clarifications
 
