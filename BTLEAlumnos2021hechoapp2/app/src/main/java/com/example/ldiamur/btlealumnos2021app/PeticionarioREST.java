@@ -56,7 +56,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * --> PeticionarioREST() --> PeticionarioREST
+     *  PeticionarioREST() -->
      * Construye el cliente HTTP asíncrono.
      * --------------------
      */
@@ -66,7 +66,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> enviarMedicion() -->
+     * tipo: Text, valor: R --> enviarMedicion()
      * Forma el JSON y envía una medición al endpoint REST.
      * --------------------
      */

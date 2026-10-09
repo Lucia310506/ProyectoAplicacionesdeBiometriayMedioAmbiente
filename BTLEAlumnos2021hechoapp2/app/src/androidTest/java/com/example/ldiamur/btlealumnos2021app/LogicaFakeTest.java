@@ -22,7 +22,7 @@ public class LogicaFakeTest {
 
     /*
      * --------------------
-     * --> guardarMedicionesAceptaTiposPermitidos() -->
+     * guardarMedicionesAceptaTiposPermitidos()
      * --------------------
      */
     @Test
@@ -34,7 +34,7 @@ public class LogicaFakeTest {
 
     /*
      * --------------------
-     * --> guardarMedicionesRechazaTipoDesconocido() -->
+     * guardarMedicionesRechazaTipoDesconocido()
      * --------------------
      */
     @Test
@@ -45,7 +45,7 @@ public class LogicaFakeTest {
 
     /*
      * --------------------
-     * --> guardarMedicionesRechazaValorNoFinito() -->
+     * guardarMedicionesRechazaValorNoFinito()
      * --------------------
      */
     @Test
@@ -57,7 +57,7 @@ public class LogicaFakeTest {
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> comprobarRechazo() -->
+     * tipo: Text, valor: R --> comprobarRechazo()
      * --------------------
      */
     private void comprobarRechazo(String tipo, double valor) {

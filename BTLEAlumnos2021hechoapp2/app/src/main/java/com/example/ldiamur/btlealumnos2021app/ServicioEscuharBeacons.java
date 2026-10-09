@@ -36,7 +36,7 @@ public class ServicioEscuharBeacons extends Service {
     public static final String ACCION_INICIAR =
             "com.example.ldiamur.btlealumnos2021app.INICIAR_ESCANEO";
     private static final String ETIQUETA_LOG = ">>>>";
-    private static final String NOMBRE_BEACON = "GTI-3A";
+    private static final String NOMBRE_BEACON = "JU-GTI";
     private static final String CANAL_ID = "escucha_beacons";
     private static final int ID_NOTIFICACION = 1001;
 
@@ -48,7 +48,7 @@ public class ServicioEscuharBeacons extends Service {
     @Override
     /*
      * --------------------
-     * --> onCreate()
+     *  onCreate()
      * Prepara las notificaciones y el escáner del servicio.
      * --------------------
      */
@@ -73,7 +73,7 @@ public class ServicioEscuharBeacons extends Service {
 
     /*
      * --------------------
-     * --> prepararEscaner() -->
+     * prepararEscaner() -->
      * Obtiene el escáner BLE o detiene el servicio si no hay Bluetooth.
      * --------------------
      */
@@ -89,7 +89,7 @@ public class ServicioEscuharBeacons extends Service {
 
     /*
      * --------------------
-     * --> tengoPermisoEscaneo() --> B
+     *  tengoPermisoEscaneo() --> B
      * Comprueba el permiso requerido por la versión Android.
      * --------------------
      */
@@ -264,7 +264,7 @@ public class ServicioEscuharBeacons extends Service {
 
     /*
      * --------------------
-     * --> crearCanalNotificacion() -->
+     * crearCanalNotificacion()
      * Crea el canal requerido por la notificación persistente.
      * --------------------
      */
@@ -297,7 +297,7 @@ public class ServicioEscuharBeacons extends Service {
     @Override
     /*
      * --------------------
-     * --> onDestroy() 
+     * onDestroy()
      * Detiene la escucha antes de destruir el servicio.
      * --------------------
      */

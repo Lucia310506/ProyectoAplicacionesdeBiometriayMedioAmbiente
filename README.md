@@ -10,6 +10,7 @@ El proyecto mide CO2 y temperatura. El Arduino manda las mediciones por Bluetoot
 - BTLEAlumnos2021hechoapp2: aplicación Android.
 - EsqueletoWebAppEnPHPConSesion: página web, servidor PHP y base de datos.
 - doc: diseños y documentación de las partes del proyecto.
+- Author: Pone quien es el autor del proyecto.
 
 Dentro de la carpeta del servidor:
 
@@ -21,7 +22,7 @@ Dentro de la carpeta del servidor:
 - src/tests: pruebas del proyecto.
 - bbdd: archivos para crear y rellenar las tablas de MySQL.
 
-## Cómo funciona
+## Cómo funciona el proyecto.
 
 1. El Arduino prepara una medición y la manda por Bluetooth.
 2. Android recibe el beacon y comprueba sus datos.
@@ -33,8 +34,10 @@ Dentro de la carpeta del servidor:
 
 1. Abre HolaMundoIBeacon.ino con Arduino IDE.
 2. Selecciona la placa del proyecto y comprueba que tienes instalada la librería Bluefruit.
-3. Compila y carga el programa. El Arduino empezará a enviar los beacons.
-4. Si quieres ver los mensajes del programa, abre el monitor serie a 115200 baudios.
+3. Compila y carga el programa. 
+4. Si quieres que el programa comience a enviar beacons , abre el monitor serie a 115200 baudios.
+5. El Arduino empezará a enviar los beacons.
+
 ## Android
 
 1. Abre BTLEAlumnos2021hechoapp2 en Android Studio y espera a que termine de preparar el proyecto.
