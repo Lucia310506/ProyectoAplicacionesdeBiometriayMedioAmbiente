@@ -22,6 +22,10 @@ class PuertoSerie  {
 public:
   // .........................................................
   // .........................................................
+// --------------------
+// baudios: N --> PuertoSerie() --> 
+// Abre el puerto serie a la velocidad indicada.
+// --------------------
   PuertoSerie (long baudios) {
 	Serial.begin( baudios );
 	// mejor no poner esto aquí: while ( !Serial ) delay(10);   
@@ -29,6 +33,10 @@ public:
 
   // .........................................................
   // .........................................................
+// --------------------
+// esperarDisponible() 
+// Espera a que el monitor serie esté conectado.
+// --------------------
   void esperarDisponible() {
 
 	while ( !Serial ) {
@@ -39,7 +47,11 @@ public:
 
   // .........................................................
   // .........................................................
-  template<typename T>
+  template<typename T> //Cualquier tipo
+// --------------------
+// mensaje: T --> escribir() -->
+// Escribe el mensaje en el puerto serie.
+// --------------------
   void escribir (T mensaje) {
 	Serial.print( mensaje );
   } // ()

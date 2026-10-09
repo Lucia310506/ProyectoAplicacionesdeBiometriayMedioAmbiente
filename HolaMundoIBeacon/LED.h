@@ -16,6 +16,10 @@
 
 // ----------------------------------------------------------
 // ----------------------------------------------------------
+// --------------------
+// tiempo: N --> esperar() -->
+// Espera el intervalo solicitado.
+// --------------------
 void esperar (long tiempo) {
   delay (tiempo);
 }
@@ -30,6 +34,10 @@ public:
 
   // .........................................................
   // .........................................................
+// --------------------
+// numero: N --> LED() --> LED
+// Configura el pin y deja la luz apagada.
+// --------------------
   LED (int numero)
 	: numeroLED (numero), encendido(false)
   {
@@ -39,6 +47,10 @@ public:
 
   // .........................................................
   // .........................................................
+// --------------------
+// --> encender() -->
+// Enciende el pin y actualiza el estado local.
+// --------------------
   void encender () {
 	digitalWrite(numeroLED, HIGH); 
 	encendido = true;
@@ -46,6 +58,10 @@ public:
 
   // .........................................................
   // .........................................................
+// --------------------
+// --> apagar() -->
+// Apaga el pin y actualiza el estado local.
+// --------------------
   void apagar () {
 	  digitalWrite(numeroLED, LOW);
 	  encendido = false;
@@ -53,6 +69,10 @@ public:
 
   // .........................................................
   // .........................................................
+// --------------------
+// --> alternar() -->
+// Invierte el estado actual de la luz.
+// --------------------
   void alternar () {
 	if (encendido) {
 	  apagar();
@@ -63,6 +83,10 @@ public:
 
   // .........................................................
   // .........................................................
+// --------------------
+// tiempo: N --> brillar() -->
+// Enciende la luz durante el intervalo y luego la apaga.
+// --------------------
   void brillar (long tiempo) {
 	encender ();
 	esperar(tiempo); 

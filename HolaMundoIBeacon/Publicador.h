@@ -51,6 +51,12 @@ public:
 
   // ............................................................
   // ............................................................
+  // --------------------
+// Publicador()
+// Prepara el beacon sin activar la radio durante la construcción.
+// --------------------
+
+  // Prepara el beacon sin activar la radio durante la construcción.
   Publicador( ) {
 	// ATENCION: no hacerlo aquí. (*this).laEmisora.encenderEmisora();
 	// Pondremos un método para llamarlo desde el setup() más tarde
@@ -58,18 +64,28 @@ public:
 
   // ............................................................
   // ............................................................
+  // --------------------
+// --> encenderEmisora() 
+// Activa la emisora BLE una vez inicializada la placa.
+// --------------------
+
+  // Activa la emisora BLE una vez inicializada la placa.
   void encenderEmisora() {
 	(*this).laEmisora.encenderEmisora();
   } // ()
 
   // ............................................................
   // ............................................................
+  // --------------------
+// valorCO2: N, contador: N, tiempoEspera: Z --> publicarCO2() -->
+// Emite CO2 y detiene el anuncio al terminar el intervalo.
+// --------------------
+
+  // Emite CO2 y detiene el anuncio al terminar el intervalo.
   void publicarCO2( int16_t valorCO2, uint8_t contador,
 					long tiempoEspera ) {
 
-	//
 	// 1. empezamos anuncio
-	//
 	uint16_t major = (MedicionesID::CO2 << 8) + contador;
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
@@ -87,19 +103,21 @@ public:
 	Globales::elPuerto.escribir( "\n" );
 	*/
 
-	//
 	// 2. esperamos el tiempo que nos digan
-	//
 	esperar( tiempoEspera );
 
-	//
 	// 3. paramos anuncio
-	//
 	(*this).laEmisora.detenerAnuncio();
   } // ()
 
   // ............................................................
   // ............................................................
+  // --------------------
+// valorTemperatura:Z , contador: N, espera: N --> publicarTemperatura() -->
+// Emite temperatura y detiene el anuncio al terminar el intervalo.
+// --------------------
+
+  // Emite temperatura y detiene el anuncio al terminar el intervalo.
   void publicarTemperatura( int16_t valorTemperatura,
 							uint8_t contador, long tiempoEspera ) {
 

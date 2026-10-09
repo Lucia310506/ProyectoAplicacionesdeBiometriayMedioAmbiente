@@ -1,10 +1,8 @@
 // -*-c++-*-
 
 // --------------------------------------------------------------
-//
 // Jordi Bataller i Mascarell
 // 2019-07-07
-//
 // --------------------------------------------------------------
 /*
  * Fichero: HolaMundoIBeacon.ino
@@ -40,11 +38,26 @@ namespace Globales {
   // Serial1 en el ejemplo de Curro creo que es la conexión placa-sensor 
 };
 
+// Pulsador externo entre D2 y GND; usa interrupción para no perder pulsaciones durante las esperas BLE.
+constexpr uint8_t PIN_BOTON_TESTS = 2;
+volatile bool pruebasSolicitadas = false;
+volatile unsigned long ultimoFlancoBoton = 0;
+
+// Registra una pulsación breve y filtra el rebote mecánico del pulsador.
+void botonPruebasInterrupcion() {
+  const unsigned long ahora = millis();
+  if (ahora - ultimoFlancoBoton >= 250) {
+    pruebasSolicitadas = true;
+    ultimoFlancoBoton = ahora;
+  }
+}
+
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 #include "EmisoraBLE.h"
 #include "Publicador.h"
 #include "Medidor.h"
+#include "test.h"
 
 
 // --------------------------------------------------------------
@@ -59,6 +72,9 @@ namespace Globales {
 
 // --------------------------------------------------------------
 // --------------------------------------------------------------
+// --------------------
+// Punto de inicialización de la placa antes de activar BLE.
+// --------------------
 void inicializarPlaquita () {
 
   // de momento nada
@@ -68,33 +84,19 @@ void inicializarPlaquita () {
 // --------------------------------------------------------------
 // setup()
 // --------------------------------------------------------------
+// --------------------
+// Inicializa serie, emisora BLE y medidor al arrancar la placa.
+// --------------------
 void setup() {
 
   Globales::elPuerto.esperarDisponible();
-
-  // 
-  // 
-  // 
+  pinMode(PIN_BOTON_TESTS, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN_BOTON_TESTS), botonPruebasInterrupcion, FALLING);
   inicializarPlaquita();
 
   // Suspend Loop() to save power
-  // suspendLoop();
-
-  // 
-  // 
-  // 
   Globales::elPublicador.encenderEmisora();
-
-  // Globales::elPublicador.laEmisora.pruebaEmision();
-  
-  // 
-  // 
-  // 
   Globales::elMedidor.iniciarMedidor();
-
-  // 
-  // 
-  // 
   esperar( 1000 );
 
   Globales::elPuerto.escribir( "---- setup(): fin ---- \n " );
@@ -103,6 +105,9 @@ void setup() {
 
 // --------------------------------------------------------------
 // --------------------------------------------------------------
+// --------------------
+// Ejecuta la secuencia visual de señalización del ciclo.
+// --------------------
 inline void lucecitas() {
   using namespace Globales;
 
@@ -125,11 +130,20 @@ namespace Loop {
 
 // ..............................................................
 // ..............................................................
+// --------------------
+// Lee y publica CO2 y temperatura en cada ciclo del firmware.
+// --------------------
 void loop () {
 
   using namespace Loop;
   using namespace Globales;
 
+  // Consume la pulsación fuera de la interrupción y ejecuta los tests en el ciclo principal.
+  noInterrupts();
+  const bool pulsado = pruebasSolicitadas;
+  pruebasSolicitadas = false;
+  interrupts();
+  if (pulsado) ejecutarTestsArduino();
   cont++;
 
   elPuerto.escribir( "\n---- loop(): empieza " );
@@ -138,29 +152,20 @@ void loop () {
 
 
   lucecitas();
-
-  // 
   // mido y publico
-  // 
   int valorCO2 = elMedidor.medirCO2();
   
   elPublicador.publicarCO2( valorCO2,
 							cont,
 							2000 // intervalo de emisión
 							);
-  
-  // 
   // mido y publico
-  // 
   int valorTemperatura = elMedidor.medirTemperatura();
   
   elPublicador.publicarTemperatura( valorTemperatura, 
 									cont,
 									2000 // intervalo de emisión
 									);
-  // 
-  // 
-  // 
   elPuerto.escribir( "---- loop(): acaba **** " );
   elPuerto.escribir( cont );
   elPuerto.escribir( "\n" );

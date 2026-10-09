@@ -9,6 +9,7 @@
 const fs = require('fs');
 const vm = require('vm');
 const codigo = fs.readFileSync(__dirname + '/../ux/Aplicacion.js', 'utf8');
+const codigoLogica = fs.readFileSync(__dirname + '/../logicaFake/LogicaFake.js', 'utf8');
 
 // condicion: B, mensaje: Text --> comprobar() -->
 function comprobar(condicion, mensaje) {
@@ -53,6 +54,7 @@ async function probarUx() {
     }
   };
   vm.createContext(contexto);
+  vm.runInContext(codigoLogica, contexto);
   vm.runInContext(codigo, contexto);
 
   comprobar(documento.estado.textContent === 'Cargando mediciones...', 'Renderizado inicial de carga');

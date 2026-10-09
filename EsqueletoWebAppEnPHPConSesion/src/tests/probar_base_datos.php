@@ -30,7 +30,10 @@ function probarBaseDatos(): void {
         $porTipo = []; foreach ($mediciones as $medicion) { $porTipo[$medicion['tipo']] = $medicion; }
         comprobar((float) $porTipo['CO2']['valor'] === 500.0, 'CO2 debe valer 500');
         comprobar((float) $porTipo['TEMPERATURA']['valor'] === -19.0, 'Temperatura debe valer -19');
-        comprobar(!empty($porTipo['CO2']['fecha']), 'La fecha debe generarse en servidor');
+        foreach (['CO2', 'TEMPERATURA'] as $tipo) {
+            comprobar(!empty($porTipo[$tipo]['id']), 'Falta el identificador de ' . $tipo);
+            comprobar(!empty($porTipo[$tipo]['fecha']), 'La fecha debe generarse en servidor para ' . $tipo);
+        }
         echo "OK: pruebas de base de datos superadas\n";
     } finally {
         $conexion->exec('DELETE FROM mediciones');

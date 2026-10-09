@@ -21,12 +21,17 @@ import org.json.JSONObject;
 
 public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
-    /*
-     * --------------------
-     * codigo: N, cuerpo: Text --> callback() -->
-     * --------------------
-     */
+    interface AbridorConexion {
+        HttpURLConnection abrir(URL url) throws IOException;
+    }
+
     public interface RespuestaREST {
+        /*
+         * --------------------
+         * codigo: N, cuerpo: Text --> callback() -->
+         * Entrega al cliente el estado HTTP y el cuerpo de respuesta.
+         * --------------------
+         */
         void callback (int codigo, String cuerpo);
     }
 
@@ -34,13 +39,15 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     private String urlDestino;
     private String elCuerpo = null;
     private RespuestaREST laRespuesta;
+    private final AbridorConexion abridorConexion;
 
     private int codigoRespuesta;
     private String cuerpoRespuesta = "";
 
     /*
      * --------------------
-     * metodo: Text, url: Text, cuerpo: Text --> hacerPeticionREST() -->
+     * metodo: Texto, URL: Texto, cuerpo: Texto, laRespuesta: RespuestaREST --> hacerPeticionREST() -->
+     * Configura y lanza la petición HTTP en segundo plano.
      * --------------------
      */
     public void hacerPeticionREST (String metodo, String urlDestino, String cuerpo, RespuestaREST laRespuesta) {
@@ -54,38 +61,68 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * --> PeticionarioREST() -->
+     *  PeticionarioREST() -->
+     * Construye el cliente HTTP asíncrono.
      * --------------------
      */
     public PeticionarioREST() {
+        this(url -> (HttpURLConnection) url.openConnection());
+    }
+
+    /*
+     * --------------------
+     * abridor: AbridorConexion --> PeticionarioREST() -->
+     * Permite sustituir el transporte por uno simulado durante las pruebas.
+     * --------------------
+     */
+    PeticionarioREST(AbridorConexion abridor) {
+        this.abridorConexion = abridor;
         Log.d("clienterestandroid", "constructor()");
     }
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> enviarMedicion() --x
+     * tipo: Text, valor: R --> crearCuerpoMedicion() --> JSON
+     * Construye el cuerpo del contrato POST sin campos adicionales.
+     * --------------------
+     */
+    static String crearCuerpoMedicion(String tipo, double valor) throws Exception {
+        JSONObject cuerpo = new JSONObject();
+        cuerpo.put("tipo", tipo);
+        cuerpo.put("valor", valor);
+        return cuerpo.toString();
+    }
+
+    /*
+     * --------------------
+     * tipo: Text, valor: R --> enviarMedicion()
+     * Forma el JSON y envía una medición al endpoint REST.
      * --------------------
      */
     public static void enviarMedicion(String tipo, double valor) {
         try {
-            JSONObject cuerpo = new JSONObject();
-            cuerpo.put("tipo", tipo);
-            cuerpo.put("valor", valor);
             new PeticionarioREST().hacerPeticionREST(
-                    "POST", ConfiguracionRest.URL_MEDICIONES, cuerpo.toString(),
-                    (codigo, respuesta) -> Log.d("clienterestandroid",
-                            "enviarMedicion(): código=" + codigo + " cuerpo=" + respuesta));
+                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(tipo, valor),
+                    (codigo, respuesta) -> {
+                        if (codigo == 201) {
+                            Log.i("clienterestandroid", "OK: POST /mediciones respondió HTTP 201");
+                        } else {
+                            Log.e("clienterestandroid", "ERROR: POST /mediciones respondió HTTP "
+                                    + codigo + " cuerpo=" + respuesta);
+                        }
+                    });
         } catch (Exception error) {
             Log.e("clienterestandroid", "enviarMedicion(): no se pudo crear el JSON", error);
         }
     }
 
+    @Override
     /*
      * --------------------
-     * --> doInBackground() --> B
+     * parámetros: Void[] --> doInBackground() --> B
+     * Ejecuta la conexión y lee la respuesta fuera del hilo principal.
      * --------------------
      */
-    @Override
     protected Boolean doInBackground(Void... params) {
         Log.d("clienterestandroid", "doInBackground()");
 
@@ -93,7 +130,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
             Log.d("clienterestandroid", "doInBackground() me conecto a >" + urlDestino + "<");
 
             URL url = new URL(urlDestino);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = abridorConexion.abrir(url);
             connection.setConnectTimeout(15000);
             connection.setReadTimeout(15000);
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
@@ -157,12 +194,13 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         return false;
     }
 
+    @Override
     /*
      * --------------------
-     * resultado: B --> onPostExecute() -->
+     * comoFue: B --> onPostExecute() <--
+     * Entrega la respuesta HTTP al callback tras finalizar la petición.
      * --------------------
      */
-    @Override
     protected void onPostExecute(Boolean comoFue) {
         Log.d("clienterestandroid", "onPostExecute() comoFue = " + comoFue);
         if (this.laRespuesta != null) {

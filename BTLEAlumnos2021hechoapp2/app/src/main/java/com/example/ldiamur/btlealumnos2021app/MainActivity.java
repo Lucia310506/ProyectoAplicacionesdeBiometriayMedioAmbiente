@@ -1,7 +1,7 @@
 /*
  * Fichero: MainActivity.java
  * Autor: Lucía Díaz Murcia
- * Descripción: Clase base de la app, que escanea los beacon, que pide permisos y filtra los beacons.
+ * Descripción: Clase principal que ejecuta las comprobaciones y gestiona los permisos de Bluetooth.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
@@ -11,27 +11,18 @@ package com.example.ldiamur.btlealumnos2021app;
 
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanFilter;
-import android.bluetooth.le.ScanResult;
-import android.bluetooth.le.ScanSettings;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.Collections;
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -43,160 +34,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String ETIQUETA_LOG = ">>>>";
 
     private static final int CODIGO_PETICION_PERMISOS = 11223344;
-
+    private boolean resultadoTestLogicaFake = false;
+    private boolean pruebasEnCurso = false;
     // --------------------------------------------------------------
     // --------------------------------------------------------------
-    private BluetoothLeScanner elEscanner;
-
-    private ScanCallback callbackDelEscaneo = null;
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    private void buscarTodosLosDispositivosBTLE() {
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empieza ");
-
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): instalamos scan callback ");
-
-        this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            public void onScanResult( int callbackType, ScanResult resultado ) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanResult() ");
-
-                mostrarInformacionDispositivoBTLE( resultado );
-            }
-
-            @Override
-            public void onBatchScanResults(List<ScanResult> results) {
-                super.onBatchScanResults(results);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onBatchScanResults() ");
-
-            }
-
-            @Override
-            public void onScanFailed(int errorCode) {
-                super.onScanFailed(errorCode);
-                Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): onScanFailed() ");
-
-            }
-        };
-
-        Log.d(ETIQUETA_LOG, " buscarTodosLosDispositivosBTL(): empezamos a escanear ");
-
-        this.elEscanner.startScan( this.callbackDelEscaneo);
-
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    private void mostrarInformacionDispositivoBTLE( ScanResult resultado ) {
-
-        BluetoothDevice bluetoothDevice = resultado.getDevice();
-        byte[] bytes = resultado.getScanRecord().getBytes();
-        int rssi = resultado.getRssi();
-
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        Log.d(ETIQUETA_LOG, " ****** DISPOSITIVO DETECTADO BTLE ****************** ");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-        Log.d(ETIQUETA_LOG, " nombre = " + bluetoothDevice.getName());
-        Log.d(ETIQUETA_LOG, " toString = " + bluetoothDevice.toString());
-
-        /*
-        ParcelUuid[] puuids = bluetoothDevice.getUuids();
-        if ( puuids.length >= 1 ) {
-            //Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].getUuid());
-           // Log.d(ETIQUETA_LOG, " uuid = " + puuids[0].toString());
-        }*/
-
-        Log.d(ETIQUETA_LOG, " dirección = " + bluetoothDevice.getAddress());
-        Log.d(ETIQUETA_LOG, " rssi = " + rssi );
-
-        Log.d(ETIQUETA_LOG, " bytes = " + new String(bytes));
-        Log.d(ETIQUETA_LOG, " bytes (" + bytes.length + ") = " + Utilidades.bytesToHexString(bytes));
-
-        TramaIBeacon tib = new TramaIBeacon(bytes);
-
-        Log.d(ETIQUETA_LOG, " ----------------------------------------------------");
-        Log.d(ETIQUETA_LOG, " prefijo  = " + Utilidades.bytesToHexString(tib.getPrefijo()));
-        Log.d(ETIQUETA_LOG, "          advFlags = " + Utilidades.bytesToHexString(tib.getAdvFlags()));
-        Log.d(ETIQUETA_LOG, "          advHeader = " + Utilidades.bytesToHexString(tib.getAdvHeader()));
-        Log.d(ETIQUETA_LOG, "          companyID = " + Utilidades.bytesToHexString(tib.getCompanyID()));
-        Log.d(ETIQUETA_LOG, "          iBeacon type = " + Integer.toHexString(tib.getiBeaconType()));
-        Log.d(ETIQUETA_LOG, "          iBeacon length 0x = " + Integer.toHexString(tib.getiBeaconLength()) + " ( "
-                + tib.getiBeaconLength() + " ) ");
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToHexString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " uuid  = " + Utilidades.bytesToString(tib.getUUID()));
-        Log.d(ETIQUETA_LOG, " major  = " + Utilidades.bytesToHexString(tib.getMajor()) + "( "
-                + Utilidades.bytesToInt(tib.getMajor()) + " ) ");
-        Log.d(ETIQUETA_LOG, " minor  = " + Utilidades.bytesToHexString(tib.getMinor()) + "( "
-                + Utilidades.bytesToInt(tib.getMinor()) + " ) ");
-        Log.d(ETIQUETA_LOG, " txPower  = " + Integer.toHexString(tib.getTxPower()) + " ( " + tib.getTxPower() + " )");
-        Log.d(ETIQUETA_LOG, " ****************************************************");
-
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    private void buscarEsteDispositivoBTLE(final String dispositivoBuscado ) {
-        Log.d(ETIQUETA_LOG, " buscarEsteDispositivoBTLE(): empieza ");
-
-        Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): instalamos scan callback ");
-
-
-        // super.onScanResult(ScanSettings.SCAN_MODE_LOW_LATENCY, result); para ahorro de energía
-
-        this.callbackDelEscaneo = new ScanCallback() {
-            @Override
-            public void onScanResult( int callbackType, ScanResult resultado ) {
-                super.onScanResult(callbackType, resultado);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanResult() ");
-
-                mostrarInformacionDispositivoBTLE( resultado );
-            }
-
-            @Override
-            public void onBatchScanResults(List<ScanResult> results) {
-                super.onBatchScanResults(results);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onBatchScanResults() ");
-
-            }
-
-            @Override
-            public void onScanFailed(int errorCode) {
-                super.onScanFailed(errorCode);
-                Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): onScanFailed() ");
-
-            }
-        };
-
-        ScanFilter sf = new ScanFilter.Builder().setDeviceName( dispositivoBuscado ).build();
-
-        Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado );
-        //Log.d(ETIQUETA_LOG, "  buscarEsteDispositivoBTLE(): empezamos a escanear buscando: " + dispositivoBuscado
-          //      + " -> " + Utilidades.stringToUUID( dispositivoBuscado ) );
-
-        // A diferencia del escaneo general, aquí sí se aplica el filtro creado arriba.
-        this.elEscanner.startScan(
-                Collections.singletonList(sf),
-                new ScanSettings.Builder().build(),
-                this.callbackDelEscaneo);
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    private void detenerBusquedaDispositivosBTLE() {
-
-        if ( this.callbackDelEscaneo == null ) {
-            return;
-        }
-
-        this.elEscanner.stopScan( this.callbackDelEscaneo );
-        this.callbackDelEscaneo = null;
-
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
+    /*
+     * --------------------
+     * v: vista --> botonBuscarDispositivosBTLEPulsado() <--
+     * Inicia el servicio persistente de escucha BLE desde la interfaz.
+     * --------------------
+     */
     public void botonBuscarDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado" );
         iniciarServicioEscucha();
@@ -204,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * v: vista --> botonBuscarNuestroDispositivoBTLEPulsado() <--
+     * Inicia la escucha del beacon configurado.
+     * --------------------
+     */
     public void botonBuscarNuestroDispositivoBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton nuestro dispositivo BTLE Pulsado" );
         iniciarServicioEscucha();
@@ -212,11 +65,23 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * v: vista --> botonDetenerBusquedaDispositivosBTLEPulsado() <--
+     * Detiene el servicio que escucha beacons.
+     * --------------------
+     */
     public void botonDetenerBusquedaDispositivosBTLEPulsado( View v ) {
         Log.d(ETIQUETA_LOG, " boton detener busqueda dispositivos BTLE Pulsado" );
         stopService(new Intent(this, ServicioEscuharBeacons.class));
     } // ()
 
+    /*
+     * --------------------
+     * --> iniciarServicioEscucha() -->
+     * Arranca el servicio Android en primer plano para mantener la escucha.
+     * --------------------
+     */
     private void iniciarServicioEscucha() {
         Intent intent = new Intent(this, ServicioEscuharBeacons.class);
         intent.setAction(ServicioEscuharBeacons.ACCION_INICIAR);
@@ -225,6 +90,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     *  inicializarBlueTooth() -->
+     * Habilita Bluetooth cuando ya se han concedido los permisos.
+     * --------------------
+     */
     private void inicializarBlueTooth() {
         // Sin permisos, las llamadas Bluetooth lanzan SecurityException (crash)
         if ( !tengoLosPermisosNecesarios() ) {
@@ -248,19 +119,17 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): habilitado =  " + bta.isEnabled() );
 
         Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): estado =  " + bta.getState() );
-
-        Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): obtenemos escaner btle ");
-
-        this.elEscanner = bta.getBluetoothLeScanner();
-
-        if ( this.elEscanner == null ) {
-            Log.d(ETIQUETA_LOG, " inicializarBlueTooth(): Socorro: NO hemos obtenido escaner btle  !!!!");
-
-        }
     } // ()
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     *  permisosNecesarios() --> Texto[]
+     * Elige los permisos Bluetooth/localización según la versión Android.
+     * --------------------
+     */
+    /// --------------------------PERMISOS---------------------------------///
     private String[] permisosNecesarios() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -286,6 +155,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     *  tengoLosPermisosNecesarios() --> B
+     * Comprueba que todos los permisos requeridos estén concedidos.
+     * --------------------
+     */
     private boolean tengoLosPermisosNecesarios() {
         for (String permiso : this.permisosNecesarios()) {
             if (ContextCompat.checkSelfPermission(this, permiso) != PackageManager.PERMISSION_GRANTED) {
@@ -299,6 +174,12 @@ public class MainActivity extends AppCompatActivity {
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * --> pedirPermisosNecesarios() -->
+     * Solicita permisos pendientes o inicializa Bluetooth si ya están concedidos.
+     * --------------------
+     */
     private void pedirPermisosNecesarios() {
         Log.d(ETIQUETA_LOG, " pedirPermisosNecesarios(): comprobando permisos ");
 
@@ -319,23 +200,109 @@ public class MainActivity extends AppCompatActivity {
     } // ()
 
 
+    /*
+     * --------------------
+     *  comprobarLogicaFake() -->
+     * Comprueba la validación de mediciones válidas e inválidas.
+     * --------------------
+     */
+    private void comprobarLogicaFake() {
+        resultadoTestLogicaFake = false;
+        try {
+            Log.i("TESTS_APP", "Ejecutando test: guardar CO2 valido");
+            LogicaFake.guardarMediciones("CO2", 500.0);
+            Log.i("TESTS_APP", "OK: guardar CO2 valido");
+
+            Log.i("TESTS_APP", "Ejecutando test: guardar TEMPERATURA valida");
+            LogicaFake.guardarMediciones("TEMPERATURA", -19.0);
+            Log.i("TESTS_APP", "OK: guardar TEMPERATURA valida");
+
+            comprobarRechazoLogica("HUMEDAD", 50.0, "rechazar tipo no admitido");
+            comprobarRechazoLogica("CO2", Double.NaN, "rechazar valor NaN");
+            resultadoTestLogicaFake = true;
+            Log.i("TEST_LOGICAFake", "OK: pruebas de logica fake superadas");
+        } catch (Throwable error) {
+            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de lógica fake", error);
+        }
+    }
+
+    /*
+     * --------------------
+     * tipo: Texto, valor: R, nombre: Texto --> comprobarRechazoLogica() -->
+     * Confirma que la lógica rechaza la medición inválida.
+     * --------------------
+     */
+    private void comprobarRechazoLogica(String tipo, double valor, String nombre) {
+        Log.i("TESTS_APP", "Ejecutando test: " + nombre);
+        try {
+            LogicaFake.guardarMediciones(tipo, valor);
+            throw new AssertionError("La medicion invalida debia rechazarse");
+        } catch (IllegalArgumentException esperado) {
+            Log.i("TESTS_APP", "OK: " + nombre);
+        }
+    }
+
+    /*
+     * --------------------
+     * --> botonEjecutarTestsPulsado() <--
+     * Ejecuta las pruebas cuando el usuario pulsa el botón.
+     * --------------------
+     */
+    public void botonEjecutarTestsPulsado(View vista) {
+        if (pruebasEnCurso) return;
+        pruebasEnCurso = true;
+        vista.setEnabled(false);
+        TextView estado = findViewById(R.id.estadoTests);
+        estado.setText("Ejecutando pruebas...");
+        Log.i("TESTS_APP", "EJECUTAR TESTS");
+        comprobarLogicaFake();
+        comprobarRest();
+    }
+    /*
+     * --------------------
+     * --> comprobarRest() -->
+     * Ejecuta los casos GET y POST REST simulados y muestra el resumen.
+     * --------------------
+     */
+    private void comprobarRest() {
+        PruebasRESTBoton.ejecutar((resultadoRest, resumenRest) -> {
+            boolean todoCorrecto = resultadoRest && resultadoTestLogicaFake;
+            Log.i("TESTS_APP", "RESULTADOS : LOGICA_FAKE="
+                    + (resultadoTestLogicaFake ? "OK" : "ERROR") + ", " + resumenRest);
+            TextView estado = findViewById(R.id.estadoTests);
+            estado.setText(todoCorrecto
+                    ? "Pruebas Android: OK" : "Pruebas Android: ERROR; revisa Logcat");
+            Button boton = findViewById(R.id.botonEjecutarTests);
+            boton.setEnabled(true);
+            pruebasEnCurso = false;
+        });
+    }
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     @Override
+    /*
+     * --------------------
+     * savedInstanceState: Bundle --> onCreate()
+     * Configura la pantalla y solicita los permisos Bluetooth.
+     * --------------------
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
-
         pedirPermisosNecesarios();
-
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
-
     } // onCreate()
 
     // --------------------------------------------------------------
     // --------------------------------------------------------------
+    /*
+     * --------------------
+     * código: N, permisos: Texto[], resultados: Z[] --> onRequestPermissionsResult()
+     * Continúa la inicialización si el usuario concede los permisos.
+     * --------------------
+     */
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
         super.onRequestPermissionsResult( requestCode, permissions, grantResults);
@@ -371,9 +338,5 @@ if (todoConcedido) {
     } // ()
 
 } // class
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-// --------------------------------------------------------------
-
-
+    // --------------------------------------------------------------
+    // --------------------------------------------------------------

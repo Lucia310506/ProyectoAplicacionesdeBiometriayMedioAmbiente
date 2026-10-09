@@ -1,6 +1,10 @@
 # Fichero: .htaccess
 # Autor: Lucía Díaz Murcia
-# Descripción: Impide el acceso web directo a los tests.
-# Fecha: 2026-09-25
+# Descripción: Permite la página de autocomprobación desde Aplicacion.html y mantiene el resto de tests privados.
+# Fecha: 2026-10-03
 # Copyright (c) 2026 Lucía Díaz Murcia
 Require all denied
+
+<FilesMatch "^(pruebas_consola\.js|ejecutar_tests_consola\.php)$">
+    Require all granted
+</FilesMatch>

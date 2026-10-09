@@ -6,7 +6,11 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 
+// --------------------
 // texto: Text, clase: Text --> mostrarEstado() -->
+// Actualiza el mensaje visible y su estilo.
+// --------------------
+
 function mostrarEstado(texto, clase) {
   const estado = document.getElementById('estado');
 
@@ -18,9 +22,11 @@ function mostrarEstado(texto, clase) {
   estado.className = clase;
 }
 
-let ultimasMediciones = [];
+// --------------------
+// mediciones: Mediciones --> dibujarLista() -->
+// Ordena y representa las últimas diez filas sin interpretar HTML externo.
+// --------------------
 
-// mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] --> dibujarLista() -->
 function dibujarLista(mediciones) {
   const cuerpo = document.getElementById('cuerpo-mediciones');
 
@@ -59,11 +65,15 @@ function dibujarLista(mediciones) {
   });
 }
 
+// --------------------
 // --> actualizarMediciones() -->
+// Solicita la lista a la lógica fake, representa los datos y refleja estados.
+// --------------------
+
 async function actualizarMediciones() {
   try {
     mostrarEstado('Cargando mediciones...', 'carga');
-    const mediciones = await pedirMediciones();
+    const mediciones = await mostrarMediciones();
     dibujarLista(mediciones);
     if (mediciones.length > 0) {
       mostrarEstado(`Actualizado: ${mediciones.length} mediciones.`, 'ok');
@@ -75,13 +85,15 @@ async function actualizarMediciones() {
   }
 }
 
+// --------------------
 // --> iniciarAplicacion() -->
+// Hace la primera actualización y programa la consulta periódica.
+// --------------------
+
 function iniciarAplicacion() {
   actualizarMediciones();
   setInterval(actualizarMediciones, 5000);
 }
 
 
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  iniciarAplicacion();
-}
+iniciarAplicacion();
