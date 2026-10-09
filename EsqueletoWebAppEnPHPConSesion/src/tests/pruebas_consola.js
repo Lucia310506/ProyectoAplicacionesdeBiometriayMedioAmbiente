@@ -1,12 +1,14 @@
 /*
  * Fichero: pruebas_consola.js
  * Autor: Lucía Díaz Murcia
- * Descripción: Ejecuta autocomprobaciones web al abrir Aplicacion.html.
- * Fecha: 2026-10-04
+ * Descripción: Ejecuta las pruebas web solo cuando se pulsa el botón.
+ * Fecha: 2026-10-09
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
-(async function () {
-  const grupos = { web: [], logica: [], baseDatos: [] };
+(function () {
+  const boton = document.getElementById('boton-tests');
+  const estado = document.getElementById('estado-tests');
+  let enCurso = false;
 
   // condicion: B, mensaje: Text --> comprobar() -->
   // Falla el caso actual con una explicación breve.
@@ -14,23 +16,23 @@
     if (!condicion) throw new Error(mensaje);
   }
 
-  // nombre: Text, prueba: Función --> caso() -->
-  // Ejecuta un caso y guarda su resultado sin detener la batería.
-  async function caso(nombre, prueba) {
+  // nombre: Text, prueba: Funcion, resultados: [Dict] --> caso() -->
+  // Ejecuta un caso y guarda su resultado sin detener las demás pruebas.
+  async function caso(nombre, prueba, resultados) {
     console.log('Ejecutando test: ' + nombre);
     try {
       await prueba();
-      grupos.web.push({ nombre, estado: 'OK' });
+      resultados.push({ nombre, estado: 'OK' });
       console.log('OK: ' + nombre);
     } catch (error) {
-      grupos.web.push({ nombre, estado: 'ERROR' });
+      resultados.push({ nombre, estado: 'ERROR' });
       console.log('ERROR: ' + nombre + ' — ' + error.message);
     }
   }
 
-  // --> probarPeticionarioREST() -->
-  // Simula las respuestas y restaura fetch original incluso ante fallos.
-  async function probarPeticionarioREST() {
+  // resultados: [Dict] --> probarPeticionarioREST() -->
+  // Simula GET, errores HTTP y errores de red del cliente web.
+  async function probarPeticionarioREST(resultados) {
     const fetchReal = window.fetch;
     let ruta = '';
     try {
@@ -42,7 +44,7 @@
         const datos = await pedirMediciones();
         comprobar(ruta === '/mediciones' && datos.length === 1 && datos[0].tipo === 'CO2',
           'Ruta o JSON inesperado');
-      });
+      }, resultados);
 
       for (const [nombre, respuesta, errorEsperado] of [
         ['HTTP', { ok: false, text: async () => '{"error":"HTTP simulado"}' }, 'HTTP simulado'],
@@ -56,17 +58,17 @@
           } catch (error) {
             comprobar(error.message === errorEsperado, 'Mensaje de error inesperado');
           }
-        });
+        }, resultados);
       }
     } finally {
       window.fetch = fetchReal;
     }
   }
 
-  // --> probarServidor() -->
-  // Pide al servidor sus pruebas de lógica y BD; este borra sus filas centinela.
-  async function probarServidor() {
-    console.log('Ejecutando tests PHP y base de datos');
+  // resultados: [Dict] --> probarServidor() -->
+  // Solicita pruebas PHP; el servidor borra únicamente sus filas centinela.
+  async function probarServidor(resultados) {
+    console.log('Ejecutando pruebas PHP y base de datos');
     try {
       const respuesta = await window.fetch('../tests/ejecutar_tests_consola.php', {
         method: 'POST',
@@ -78,33 +80,58 @@
       const resultado = await respuesta.json();
       if (!respuesta.ok && !resultado.tests) throw new Error(resultado.error || 'Solicitud rechazada');
       (resultado.tests || []).forEach((test) => {
-        grupos[test.grupo === 'logica' ? 'logica' : 'baseDatos'].push(test);
+        resultados[test.grupo === 'logica' ? 'logica' : 'baseDatos'].push(test);
         console.log(test.estado + ': ' + test.nombre + (test.detalle ? ' — ' + test.detalle : ''));
       });
     } catch (error) {
-      grupos.logica.push({ nombre: 'Pruebas PHP de lógica', estado: 'ERROR' });
-      grupos.baseDatos.push({ nombre: 'Pruebas de base de datos', estado: 'ERROR' });
+      resultados.logica.push({ nombre: 'Pruebas PHP de lógica', estado: 'ERROR' });
+      resultados.baseDatos.push({ nombre: 'Pruebas de base de datos', estado: 'ERROR' });
       console.log('ERROR: pruebas PHP/BD — ' + error.message);
     }
   }
 
-  // --> imprimirResultados() -->
-  // Muestra el resumen final de cada grupo de pruebas.
-  function imprimirResultados() {
+  // grupos: Dict --> imprimirResultados() --> Texto
+  // Imprime los resúmenes y devuelve si todos los casos han pasado.
+  function imprimirResultados(grupos) {
     console.log('RESULTADOS :');
+    let todoCorrecto = true;
     for (const [nombre, pruebas] of [
       ['LOGICA_FAKE_WEB', grupos.web],
       ['LOGICA_NEGOCIO_PHP', grupos.logica],
       ['BASE_DATOS_MEDICIONES', grupos.baseDatos]
     ]) {
-      const ok = pruebas.filter((prueba) => prueba.estado === 'OK').length;
-      console.log(nombre + '=' + (pruebas.length && ok === pruebas.length ? 'OK' : 'ERROR')
-        + ' (' + ok + '/' + pruebas.length + ')');
+      const correctos = pruebas.filter((prueba) => prueba.estado === 'OK').length;
+      const correcto = pruebas.length > 0 && correctos === pruebas.length;
+      todoCorrecto = todoCorrecto && correcto;
+      console.log(nombre + '=' + (correcto ? 'OK' : 'ERROR') + ' (' + correctos + '/' + pruebas.length + ')');
+    }
+    return todoCorrecto;
+  }
+
+  // --> ejecutarPruebasWeb() -->
+  // Ejecuta la batería web completa al solicitarla desde el botón.
+  async function ejecutarPruebasWeb() {
+    if (enCurso) return;
+    enCurso = true;
+    boton.disabled = true;
+    estado.textContent = 'Ejecutando pruebas; mira la consola del navegador.';
+    const grupos = { web: [], logica: [], baseDatos: [] };
+
+    console.log('EJECUTAR TESTS');
+    try {
+      await probarPeticionarioREST(grupos.web);
+      await probarServidor(grupos);
+      estado.textContent = imprimirResultados(grupos)
+        ? 'Todas las pruebas han terminado correctamente.'
+        : 'Hay pruebas con errores. Revisa la consola del navegador.';
+    } catch (error) {
+      console.log('ERROR: fallo inesperado en las pruebas — ' + error.message);
+      estado.textContent = 'No se pudieron completar las pruebas. Revisa la consola.';
+    } finally {
+      enCurso = false;
+      boton.disabled = false;
     }
   }
 
-  console.log('EJECUTAR TESTS');
-  await probarPeticionarioREST();
-  await probarServidor();
-  imprimirResultados();
-}());
+  boton.addEventListener('click', ejecutarPruebasWeb);
+})();

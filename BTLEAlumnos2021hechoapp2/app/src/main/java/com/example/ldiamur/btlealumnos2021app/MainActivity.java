@@ -17,6 +17,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -34,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int CODIGO_PETICION_PERMISOS = 11223344;
     private boolean resultadoTestLogicaFake = false;
+    private boolean pruebasEnCurso = false;
     // --------------------------------------------------------------
     // --------------------------------------------------------------
     /*
@@ -200,11 +203,11 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      * --------------------
-     *  comprobarLogicaFakeAlArrancar() -->
-     * Ejecuta las validaciones locales de lógica y registra su resultado.
+     *  comprobarLogicaFake() -->
+     * Comprueba la validación de mediciones válidas e inválidas.
      * --------------------
      */
-    private void comprobarLogicaFakeAlArrancar() {
+    private void comprobarLogicaFake() {
         resultadoTestLogicaFake = false;
         try {
             Log.i("TESTS_APP", "Ejecutando test: guardar CO2 valido");
@@ -218,9 +221,9 @@ public class MainActivity extends AppCompatActivity {
             comprobarRechazoLogica("HUMEDAD", 50.0, "rechazar tipo no admitido");
             comprobarRechazoLogica("CO2", Double.NaN, "rechazar valor NaN");
             resultadoTestLogicaFake = true;
-            Log.i("TEST_LOGICAFake", "OK: pruebas de logica fake superadas al iniciar");
+            Log.i("TEST_LOGICAFake", "OK: pruebas de logica fake superadas");
         } catch (Throwable error) {
-            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de logica fake al iniciar", error);
+            Log.e("TEST_LOGICAFake", "ERROR: fallaron las pruebas de lógica fake", error);
         }
     }
 
@@ -242,11 +245,27 @@ public class MainActivity extends AppCompatActivity {
 
     /*
      * --------------------
-     * --> comprobarRestAlArrancar() -->
-     * Comprueba en segundo plano que REST devuelve JSON válido.
+     * --> botonEjecutarTestsPulsado() <--
+     * Ejecuta las pruebas cuando el usuario pulsa el botón.
      * --------------------
      */
-    private void comprobarRestAlArrancar() {
+    public void botonEjecutarTestsPulsado(View vista) {
+        if (pruebasEnCurso) return;
+        pruebasEnCurso = true;
+        vista.setEnabled(false);
+        TextView estado = findViewById(R.id.estadoTests);
+        estado.setText("Ejecutando pruebas...");
+        Log.i("TESTS_APP", "EJECUTAR TESTS");
+        comprobarLogicaFake();
+        comprobarRest();
+    }
+    /*
+     * --------------------
+     * --> comprobarRest() -->
+     * Comprueba en segundo plano que REST devuelve JSON válido y muestra el resumen.
+     * --------------------
+     */
+    private void comprobarRest() {
         Log.i("TESTS_APP", "Ejecutando test REST: GET /mediciones, HTTP 200 y JSON array");
         new PeticionarioREST().hacerPeticionREST(
                 "GET", ConfiguracionRest.URL_MEDICIONES, null,
@@ -260,12 +279,17 @@ public class MainActivity extends AppCompatActivity {
                         resultadoRest = true;
                         Log.i("TEST_PETICIONARIO_REST", "OK: GET /mediciones devolvio HTTP 200 y JSON valido");
                     } catch (Exception error) {
-                        Log.e("TEST_PETICIONARIO_REST", "ERROR: fallo la comprobacion REST al iniciar", error);
+                        Log.e("TEST_PETICIONARIO_REST", "ERROR: falló la comprobación REST", error);
                     }
                     Log.i("TESTS_APP", "RESULTADOS : LOGICA_FAKE="
                             + (resultadoTestLogicaFake ? "OK" : "ERROR")
                             + ", REST=" + (resultadoRest ? "OK" : "ERROR"));
-                    pedirPermisosNecesarios();
+                    TextView estado = findViewById(R.id.estadoTests);
+                    estado.setText(resultadoRest && resultadoTestLogicaFake
+                            ? "Pruebas Android: OK" : "Pruebas Android: ERROR; revisa Logcat");
+                    Button boton = findViewById(R.id.botonEjecutarTests);
+                    boton.setEnabled(true);
+                    pruebasEnCurso = false;
                 });
     }
     // --------------------------------------------------------------
@@ -274,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
     /*
      * --------------------
      * savedInstanceState: Bundle --> onCreate()
-     * Configura la pantalla y ejecuta las comprobaciones de inicio.
+     * Configura la pantalla y solicita los permisos Bluetooth.
      * --------------------
      */
     protected void onCreate(Bundle savedInstanceState) {
@@ -282,14 +306,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Log.d(ETIQUETA_LOG, " onCreate(): empieza ");
-
-        Log.i("TESTS_APP", "EJECUTAR TESTS");
-
-        comprobarLogicaFakeAlArrancar();
-        comprobarRestAlArrancar();
-
+        pedirPermisosNecesarios();
         Log.d(ETIQUETA_LOG, " onCreate(): termina ");
-
     } // onCreate()
 
     // --------------------------------------------------------------

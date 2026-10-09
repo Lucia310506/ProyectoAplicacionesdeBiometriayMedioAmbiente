@@ -43,6 +43,7 @@ namespace Globales {
 #include "EmisoraBLE.h"
 #include "Publicador.h"
 #include "Medidor.h"
+#include "test.h"
 
 
 // --------------------------------------------------------------
@@ -121,6 +122,13 @@ void loop () {
   using namespace Loop;
   using namespace Globales;
 
+  // Ejecuta las pruebas solo al enviar t o T desde el monitor serie.
+  if (Serial.available() > 0) {
+    const char comando = static_cast<char>(Serial.read());
+    if (comando == 't' || comando == 'T') {
+      ejecutarTestsArduino();
+    }
+  }
   cont++;
 
   elPuerto.escribir( "\n---- loop(): empieza " );

@@ -34,9 +34,8 @@ Dentro de la carpeta del servidor:
 
 1. Abre HolaMundoIBeacon.ino con Arduino IDE.
 2. Selecciona la placa del proyecto y comprueba que tienes instalada la librería Bluefruit.
-3. Compila y carga el programa. 
-4. Si quieres que el programa comience a enviar beacons , abre el monitor serie a 115200 baudios.
-5. El Arduino empezará a enviar los beacons.
+3. Compila y carga el programa. Al arrancar empieza a enviar los beacons; no ejecuta pruebas automáticamente.
+4. Abre el monitor serie a 115200 baudios y escribe t para ejecutar las pruebas cuando quieras. Verás los resultados en el monitor serie.
 
 ## Android
 
@@ -44,7 +43,7 @@ Dentro de la carpeta del servidor:
 2. Si usas otro servidor, cambia la dirección en ConfiguracionRest.java.
 3. Ejecuta la aplicación en un móvil compatible y acepta los permisos que pide.
 
-Al abrirse, la aplicación ejecuta las pruebas de la lógica y comprueba la conexión REST. Los resultados aparecen en Logcat. Puedes buscar TESTS_APP, TEST_LOGICAFake o TEST_PETICIONARIO_REST.
+Las pruebas no se ejecutan al abrir la aplicación. Pulsa el botón Ejecutar pruebas cuando quieras. Las comprobaciones de lógica se ejecutan al pulsar; la petición REST se hace en segundo plano. Los resultados aparecen en Logcat con TESTS_APP, TEST_LOGICAFake y TEST_PETICIONARIO_REST.
 
 También hay pruebas en app/src/androidTest. PeticionarioRESTTest necesita MockWebServer, que ahora mismo no está añadido en app/build.gradle.kts.
 
@@ -84,9 +83,9 @@ La web consulta con GET. Android guarda una medición con POST. Si se guarda bie
 
 ## Pruebas
 
-### Al abrir la web
+### Pruebas de la web
 
-Cuando abres Aplicacion.html, la web ejecuta las pruebas y luego empieza a consultar las mediciones. Abre la consola del navegador para ver EJECUTAR TESTS, el resultado de cada prueba y el resumen.
+Al abrir Aplicacion.html, la página empieza a consultar las mediciones, pero no ejecuta las pruebas. Pulsa Ejecutar pruebas cuando quieras. La consola del navegador mostrará EJECUTAR TESTS, cada resultado y el resumen.
 
 Las pruebas comprueban el cliente REST de la web, la lógica PHP y la conexión con la base de datos. Las pruebas de base de datos guardan dos mediciones temporales y luego borran solo esas dos. No borran las mediciones normales.
 

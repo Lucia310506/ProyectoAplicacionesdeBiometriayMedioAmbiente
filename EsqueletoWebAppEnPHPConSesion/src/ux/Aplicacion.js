@@ -96,14 +96,4 @@ function iniciarAplicacion() {
 }
 
 
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  const pruebasInicio = window.promesasPruebasInicio;
-  if (pruebasInicio && typeof pruebasInicio.then === 'function') {
-    pruebasInicio.then(iniciarAplicacion).catch((error) => {
-      console.log('ERROR: fallo inesperado al ejecutar tests de inicio — ' + error.message);
-      iniciarAplicacion();
-    });
-  } else {
-    iniciarAplicacion();
-  }
-}
+iniciarAplicacion();
