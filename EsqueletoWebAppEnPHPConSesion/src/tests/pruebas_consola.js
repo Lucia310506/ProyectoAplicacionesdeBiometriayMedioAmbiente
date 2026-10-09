@@ -80,11 +80,12 @@
       const resultado = await respuesta.json();
       if (!respuesta.ok && !resultado.tests) throw new Error(resultado.error || 'Solicitud rechazada');
       (resultado.tests || []).forEach((test) => {
-        resultados[test.grupo === 'logica' ? 'logica' : 'baseDatos'].push(test);
+        resultados[test.grupo].push(test);
         console.log(test.estado + ': ' + test.nombre + (test.detalle ? ' — ' + test.detalle : ''));
       });
     } catch (error) {
       resultados.logica.push({ nombre: 'Pruebas PHP de lógica', estado: 'ERROR' });
+      resultados.rest.push({ nombre: 'Pruebas REST', estado: 'ERROR' });
       resultados.baseDatos.push({ nombre: 'Pruebas de base de datos', estado: 'ERROR' });
       console.log('ERROR: pruebas PHP/BD — ' + error.message);
     }
@@ -98,6 +99,7 @@
     for (const [nombre, pruebas] of [
       ['LOGICA_FAKE_WEB', grupos.web],
       ['LOGICA_NEGOCIO_PHP', grupos.logica],
+      ['SERVIDOR_REST', grupos.rest],
       ['BASE_DATOS_MEDICIONES', grupos.baseDatos]
     ]) {
       const correctos = pruebas.filter((prueba) => prueba.estado === 'OK').length;
@@ -115,7 +117,7 @@
     enCurso = true;
     boton.disabled = true;
     estado.textContent = 'Ejecutando pruebas; mira la consola del navegador.';
-    const grupos = { web: [], logica: [], baseDatos: [] };
+    const grupos = { web: [], logica: [], rest: [], baseDatos: [] };
 
     console.log('EJECUTAR TESTS');
     try {

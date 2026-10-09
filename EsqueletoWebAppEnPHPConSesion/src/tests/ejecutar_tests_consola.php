@@ -39,9 +39,12 @@ if (!$hostOrigen || !$hostSolicitud
 
 require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
 require_once __DIR__ . '/../logica/mediciones.php';
+define('PRUEBA_REST', true);
+require_once __DIR__ . '/../rest/mediciones.php';
 
 $tests = [];
 $conexion = null;
+$tablaLimpiaAntes = false;
 $marcadores = [];
 $agregarResultado = static function (string $grupo, string $nombre, callable $prueba) use (&$tests): void {
     try {
@@ -56,21 +59,19 @@ $comprobar = static function (bool $condicion, string $mensaje): void {
         throw new RuntimeException($mensaje);
     }
 };
-$crearMarcadorUnico = static function (PDO $pdo, string $tipo, bool $negativo): float {
-    $consulta = $pdo->prepare('SELECT COUNT(*) FROM mediciones WHERE tipo = :tipo AND valor = :valor');
-    do {
-        $valor = (float) random_int(2000000000000, 8000000000000);
-        if ($negativo) {
-            $valor = -$valor;
-        }
-        $consulta->execute(['tipo' => $tipo, 'valor' => $valor]);
-    } while ((int) $consulta->fetchColumn() !== 0);
-    return $valor;
-};
-
 try {
-    $entorno = obtenerEntornoBaseDatos();
-    $conexion = conectarBaseDatos($entorno);
+    // Esta batería es destructiva por diseño: solo permite ejecutarse contra la BD aislada de pruebas.
+    $entorno = getenv('MEDICIONES_ENTORNO');
+    if ($entorno !== 'pruebas') {
+        throw new RuntimeException('Configura MEDICIONES_ENTORNO=pruebas para ejecutar la batería.');
+    }
+    $conexion = conectarBaseDatos('pruebas');
+    $conexion->exec('DELETE FROM mediciones');
+    $tablaLimpiaAntes = true;
+    $agregarResultado('baseDatos', 'La tabla de pruebas empieza vacía', static function () use ($conexion, $comprobar): void {
+        $comprobar((int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0,
+            'La tabla de pruebas no quedó vacía antes de empezar');
+    });
     $agregarResultado('baseDatos', 'Conexión y esquema de la base de mediciones', static function () use ($conexion, $comprobar): void {
         $comprobar((int) $conexion->query('SELECT 1')->fetchColumn() === 1, 'La consulta de conexión falló');
         $columnas = $conexion->query('SHOW COLUMNS FROM mediciones')->fetchAll(PDO::FETCH_COLUMN);
@@ -78,9 +79,22 @@ try {
             $comprobar(in_array($columna, $columnas, true), 'Falta la columna ' . $columna);
         }
     });
+    $agregarResultado('baseDatos', 'Configuración selecciona solo la base de pruebas', static function () use ($comprobar): void {
+        $configuracion = obtenerConfiguracion('pruebas');
+        $baseEsperada = getenv('MEDICIONES_DB_NAME_TEST') ?: 'ldiamur_mediciones_test';
+        $comprobar($configuracion['base'] === $baseEsperada, 'La configuración no seleccionó la base de pruebas');
+        try {
+            obtenerConfiguracion('desconocido');
+        } catch (InvalidArgumentException $error) {
+            return;
+        }
+        throw new RuntimeException('La configuración debe rechazar entornos desconocidos');
+    });
 
-    $marcadores[] = ['tipo' => 'CO2', 'valor' => $crearMarcadorUnico($conexion, 'CO2', false)];
-    $marcadores[] = ['tipo' => 'TEMPERATURA', 'valor' => $crearMarcadorUnico($conexion, 'TEMPERATURA', true)];
+    $marcadores = [
+        ['tipo' => 'CO2', 'valor' => 500.0],
+        ['tipo' => 'TEMPERATURA', 'valor' => -19.0],
+    ];
 
     $agregarResultado('logica', 'Lógica guarda y devuelve mediciones de prueba', static function () use ($conexion, $marcadores, $comprobar): void {
         foreach ($marcadores as $marcador) {
@@ -110,23 +124,35 @@ try {
         }
         throw new RuntimeException('Se debía rechazar el tipo HUMEDAD');
     });
+
+    $agregarResultado('rest', 'POST /mediciones devuelve 201 y GET devuelve el alta', static function () use ($conexion, $marcadores, $comprobar): void {
+        $valor = 501.0;
+        [$codigoPost] = atenderMediciones('POST', json_encode(['tipo' => 'CO2', 'valor' => $valor]));
+        $comprobar($codigoPost === 201, 'POST /mediciones debe responder 201');
+        [$codigoGet, $respuestaGet] = atenderMediciones('GET', '');
+        $comprobar($codigoGet === 200 && is_array($respuestaGet), 'GET /mediciones debe responder una lista');
+        $encontrada = false;
+        foreach ($respuestaGet as $medicion) {
+            if ($medicion['tipo'] === 'CO2' && (float) $medicion['valor'] === $valor) {
+                $encontrada = true;
+                break;
+            }
+        }
+        $comprobar($encontrada, 'GET no devolvió la medición enviada por POST');
+    });
 } catch (Throwable $error) {
     $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Conexión a la base de mediciones', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
 } finally {
-    if ($conexion instanceof PDO && count($marcadores) > 0) {
+    if ($conexion instanceof PDO && $tablaLimpiaAntes) {
         try {
-            $borrar = $conexion->prepare('DELETE FROM mediciones WHERE tipo = :tipo AND valor = :valor');
-            $comprobarSinFilas = $conexion->prepare('SELECT COUNT(*) FROM mediciones WHERE tipo = :tipo AND valor = :valor');
-            foreach ($marcadores as $marcador) {
-                $borrar->execute($marcador);
-                $comprobarSinFilas->execute($marcador);
-                if ((int) $comprobarSinFilas->fetchColumn() !== 0) {
-                    throw new RuntimeException('No se pudo borrar la fila de prueba ' . $marcador['tipo']);
-                }
+            $conexion->exec('DELETE FROM mediciones');
+            $vacias = (int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0;
+            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Limpieza: tabla de pruebas vacía al terminar', 'estado' => $vacias ? 'OK' : 'ERROR'];
+            if (!$vacias) {
+                throw new RuntimeException('La tabla de pruebas no quedó vacía al terminar');
             }
-            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Limpieza: se borraron solo las filas centinela de prueba', 'estado' => 'OK'];
         } catch (Throwable $error) {
-            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Limpieza de filas centinela', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
+            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Limpieza de la tabla de pruebas', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
         }
     }
 }

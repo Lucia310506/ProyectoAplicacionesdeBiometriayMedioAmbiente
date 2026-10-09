@@ -77,8 +77,14 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
             cuerpo.put("valor", valor);
             new PeticionarioREST().hacerPeticionREST(
                     "POST", ConfiguracionRest.URL_MEDICIONES, cuerpo.toString(),
-                    (codigo, respuesta) -> Log.d("clienterestandroid",
-                            "enviarMedicion(): código=" + codigo + " cuerpo=" + respuesta));
+                    (codigo, respuesta) -> {
+                        if (codigo == 201) {
+                            Log.i("clienterestandroid", "OK: POST /mediciones respondió HTTP 201");
+                        } else {
+                            Log.e("clienterestandroid", "ERROR: POST /mediciones respondió HTTP "
+                                    + codigo + " cuerpo=" + respuesta);
+                        }
+                    });
         } catch (Exception error) {
             Log.e("clienterestandroid", "enviarMedicion(): no se pudo crear el JSON", error);
         }

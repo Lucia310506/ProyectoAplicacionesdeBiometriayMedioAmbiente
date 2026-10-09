@@ -9,11 +9,29 @@
 
 // --------------------
 // entorno: Text --> conectarBaseDatos() --> PDO
-// Resuelve credenciales del entorno y construye la conexión PDO.
+// Construye la conexión PDO con la configuración resuelta para el entorno.
 // --------------------
 
 function conectarBaseDatos(string $entorno = 'produccion'): PDO {
-    $sufijo = $entorno === 'pruebas' ? '_TEST' : ($entorno === 'produccion' ? '_PROD' : '');
+    $configuracion = obtenerConfiguracion($entorno);
+    return new PDO(
+        "mysql:host={$configuracion['host']};dbname={$configuracion['base']};charset=utf8mb4",
+        $configuracion['usuario'],
+        $configuracion['password'],
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+    );
+}
+
+// --------------------
+// entorno: Text --> obtenerConfiguracion() --> Dict
+// Devuelve credenciales locales o variables del entorno sin publicarlas.
+// --------------------
+
+function obtenerConfiguracion(string $entorno = 'produccion'): array {
+    if (!in_array($entorno, ['produccion', 'pruebas'], true)) {
+        throw new InvalidArgumentException('El entorno debe ser produccion o pruebas');
+    }
+    $sufijo = $entorno === 'pruebas' ? '_TEST' : '_PROD';
     $configuracion = [];
     if ($entorno === 'produccion') {
         $rutaConfiguracion = __DIR__ . '/ConfiguracionProduccion.php';
@@ -31,11 +49,12 @@ function conectarBaseDatos(string $entorno = 'produccion'): PDO {
             'Falta ConfiguracionProduccion.php en Plesk. Copia ConfiguracionProduccion.ejemplo.php y escribe host, base, usuario y password.'
         );
     }
-    $host = $host ?: '127.0.0.1';
-    $usuario = $usuario ?: 'root';
-    $password = $password === false ? '' : $password;
-    return new PDO("mysql:host={$host};dbname={$base};charset=utf8mb4", $usuario, $password,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    return [
+        'host' => $host ?: '127.0.0.1',
+        'base' => $base,
+        'usuario' => $usuario ?: 'root',
+        'password' => $password === false ? '' : $password,
+    ];
 }
 
 // --------------------

@@ -45,7 +45,7 @@ Dentro de la carpeta del servidor:
 
 Las pruebas no se ejecutan al abrir la aplicación. Pulsa el botón Ejecutar pruebas cuando quieras. Las comprobaciones de lógica se ejecutan al pulsar; la petición REST se hace en segundo plano. Los resultados aparecen en Logcat con TESTS_APP, TEST_LOGICAFake y TEST_PETICIONARIO_REST.
 
-También hay pruebas en app/src/androidTest. PeticionarioRESTTest necesita MockWebServer, que ahora mismo no está añadido en app/build.gradle.kts.
+También hay pruebas en app/src/androidTest. PeticionarioRESTTest usa MockWebServer y requiere ejecutarse con un emulador o dispositivo desde Android Studio.
 
 ## Web y base de datos
 
@@ -87,11 +87,11 @@ La web consulta con GET. Android guarda una medición con POST. Si se guarda bie
 
 Al abrir Aplicacion.html, la página empieza a consultar las mediciones, pero no ejecuta las pruebas. Pulsa Ejecutar pruebas cuando quieras. La consola del navegador mostrará EJECUTAR TESTS, cada resultado y el resumen.
 
-Las pruebas comprueban el cliente REST de la web, la lógica PHP y la conexión con la base de datos. Las pruebas de base de datos guardan dos mediciones temporales y luego borran solo esas dos. No borran las mediciones normales.
+Las pruebas comprueban el cliente REST de la web, la lógica PHP y las rutas REST. La batería PHP solo funciona si el servidor tiene `MEDICIONES_ENTORNO=pruebas` y las variables `MEDICIONES_DB_HOST_TEST`, `MEDICIONES_DB_NAME_TEST`, `MEDICIONES_DB_USER_TEST` y `MEDICIONES_DB_PASSWORD_TEST` configuradas para una base de datos exclusiva de pruebas. Antes de empezar vacía esa tabla; inserta CO2 500 y TEMPERATURA -19; comprueba las filas; y al terminar la vuelve a vaciar. No la configures con la base de datos normal.
 
 ### Pruebas PHP
 
-Hay dos pruebas para ejecutar aparte: probar_base_datos.php y probar_rest.php. Estas pruebas borran todas las filas de la tabla mediciones antes y después. Úsalas solo con una base de datos de pruebas vacía. No las ejecutes con la base de datos que usa la web o que tiene mediciones que quieras conservar.
+Hay dos pruebas para ejecutar aparte: probar_base_datos.php y probar_rest.php. Estas pruebas borran todas las filas de la tabla mediciones antes y después. Configura `MEDICIONES_ENTORNO=pruebas` y las variables `MEDICIONES_DB_HOST_TEST`, `MEDICIONES_DB_NAME_TEST`, `MEDICIONES_DB_USER_TEST` y `MEDICIONES_DB_PASSWORD_TEST` para una base de datos exclusiva de pruebas. No las ejecutes con la base de datos que usa la web o que tiene mediciones que quieras conservar.
 
 ### Pruebas JavaScript
 

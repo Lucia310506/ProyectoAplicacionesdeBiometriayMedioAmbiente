@@ -10,7 +10,7 @@ package com.example.ldiamur.btlealumnos2021app;
 public final class ConfiguracionRest {
 
     public static String URL_MEDICIONES =
-            "https://ldiamur.upv.edu.es/src/rest/ mediciones.php";
+            "https://ldiamur.upv.edu.es/mediciones";
 
     /*
      * --------------------

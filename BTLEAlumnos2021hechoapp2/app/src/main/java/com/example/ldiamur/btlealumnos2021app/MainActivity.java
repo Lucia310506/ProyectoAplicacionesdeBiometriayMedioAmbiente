@@ -267,8 +267,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void comprobarRest() {
         Log.i("TESTS_APP", "Ejecutando test REST: GET /mediciones, HTTP 200 y JSON array");
-        new PeticionarioREST().hacerPeticionREST(
-                "GET", ConfiguracionRest.URL_MEDICIONES, null,
+        LogicaFake.mostrarMediciones(
                 (codigo, cuerpo) -> {
                     boolean resultadoRest = false;
                     try {

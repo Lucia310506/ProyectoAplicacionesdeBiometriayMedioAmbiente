@@ -31,6 +31,45 @@ public class PeticionarioRESTTest {
 
     /*
      * --------------------
+     * --> mostrarMediciones() <--
+     * Comprueba que Android consulta GET /mediciones y recibe la lista JSON.
+     * --------------------
+     */
+    @Test
+    public void mostrarMedicionesUsaGetYDevuelveLaLista() throws Exception {
+        MockWebServer servidor = new MockWebServer();
+        servidor.start();
+        String urlAnterior = ConfiguracionRest.URL_MEDICIONES;
+        CountDownLatch terminada = new CountDownLatch(1);
+        int[] codigo = new int[]{0};
+        String[] cuerpo = new String[]{""};
+        try {
+            ConfiguracionRest.URL_MEDICIONES = servidor.url("/mediciones").toString();
+            servidor.enqueue(new MockResponse().setResponseCode(200)
+                    .setBody("[{\"id\":1,\"tipo\":\"CO2\",\"valor\":500,\"fecha\":\"2026-09-25T10:30:00\"}]"));
+
+            LogicaFake.mostrarMediciones((codigoRecibido, cuerpoRecibido) -> {
+                codigo[0] = codigoRecibido;
+                cuerpo[0] = cuerpoRecibido;
+                terminada.countDown();
+            });
+
+            RecordedRequest peticion = servidor.takeRequest(5, TimeUnit.SECONDS);
+            assertTrue("Debe llegar una petición", peticion != null);
+            assertEquals("GET", peticion.getMethod());
+            assertEquals("/mediciones", peticion.getPath());
+            assertTrue("La respuesta debe terminar", terminada.await(5, TimeUnit.SECONDS));
+            assertEquals(200, codigo[0]);
+            assertEquals("CO2", new org.json.JSONArray(cuerpo[0]).getJSONObject(0).getString("tipo"));
+            Log.i(ETIQUETA, "OK: GET /mediciones devuelve la lista JSON");
+        } finally {
+            ConfiguracionRest.URL_MEDICIONES = urlAnterior;
+            servidor.shutdown();
+        }
+    }
+
+    /*
+     * --------------------
      * --> enviarMedicion() -->
      * Verifica método POST, ruta y cuerpo JSON.
      * --------------------

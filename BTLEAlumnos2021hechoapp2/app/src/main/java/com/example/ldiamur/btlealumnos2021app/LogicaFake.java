@@ -26,4 +26,15 @@ public class LogicaFake {
         }
         Log.d("logicafakeandroid", "Medición aceptada: " + tipo + "=" + valor);
     }
+
+    /*
+     * --------------------
+     * respuesta: RespuestaREST --> mostrarMediciones() <--
+     * Delega en REST la lectura de la lista creada y fechada por el servidor.
+     * --------------------
+     */
+    public static void mostrarMediciones(PeticionarioREST.RespuestaREST respuesta) {
+        new PeticionarioREST().hacerPeticionREST(
+                "GET", ConfiguracionRest.URL_MEDICIONES, null, respuesta);
+    }
 }
