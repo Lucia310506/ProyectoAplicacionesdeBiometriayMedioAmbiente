@@ -39,6 +39,41 @@ La lógica fake web simula la interfaz de lógica negocio para la UX; el peticio
 
 `EsqueletoWebAppEnPHPConSesion/src/logicaFake/PeticionarioREST.js` (cliente REST); `src/ux/Aplicacion.js` consume `pedirMediciones()`.
 
+### Diseño global del módulo `PeticionarioREST.js`
+
+El módulo JavaScript no mantiene estado de instancia. Define una constante para la ruta y una operación asíncrona de solo lectura que usa `fetch`.
+
+```text
+┌────────────────────── PeticionarioREST.js ──────────────────────┐
+│ URL_MEDICIONES = "/mediciones"                                  │
+│ pedirMediciones(): Promise<Medicion[]>                           │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+| Función | Diseño lógico | Qué hace |
+|---|---|---|
+| `async pedirMediciones(): Promise<Medicion[]>` | `--> pedirMediciones() --x Medicion[]` | Ejecuta GET a `/mediciones`, lee el cuerpo como texto, lo analiza como JSON, informa errores de JSON/HTTP y devuelve la lista. |
+
+La UX consume esta operación; la ruta es relativa al servidor donde se sirve `Aplicacion.html`.
+
+### Contrato de respuesta y errores
+
+La respuesta correcta es un arreglo JSON (incluido `[]` si no hay lecturas). La función primero lee texto y luego analiza JSON para poder dar un mensaje útil si el servidor devuelve HTML, una página de error o un cuerpo vacío. Si el JSON es válido pero `response.ok` es falso, lanza el mensaje `error` del servidor cuando exista; si no, informa que no se pudieron obtener mediciones. Los errores de red propagados por `fetch` también se entregan a la UX como excepciones.
+
+### Secuencia de consulta
+
+```text
+actualizarMediciones()
+  → pedirMediciones()
+  → fetch('/mediciones')
+  → response.text()
+  → JSON.parse(texto)
+  → validar response.ok
+  → devuelve Medicion[] o lanza Error
+```
+
+El cliente no contiene funcionalidad POST: la escritura se realiza desde Android. Las pruebas reemplazan temporalmente `fetch` para verificar la ruta, JSON, errores HTTP y fallos de red, y restauran la función original al acabar.
+
 ## Design Clarifications
 
 - El prompt especifica explícitamente GET para `pedirMediciones()`; no se añade una operación POST al fake web.

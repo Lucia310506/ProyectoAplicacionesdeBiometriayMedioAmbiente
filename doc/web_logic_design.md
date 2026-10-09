@@ -19,18 +19,17 @@ mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
 
 ### Diseño de clase
 
+Este diagrama conserva el diseño lógico del contrato solicitado. Es conceptual: la implementación PHP es un módulo de funciones globales sin clase instanciable ni estado privado persistente. El borde derecho se deja abierto en las salidas públicas; las operaciones públicas se dibujan fuera y se conectan por el hueco. Los atributos privados, cuando existen en una clase, se escriben completamente dentro del contorno.
+
 ```text
-                                                          -------- LogicaNegocio --------
-                                                          |
-                                                          | mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
-                                                          |
-                       tipo: Text, valor: R --> | guardarMediciones() -->
-                                                          |
-                                                          |
-       mediciones: [ (id: N, tipo: Text,                 |
-                      valor: R, fecha: DateTime) ] <-- | mostrarMediciones() <--
-                                                          |
-                                                          --------------------------------
+tipo: Text, valor: R ──> guardarMediciones() ──┐
+                                               │ pública
+       ┌────────────── LogicaNegocio ──────────┘
+       │ - mediciones: Medicion[]
+       │
+       └──────────────────────────────────────┐
+                                              │ pública
+mediciones: Medicion[] <── mostrarMediciones()┘
 ```
 
 La lógica PHP valida los datos y delega el almacenamiento/consulta en la conexión PDO. La implementación acepta los tipos `CO2` y `TEMPERATURA`.
@@ -38,6 +37,55 @@ La lógica PHP valida los datos y delega el almacenamiento/consulta en la conexi
 ### Ubicación de implementación
 
 `EsqueletoWebAppEnPHPConSesion/src/logica/mediciones.php`.
+
+### Diseño global del módulo `mediciones.php`
+
+Este archivo es un módulo de funciones globales PHP, no una clase instanciable. Valida el contrato de mediciones, ejecuta SQL mediante PDO y adapta las filas devueltas al formato compartido. La conexión se obtiene desde `ConexionMediciones.php`.
+
+```text
+┌────────────────────────────── mediciones.php ───────────────────────────────┐
+│ Estado propio: ninguno                                                       │
+│ guardarMediciones(tipo, valor): void                                         │
+│ mostrarMediciones(): Medicion[]                                              │
+│ ejecutarPrimeraConsultaValida(PDO, SQL[], parametros?): fila[]               │
+│ normalizarFilaMedicion(fila): Medicion                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+| Función | Diseño lógico | Qué hace |
+|---|---|---|
+| `guardarMediciones(string tipo, float valor): void` | `tipo: Text, valor: R --> guardarMediciones() -->` | Rechaza tipos distintos de CO2/TEMPERATURA y números no finitos; inserta con consulta preparada. No devuelve un valor. |
+| `mostrarMediciones(): array` | `--> mostrarMediciones() --> Medicion[]` | Consulta las filas ordenadas de más recientes a más antiguas y normaliza cada una. |
+| `ejecutarPrimeraConsultaValida(PDO conexion, array consultas, ?array parametros): array` | `conexion: PDO, consultas: SQL[], parametros: Dict|Nulo --> ejecutarPrimeraConsultaValida() --> filas: Dict[]` | Prueba las variantes SQL en orden; devuelve filas para una consulta de lectura o una lista vacía tras una inserción. Si todas fallan, propaga el último error PDO. |
+| `normalizarFilaMedicion(array fila): array` | `fila: Dict --> normalizarFilaMedicion() --> Medicion` | Convierte nombres alternativos de columnas y valores a `id` entero, `tipo` texto, `valor` decimal y `fecha` texto. |
+
+Una medición de salida tiene la forma `(id: N, tipo: Text, valor: R, fecha: DateTime)`; el alta recibe únicamente `tipo` y `valor`.
+
+### Flujo interno de operaciones
+
+```text
+guardarMediciones(tipo, valor)
+  ├─ validar tipo ∈ {CO2, TEMPERATURA}
+  ├─ validar que valor sea finito
+  ├─ resolver entorno y conexión PDO
+  └─ ejecutar INSERT preparado; MySQL asigna id/fecha
+
+mostrarMediciones()
+  ├─ resolver entorno y conexión PDO
+  ├─ ejecutar variante SELECT compatible
+  ├─ normalizar cada fila
+  └─ devolver lista, ordenada de más reciente a más antigua
+```
+
+### Entradas, salidas y errores
+
+- Entrada de escritura: `tipo` texto y `valor` decimal. No hay retorno de negocio; errores se expresan mediante excepciones.
+- Tipos permitidos: `CO2` y `TEMPERATURA`, comparados de manera estricta.
+- Valor: debe ser finito; `NaN` e infinito se rechazan.
+- Lectura: devuelve una lista vacía cuando no hay filas y una lista de mediciones normalizadas cuando sí hay datos.
+- Error PDO: se intenta la siguiente variante SQL de compatibilidad; si todas fallan, se lanza el último error PDO.
+
+Las variantes de consultas responden a diferencias históricas de mayúsculas en los nombres de tabla/columnas de despliegues previos. Las consultas siguen usando parámetros enlazados para los valores de inserción.
 
 ## Design Clarifications
 
