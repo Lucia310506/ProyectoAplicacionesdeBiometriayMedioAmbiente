@@ -78,6 +78,6 @@ La batería del botón web comprueba que la fachada devuelve una lista con datos
 ## General Rules
 
 - **Programming Language:** JavaScript.
-- **Function/Method Headers:** La función lleva un comentario inmediatamente anterior con su firma lógica y descripción.
+- **Function/Method Headers:** Cada función debe llevar inmediatamente encima un bloque de comentario con su firma lógica y una breve descripción, delimitado al principio y al final por líneas de guiones `--------------------`. Mantener exactamente ese formato en todas las funciones documentadas.
 - **Code Readability:** El módulo contiene únicamente la fachada que consume la interfaz.
 - **Automated Testing:** Probar lista correcta, resultado de tipo inválido y errores propagados desde el cliente.
