@@ -42,8 +42,8 @@ El diseño de `LogicaFake.java` combina el contrato de la lógica (`guardarMedic
 
 - `guardarMediciones(tipo, valor)` devuelve `void`, como indica la firma del diseño. Las entradas inválidas producen `IllegalArgumentException`; el servicio BLE captura el rechazo antes de enviar por REST.
 - `mostrarMediciones(callback)` delega GET `/mediciones` en `PeticionarioREST`; Android recibe la lista JSON en su callback porque la petición corre en segundo plano. El servidor conserva la lista y genera `id` y `fecha`.
-- Las pruebas de `MainActivity` se ejecutan al pulsar el botón de la pantalla, no al iniciar la app. La lógica fake se comprueba en el hilo principal; GET REST corre en segundo plano y muestra sus resultados en LogCat.
-- Las pruebas instrumentadas del peticionario REST verifican `/mediciones`, POST, JSON con solo tipo y valor, respuesta 201 y error HTTP.
+- Las pruebas de `MainActivity` se ejecutan al pulsar el botón de la pantalla, no al iniciar la app. La lógica fake se comprueba en el hilo principal y los casos REST simulados corren en segundo plano; el resumen aparece en LogCat.
+- El botón ejecuta la batería REST con conexiones simuladas: GET `/mediciones`, POST con solo tipo y valor, respuesta 201 y error HTTP; así no escribe en la base de datos real.
 
 ## General Rules
 

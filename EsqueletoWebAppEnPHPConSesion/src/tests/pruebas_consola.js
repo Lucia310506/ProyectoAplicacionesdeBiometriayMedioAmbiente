@@ -65,8 +65,47 @@
     }
   }
 
-  // resultados: [Dict] --> probarServidor() -->
-  // Solicita pruebas PHP; el servidor borra únicamente sus filas centinela.
+  // resultados: [Dict] --> probarUX() -->
+  // Comprueba carga, renderizado de filas y error; restaura la vista al terminar.
+  async function probarUX(resultados) {
+    const estado = document.getElementById('estado');
+    const cuerpo = document.getElementById('cuerpo-mediciones');
+    const estadoOriginal = { texto: estado.textContent, clase: estado.className };
+    const filasOriginales = Array.from(cuerpo.childNodes).map((fila) => fila.cloneNode(true));
+    const pedirOriginal = window.pedirMediciones;
+    try {
+      let terminarCarga;
+      window.pedirMediciones = () => new Promise((resolver) => { terminarCarga = resolver; });
+      const actualizacion = actualizarMediciones();
+      await caso('UX muestra el estado de carga', async () => {
+        comprobar(estado.className === 'carga' && estado.textContent.includes('Cargando'),
+          'No mostró el estado de carga');
+      }, resultados);
+      terminarCarga([{ id: 1, tipo: 'CO2', valor: 500, fecha: '2026-09-25T10:30:00' }]);
+      await actualizacion;
+
+      await caso('UX dibuja las mediciones recibidas por GET', async () => {
+        comprobar(cuerpo.rows.length === 1 && cuerpo.rows[0].cells[0].textContent === 'CO2',
+          'No dibujó la fila recibida');
+        comprobar(estado.className === 'ok', 'No mostró estado de éxito');
+      }, resultados);
+
+      window.pedirMediciones = async () => { throw new Error('Fallo simulado'); };
+      await actualizarMediciones();
+      await caso('UX muestra el error de la consulta', async () => {
+        comprobar(estado.className === 'error' && estado.textContent === 'Fallo simulado',
+          'No mostró el error recibido');
+      }, resultados);
+    } finally {
+      window.pedirMediciones = pedirOriginal;
+      estado.textContent = estadoOriginal.texto;
+      estado.className = estadoOriginal.clase;
+      cuerpo.replaceChildren(...filasOriginales);
+    }
+  }
+
+  // resultados: Dict --> probarServidor() -->
+  // Ejecuta las pruebas PHP sobre la base aislada configurada para pruebas.
   async function probarServidor(resultados) {
     console.log('Ejecutando pruebas PHP y base de datos');
     try {
@@ -98,6 +137,7 @@
     let todoCorrecto = true;
     for (const [nombre, pruebas] of [
       ['LOGICA_FAKE_WEB', grupos.web],
+      ['UX_WEB', grupos.ux],
       ['LOGICA_NEGOCIO_PHP', grupos.logica],
       ['SERVIDOR_REST', grupos.rest],
       ['BASE_DATOS_MEDICIONES', grupos.baseDatos]
@@ -117,11 +157,12 @@
     enCurso = true;
     boton.disabled = true;
     estado.textContent = 'Ejecutando pruebas; mira la consola del navegador.';
-    const grupos = { web: [], logica: [], rest: [], baseDatos: [] };
+    const grupos = { web: [], ux: [], logica: [], rest: [], baseDatos: [] };
 
     console.log('EJECUTAR TESTS');
     try {
       await probarPeticionarioREST(grupos.web);
+      await probarUX(grupos.ux);
       await probarServidor(grupos);
       estado.textContent = imprimirResultados(grupos)
         ? 'Todas las pruebas han terminado correctamente.'

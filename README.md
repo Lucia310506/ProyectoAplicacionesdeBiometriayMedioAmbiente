@@ -35,7 +35,7 @@ Dentro de la carpeta del servidor:
 1. Abre HolaMundoIBeacon.ino con Arduino IDE.
 2. Selecciona la placa del proyecto y comprueba que tienes instalada la librería Bluefruit.
 3. Compila y carga el programa. Al arrancar empieza a enviar los beacons; no ejecuta pruebas automáticamente.
-4. Abre el monitor serie a 115200 baudios y escribe t para ejecutar las pruebas cuando quieras. Verás los resultados en el monitor serie.
+4. Conecta un pulsador entre D2 y GND. Al pulsarlo se ejecutan las pruebas; los resultados aparecen en el monitor serie a 115200 baudios.
 
 ## Android
 
@@ -43,9 +43,7 @@ Dentro de la carpeta del servidor:
 2. Si usas otro servidor, cambia la dirección en ConfiguracionRest.java.
 3. Ejecuta la aplicación en un móvil compatible y acepta los permisos que pide.
 
-Las pruebas no se ejecutan al abrir la aplicación. Pulsa el botón Ejecutar pruebas cuando quieras. Las comprobaciones de lógica se ejecutan al pulsar; la petición REST se hace en segundo plano. Los resultados aparecen en Logcat con TESTS_APP, TEST_LOGICAFake y TEST_PETICIONARIO_REST.
-
-También hay pruebas en app/src/androidTest. PeticionarioRESTTest usa MockWebServer y requiere ejecutarse con un emulador o dispositivo desde Android Studio.
+Las pruebas no se ejecutan al abrir la aplicación. Pulsa Ejecutar todas las pruebas para lanzar la lógica y los casos REST simulados. No se guarda nada en la base de datos real. Los resultados aparecen en Logcat con TESTS_APP, TEST_LOGICAFake y TEST_PETICIONARIO_REST.
 
 ## Web y base de datos
 
@@ -87,7 +85,7 @@ La web consulta con GET. Android guarda una medición con POST. Si se guarda bie
 
 Al abrir Aplicacion.html, la página empieza a consultar las mediciones, pero no ejecuta las pruebas. Pulsa Ejecutar pruebas cuando quieras. La consola del navegador mostrará EJECUTAR TESTS, cada resultado y el resumen.
 
-Las pruebas comprueban el cliente REST de la web, la lógica PHP y las rutas REST. La batería PHP solo funciona si el servidor tiene `MEDICIONES_ENTORNO=pruebas` y las variables `MEDICIONES_DB_HOST_TEST`, `MEDICIONES_DB_NAME_TEST`, `MEDICIONES_DB_USER_TEST` y `MEDICIONES_DB_PASSWORD_TEST` configuradas para una base de datos exclusiva de pruebas. Antes de empezar vacía esa tabla; inserta CO2 500 y TEMPERATURA -19; comprueba las filas; y al terminar la vuelve a vaciar. No la configures con la base de datos normal.
+Las pruebas comprueban el cliente REST, la vista web, la lógica PHP, las rutas REST y la base de datos. La batería PHP solo funciona si el servidor tiene `MEDICIONES_ENTORNO=pruebas` y las variables `MEDICIONES_DB_HOST_TEST`, `MEDICIONES_DB_NAME_TEST`, `MEDICIONES_DB_USER_TEST` y `MEDICIONES_DB_PASSWORD_TEST` configuradas para una base de datos exclusiva de pruebas. Antes de empezar vacía esa tabla; inserta CO2 500 y TEMPERATURA -19; comprueba las filas; y al terminar la vuelve a vaciar. No la configures con la base de datos normal.
 
 ### Pruebas PHP
 
@@ -95,7 +93,7 @@ Hay dos pruebas para ejecutar aparte: probar_base_datos.php y probar_rest.php. E
 
 ### Pruebas JavaScript
 
-Los archivos probar_peticionario_rest.js y probar_ux.js comprueban partes de la web con respuestas de ejemplo. No necesitan conectarse a MySQL.
+Los casos de `probar_peticionario_rest.js` y `probar_ux.js` también están incluidos en el botón de pruebas de la web. Usan respuestas de ejemplo y no necesitan conectarse a MySQL.
 
 ## Diseños
 

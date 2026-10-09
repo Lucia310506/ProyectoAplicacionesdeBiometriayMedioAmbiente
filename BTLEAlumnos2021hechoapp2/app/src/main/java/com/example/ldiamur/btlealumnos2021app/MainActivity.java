@@ -23,7 +23,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import org.json.JSONArray;
 
 // ------------------------------------------------------------------
 // ------------------------------------------------------------------
@@ -262,34 +261,21 @@ public class MainActivity extends AppCompatActivity {
     /*
      * --------------------
      * --> comprobarRest() -->
-     * Comprueba en segundo plano que REST devuelve JSON válido y muestra el resumen.
+     * Ejecuta los casos GET y POST REST simulados y muestra el resumen.
      * --------------------
      */
     private void comprobarRest() {
-        Log.i("TESTS_APP", "Ejecutando test REST: GET /mediciones, HTTP 200 y JSON array");
-        LogicaFake.mostrarMediciones(
-                (codigo, cuerpo) -> {
-                    boolean resultadoRest = false;
-                    try {
-                        if (codigo != 200) {
-                            throw new IllegalStateException("GET /mediciones devolvio HTTP " + codigo);
-                        }
-                        new JSONArray(cuerpo);
-                        resultadoRest = true;
-                        Log.i("TEST_PETICIONARIO_REST", "OK: GET /mediciones devolvio HTTP 200 y JSON valido");
-                    } catch (Exception error) {
-                        Log.e("TEST_PETICIONARIO_REST", "ERROR: falló la comprobación REST", error);
-                    }
-                    Log.i("TESTS_APP", "RESULTADOS : LOGICA_FAKE="
-                            + (resultadoTestLogicaFake ? "OK" : "ERROR")
-                            + ", REST=" + (resultadoRest ? "OK" : "ERROR"));
-                    TextView estado = findViewById(R.id.estadoTests);
-                    estado.setText(resultadoRest && resultadoTestLogicaFake
-                            ? "Pruebas Android: OK" : "Pruebas Android: ERROR; revisa Logcat");
-                    Button boton = findViewById(R.id.botonEjecutarTests);
-                    boton.setEnabled(true);
-                    pruebasEnCurso = false;
-                });
+        PruebasRESTBoton.ejecutar((resultadoRest, resumenRest) -> {
+            boolean todoCorrecto = resultadoRest && resultadoTestLogicaFake;
+            Log.i("TESTS_APP", "RESULTADOS : LOGICA_FAKE="
+                    + (resultadoTestLogicaFake ? "OK" : "ERROR") + ", " + resumenRest);
+            TextView estado = findViewById(R.id.estadoTests);
+            estado.setText(todoCorrecto
+                    ? "Pruebas Android: OK" : "Pruebas Android: ERROR; revisa Logcat");
+            Button boton = findViewById(R.id.botonEjecutarTests);
+            boton.setEnabled(true);
+            pruebasEnCurso = false;
+        });
     }
     // --------------------------------------------------------------
     // --------------------------------------------------------------

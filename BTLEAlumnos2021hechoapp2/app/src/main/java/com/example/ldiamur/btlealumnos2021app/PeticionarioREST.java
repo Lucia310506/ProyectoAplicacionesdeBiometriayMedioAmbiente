@@ -21,6 +21,10 @@ import org.json.JSONObject;
 
 public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
+    interface AbridorConexion {
+        HttpURLConnection abrir(URL url) throws IOException;
+    }
+
     public interface RespuestaREST {
         /*
          * --------------------
@@ -35,6 +39,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
     private String urlDestino;
     private String elCuerpo = null;
     private RespuestaREST laRespuesta;
+    private final AbridorConexion abridorConexion;
 
     private int codigoRespuesta;
     private String cuerpoRespuesta = "";
@@ -61,7 +66,31 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
      * --------------------
      */
     public PeticionarioREST() {
+        this(url -> (HttpURLConnection) url.openConnection());
+    }
+
+    /*
+     * --------------------
+     * abridor: AbridorConexion --> PeticionarioREST() -->
+     * Permite sustituir el transporte por uno simulado durante las pruebas.
+     * --------------------
+     */
+    PeticionarioREST(AbridorConexion abridor) {
+        this.abridorConexion = abridor;
         Log.d("clienterestandroid", "constructor()");
+    }
+
+    /*
+     * --------------------
+     * tipo: Text, valor: R --> crearCuerpoMedicion() --> JSON
+     * Construye el cuerpo del contrato POST sin campos adicionales.
+     * --------------------
+     */
+    static String crearCuerpoMedicion(String tipo, double valor) throws Exception {
+        JSONObject cuerpo = new JSONObject();
+        cuerpo.put("tipo", tipo);
+        cuerpo.put("valor", valor);
+        return cuerpo.toString();
     }
 
     /*
@@ -72,11 +101,8 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
      */
     public static void enviarMedicion(String tipo, double valor) {
         try {
-            JSONObject cuerpo = new JSONObject();
-            cuerpo.put("tipo", tipo);
-            cuerpo.put("valor", valor);
             new PeticionarioREST().hacerPeticionREST(
-                    "POST", ConfiguracionRest.URL_MEDICIONES, cuerpo.toString(),
+                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(tipo, valor),
                     (codigo, respuesta) -> {
                         if (codigo == 201) {
                             Log.i("clienterestandroid", "OK: POST /mediciones respondió HTTP 201");
@@ -104,7 +130,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
             Log.d("clienterestandroid", "doInBackground() me conecto a >" + urlDestino + "<");
 
             URL url = new URL(urlDestino);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection connection = abridorConexion.abrir(url);
             connection.setConnectTimeout(15000);
             connection.setReadTimeout(15000);
             connection.setRequestProperty("Content-Type", "application/json; charset=utf-8");

@@ -40,4 +40,4 @@ El sketch coordina `Medidor`, `Publicador`, `EmisoraBLE`, `PuertoSerie` y `LED`.
 - **Programming Language:** C++ para Arduino.
 - **Function/Method Headers:** Cada cabecera debe incluir el diseño lógico en un bloque de comentario delimitado por líneas `--------------------`.
 - **Code Readability:** Código claro y autoexplicativo; comentarios inline mínimos.
-- **Automated Testing:** Las pruebas manuales del medidor están en `test.h`; se activan desde `loop()` al enviar `t` por el monitor serie. No se ejecutan al arrancar. La transmisión BLE se comprueba con la placa.
+- **Automated Testing:** Las pruebas manuales del medidor están en `test.h`; se activan al pulsar un botón conectado entre D2 y GND. No se ejecutan al arrancar.

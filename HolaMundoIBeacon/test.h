@@ -1,7 +1,7 @@
 /*
  * Fichero: test.h
  * Autor: Lucía Díaz Murcia
- * Descripción: Pruebas manuales de las mediciones simuladas.
+ * Descripción: Pruebas manuales de las mediciones simuladas, activadas con pulsador.
  * Fecha: 2026-10-09
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
@@ -11,7 +11,7 @@
 #include "Medidor.h"
 
 // --> ejecutarTestsArduino() --> B
-// Comprueba los valores simulados cuando se solicita desde el monitor serie.
+// Comprueba los valores simulados cuando se pulsa el botón conectado a D2.
 inline bool ejecutarTestsArduino() {
   Medidor medidorDePrueba;
   const bool co2Correcto = medidorDePrueba.medirCO2() == 18;

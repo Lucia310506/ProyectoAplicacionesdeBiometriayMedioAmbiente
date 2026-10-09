@@ -38,6 +38,20 @@ namespace Globales {
   // Serial1 en el ejemplo de Curro creo que es la conexión placa-sensor 
 };
 
+// Pulsador externo entre D2 y GND; usa interrupción para no perder pulsaciones durante las esperas BLE.
+constexpr uint8_t PIN_BOTON_TESTS = 2;
+volatile bool pruebasSolicitadas = false;
+volatile unsigned long ultimoFlancoBoton = 0;
+
+// Registra una pulsación breve y filtra el rebote mecánico del pulsador.
+void botonPruebasInterrupcion() {
+  const unsigned long ahora = millis();
+  if (ahora - ultimoFlancoBoton >= 250) {
+    pruebasSolicitadas = true;
+    ultimoFlancoBoton = ahora;
+  }
+}
+
 // --------------------------------------------------------------
 // --------------------------------------------------------------
 #include "EmisoraBLE.h"
@@ -76,6 +90,8 @@ void inicializarPlaquita () {
 void setup() {
 
   Globales::elPuerto.esperarDisponible();
+  pinMode(PIN_BOTON_TESTS, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(PIN_BOTON_TESTS), botonPruebasInterrupcion, FALLING);
   inicializarPlaquita();
 
   // Suspend Loop() to save power
@@ -122,13 +138,12 @@ void loop () {
   using namespace Loop;
   using namespace Globales;
 
-  // Ejecuta las pruebas solo al enviar t o T desde el monitor serie.
-  if (Serial.available() > 0) {
-    const char comando = static_cast<char>(Serial.read());
-    if (comando == 't' || comando == 'T') {
-      ejecutarTestsArduino();
-    }
-  }
+  // Consume la pulsación fuera de la interrupción y ejecuta los tests en el ciclo principal.
+  noInterrupts();
+  const bool pulsado = pruebasSolicitadas;
+  pruebasSolicitadas = false;
+  interrupts();
+  if (pulsado) ejecutarTestsArduino();
   cont++;
 
   elPuerto.escribir( "\n---- loop(): empieza " );
