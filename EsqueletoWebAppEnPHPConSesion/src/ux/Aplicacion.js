@@ -67,13 +67,13 @@ function dibujarLista(mediciones) {
 
 // --------------------
 // --> actualizarMediciones() -->
-// Consulta REST, representa los datos y refleja carga, éxito o error.
+// Solicita la lista a la lógica fake, representa los datos y refleja estados.
 // --------------------
 
 async function actualizarMediciones() {
   try {
     mostrarEstado('Cargando mediciones...', 'carga');
-    const mediciones = await pedirMediciones();
+    const mediciones = await mostrarMediciones();
     dibujarLista(mediciones);
     if (mediciones.length > 0) {
       mostrarEstado(`Actualizado: ${mediciones.length} mediciones.`, 'ok');

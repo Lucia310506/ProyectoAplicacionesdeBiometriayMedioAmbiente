@@ -20,7 +20,8 @@ flowchart LR
   SCAN --> LOGA[LogicaFake Android]
   LOGA --> RESTA[PeticionarioREST Android]
   RESTA -->|POST /mediciones| API[API REST PHP]
-  WEB[Aplicacion.html / UX] --> CLIENT[PeticionarioREST.js]
+  WEB[Aplicacion.html / UX] --> FRONTLOGIC[LogicaFake.js · contrato de dominio]
+  FRONTLOGIC --> CLIENT[PeticionarioREST.js]
   CLIENT -->|GET /mediciones| API
   API --> LOG[mediciones.php · lógica PHP]
   LOG --> DBAD[ConexionMediciones · PDO]

@@ -7,8 +7,11 @@
  */
 package com.example.ldiamur.btlealumnos2021app;
 
-import android.util.Log;
-
+/**
+ * Valida las reglas de dominio de una medición Android.
+ * No conoce HTTP, callbacks REST ni persistencia; el servicio BLE decide qué
+ * adaptador invocar después de que esta validación termine correctamente.
+ */
 public class LogicaFake {
 
     /*
@@ -24,17 +27,5 @@ public class LogicaFake {
         if (Double.isNaN(valor) || Double.isInfinite(valor)) {
             throw new IllegalArgumentException("Valor de medición no válido: " + valor);
         }
-        Log.d("logicafakeandroid", "Medición aceptada: " + tipo + "=" + valor);
-    }
-
-    /*
-     * --------------------
-     * respuesta: RespuestaREST --> mostrarMediciones() <--
-     * Delega en REST la lectura de la lista creada y fechada por el servidor.
-     * --------------------
-     */
-    public static void mostrarMediciones(PeticionarioREST.RespuestaREST respuesta) {
-        new PeticionarioREST().hacerPeticionREST(
-                "GET", ConfiguracionRest.URL_MEDICIONES, null, respuesta);
     }
 }

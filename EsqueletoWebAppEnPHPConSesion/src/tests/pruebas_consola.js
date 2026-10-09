@@ -65,6 +65,39 @@
     }
   }
 
+  /*
+   * --------------------
+   * resultados: [Test] --> probarLogicaFakeWeb() -->
+   * Comprueba el contrato de dominio de la fachada web.
+   * --------------------
+   */
+  async function probarLogicaFakeWeb(resultados) {
+    const pedirOriginal = window.pedirMediciones;
+    try {
+      window.pedirMediciones = async () => [
+        { id: 7, tipo: 'TEMPERATURA', valor: 21, fecha: '2026-10-09T12:00:00' }
+      ];
+      await caso('LogicaFake web devuelve mediciones del dominio', async () => {
+        const mediciones = await mostrarMediciones();
+        comprobar(mediciones.length === 1 && mediciones[0].tipo === 'TEMPERATURA',
+          'La fachada no devolvió la lista de mediciones');
+      }, resultados);
+
+      window.pedirMediciones = async () => ({ error: 'respuesta incorrecta' });
+      await caso('LogicaFake web rechaza una respuesta que no es una lista', async () => {
+        try {
+          await mostrarMediciones();
+          throw new Error('La fachada aceptó un resultado que no era lista');
+        } catch (error) {
+          comprobar(error.message === 'La lógica fake esperaba una lista de mediciones',
+            'No se informó del tipo de respuesta inválido');
+        }
+      }, resultados);
+    } finally {
+      window.pedirMediciones = pedirOriginal;
+    }
+  }
+
   // resultados: [Dict] --> probarUX() -->
   // Comprueba carga, renderizado de filas y error; restaura la vista al terminar.
   async function probarUX(resultados) {
@@ -72,10 +105,10 @@
     const cuerpo = document.getElementById('cuerpo-mediciones');
     const estadoOriginal = { texto: estado.textContent, clase: estado.className };
     const filasOriginales = Array.from(cuerpo.childNodes).map((fila) => fila.cloneNode(true));
-    const pedirOriginal = window.pedirMediciones;
+    const mostrarOriginal = window.mostrarMediciones;
     try {
       let terminarCarga;
-      window.pedirMediciones = () => new Promise((resolver) => { terminarCarga = resolver; });
+      window.mostrarMediciones = () => new Promise((resolver) => { terminarCarga = resolver; });
       const actualizacion = actualizarMediciones();
       await caso('UX muestra el estado de carga', async () => {
         comprobar(estado.className === 'carga' && estado.textContent.includes('Cargando'),
@@ -90,14 +123,14 @@
         comprobar(estado.className === 'ok', 'No mostró estado de éxito');
       }, resultados);
 
-      window.pedirMediciones = async () => { throw new Error('Fallo simulado'); };
+      window.mostrarMediciones = async () => { throw new Error('Fallo simulado'); };
       await actualizarMediciones();
       await caso('UX muestra el error de la consulta', async () => {
         comprobar(estado.className === 'error' && estado.textContent === 'Fallo simulado',
           'No mostró el error recibido');
       }, resultados);
     } finally {
-      window.pedirMediciones = pedirOriginal;
+      window.mostrarMediciones = mostrarOriginal;
       estado.textContent = estadoOriginal.texto;
       estado.className = estadoOriginal.clase;
       cuerpo.replaceChildren(...filasOriginales);
@@ -136,7 +169,8 @@
     console.log('RESULTADOS :');
     let todoCorrecto = true;
     for (const [nombre, pruebas] of [
-      ['LOGICA_FAKE_WEB', grupos.web],
+      ['CLIENTE_REST_WEB', grupos.web],
+      ['LOGICA_FAKE_WEB', grupos.logicaFake],
       ['UX_WEB', grupos.ux],
       ['LOGICA_NEGOCIO_PHP', grupos.logica],
       ['SERVIDOR_REST', grupos.rest],
@@ -157,11 +191,12 @@
     enCurso = true;
     boton.disabled = true;
     estado.textContent = 'Ejecutando pruebas; mira la consola del navegador.';
-    const grupos = { web: [], ux: [], logica: [], rest: [], baseDatos: [] };
+    const grupos = { web: [], logicaFake: [], ux: [], logica: [], rest: [], baseDatos: [] };
 
     console.log('EJECUTAR TESTS');
     try {
       await probarPeticionarioREST(grupos.web);
+      await probarLogicaFakeWeb(grupos.logicaFake);
       await probarUX(grupos.ux);
       await probarServidor(grupos);
       estado.textContent = imprimirResultados(grupos)

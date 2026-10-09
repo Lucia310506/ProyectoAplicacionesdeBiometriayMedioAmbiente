@@ -9,30 +9,18 @@
 ### Lógica fake y cliente REST
 
 ```text
-tipo: Text, valor: R --> guardarMediciones() -->
+tipo: Text, valor: R --> LogicaFake.guardarMediciones() -->
+                         validación de dominio (sin transporte)
 
-                                                             -------- LogicaNegocio --------
-                                                             |
-                                                             | mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
-                                                             |
-                       tipo: Text, valor: R --> | guardarMediciones() -->
-                                                             |
-                                                             |
- mediciones: [ (id: N, tipo: Text,                    |
-                valor: R, fecha: DateTime) ] <-- | mostrarMediciones() <--
-                                                             --------------------------------
-
-POST /mediciones
-(tipo: Text, valor: R) --> guardarMediciones()
-
-tipo: Text, valor: R --> PeticionarioREST.enviarMedicion() --x
+tipo: Text, valor: R --> PeticionarioREST.enviarMedicion() --> POST /mediciones
+GET /mediciones        --> PeticionarioREST.hacerPeticionREST() --> callback HTTP
 ```
 
-La implementación usa ambos contratos como partes coordinadas del mismo recorrido, pero conserva responsabilidades en clases separadas: `LogicaFake.java` contiene `guardarMediciones` y `mostrarMediciones`; `PeticionarioREST.java` construye/ejecuta HTTP y ofrece `enviarMedicion(tipo, valor)`; `ServicioEscuharBeacons.java` entrega las mediciones BLE a esas capas. `ConfiguracionRest.java` centraliza la URL completa del endpoint para cambiar el servidor sin alterar la lógica.
+`LogicaFake.java` contiene solo la validación de dominio. `PeticionarioREST.java` construye/ejecuta HTTP y ofrece `enviarMedicion(tipo, valor)`; `ServicioEscuharBeacons.java` coordina validación y envío. `ConfiguracionRest.java` centraliza la URL completa del endpoint para cambiar el servidor sin alterar la lógica.
 
 ### Interpretación de la separación
 
-`LogicaFake` implementa el punto de entrada de lógica solicitado por el diseño. `PeticionarioREST` es la operación de infraestructura REST con interfaz estática `enviarMedicion(tipo, valor)`. El servicio BLE conserva su escucha y utiliza la lógica fake y el cliente REST conforme a sus respectivos diseños; son archivos/clases separados.
+`LogicaFake` implementa validación independiente de transporte. `PeticionarioREST` es la infraestructura HTTP; sus callbacks HTTP pertenecen al cliente, no al contrato de negocio. El servicio BLE conserva su escucha y utiliza ambos componentes secuencialmente.
 
 ### Ubicación de implementación
 
@@ -47,24 +35,22 @@ La implementación usa ambos contratos como partes coordinadas del mismo recorri
 Convención del diagrama de clase: los campos privados quedan completamente dentro del contorno. Las operaciones públicas se dibujan fuera y entran por una abertura del borde; el borde no se cierra atravesando la operación. Los diagramas siguientes muestran relaciones entre clases; las tablas identifican la visibilidad al describir cada firma.
 
 ```text
-┌─────────────────────── MainActivity ────────────────────────┐
-│ permisos, estado de pruebas                                 │
-│ botones BLE, botón de pruebas, callbacks del ciclo Android  │
-└──────────────┬────────────────────────────┬─────────────────┘
-               │ inicia/detiene             │ valida y prueba
-               ▼                            ▼
-┌───────────────────────┐         ┌───────────────────────────┐
-│ ServicioEscuharBeacons│────────▶│ LogicaFake                │
-│ escáner BLE y parser  │         │ guardarMediciones(tipo,v) │
-└───────────────────────┘         │ mostrarMediciones(cb)     │
-                                  └────────────┬──────────────┘
-                                               ▼
-┌────────────────────── PeticionarioREST ─────────────────────┐
-│ hacerPeticionREST(método, URL, cuerpo, callback)              │
-│ enviarMedicion(tipo, valor)                                   │
-└─────────────────────────────┬────────────────────────────────┘
-                              ▼
-                     ConfiguracionRest.URL_MEDICIONES
+MainActivity --inicia/detiene--> ServicioEscuharBeacons
+ServicioEscuharBeacons --valida--> LogicaFake.guardarMediciones()
+ServicioEscuharBeacons --envía tras validar--> PeticionarioREST.enviarMedicion()
+PeticionarioREST --lee URL de--> ConfiguracionRest.URL_MEDICIONES
+MainActivity --activa manualmente--> PruebasRESTBoton
+```
+
+El siguiente es el diseño de clase de la lógica Android. La operación es pública y estática; por eso aparece en la pared de la clase y lleva `--x`. No hay campos de instancia privados.
+
+```text
+                           -------- LogicaFake --------
+                           |
+                           |
+tipo: Text, valor: R --> | guardarMediciones() --x
+                           |
+                           --------------------------------
 ```
 
 ### Clases y funciones
@@ -94,7 +80,6 @@ Clase estática de validación y delegación. No almacena mediciones.
 | Función | Diseño lógico | Qué hace |
 |---|---|---|
 | `guardarMediciones(String tipo, double valor): void` | `tipo: Text, valor: R --> guardarMediciones() -->` | Acepta únicamente CO2/TEMPERATURA y valores finitos; si no, lanza `IllegalArgumentException`. No devuelve nada ni persiste localmente. |
-| `mostrarMediciones(RespuestaREST respuesta): void` | `respuesta: CallbackREST --> mostrarMediciones() -->` | Pide por GET la lista al servidor y entrega la respuesta mediante callback. |
 
 #### `PeticionarioREST`
 
@@ -196,7 +181,7 @@ Contiene conexiones simuladas y una batería asíncrona GET, POST y error HTTP. 
 | `Utilidades.bytesToHexString(byte[]): String` | `bytes: Byte[] --> bytesToHexString() --> Text` | Representa un arreglo de bytes en hexadecimal. |
 
 - `guardarMediciones(tipo, valor)` devuelve `void`, como indica la firma del diseño. Las entradas inválidas producen `IllegalArgumentException`; el servicio BLE captura el rechazo antes de enviar por REST.
-- `mostrarMediciones(callback)` delega GET `/mediciones` en `PeticionarioREST`; Android recibe la lista JSON en su callback porque la petición corre en segundo plano. El servidor conserva la lista y genera `id` y `fecha`.
+- El cliente REST admite GET para consumidores que lo necesiten, pero la lógica fake Android no expone ni recibe callbacks HTTP. La aplicación actual usa el cliente para POST; los datos persistidos y la fecha se generan en el servidor.
 - Las pruebas de `MainActivity` se ejecutan al pulsar el botón de la pantalla, no al iniciar la app. La lógica fake se comprueba en el hilo principal y los casos REST simulados corren en segundo plano; el resumen aparece en LogCat.
 - El botón ejecuta la batería REST con conexiones simuladas: GET `/mediciones`, POST con solo tipo y valor, respuesta 201 y error HTTP; así no escribe en la base de datos real.
 

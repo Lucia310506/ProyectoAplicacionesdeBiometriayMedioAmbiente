@@ -64,11 +64,12 @@ flowchart LR
 
   DB[(MySQL · mediciones)]
   WEB[UX web · Aplicacion.html / Aplicacion.js]
+  WLOGIC[LogicaFake.js · fachada de dominio]
   WCLIENT[PeticionarioREST.js · GET]
 
   BLE -- anuncio iBeacon: tipo/contador en Major, valor en Minor --> SCAN
   CLIENT -- POST /mediciones · JSON tipo/valor --> ROUTE
-  WEB --> WCLIENT -->|GET /mediciones| ROUTE
+  WEB --> WLOGIC --> WCLIENT -->|GET /mediciones| ROUTE
   CONN --> DB
   ROUTE -->|JSON: id, tipo, valor, fecha| WCLIENT
   WCLIENT --> WEB
@@ -131,7 +132,8 @@ EsqueletoWebAppEnPHPConSesion/
   src/rest/mediciones.php                Endpoint GET/POST /mediciones
   src/logica/mediciones.php               Reglas e interacción de mediciones
   src/BBDD/ConexionMediciones.php         Selección de entorno y PDO
-  src/logicaFake/PeticionarioREST.js      Cliente GET web
+  src/logicaFake/LogicaFake.js             Fachada de dominio para la UX web
+  src/logicaFake/PeticionarioREST.js       Adaptador HTTP GET web
   src/ux/Aplicacion.html y Aplicacion.js  Interfaz web
   src/tests/                              Pruebas web, PHP, REST y BD
   bbdd/Estructura.sql                     Esquema MySQL
@@ -178,7 +180,7 @@ El archivo PHP no se incluye en el repositorio porque contiene credenciales. Cr�
 4. Para comprobar la lógica y el cliente REST simulado, pulsa **Ejecutar todas las pruebas**. Las pruebas no se ejecutan al iniciar la aplicación. En Logcat filtra por `TESTS_APP`, `TEST_LOGICAFake` o `TEST_PETICIONARIO_REST` para ver inicio, casos y resumen.
 5. Para iniciar la escucha BLE, utiliza los botones de búsqueda de la aplicación; para acabarla, pulsa detener. Una medición real que supere la validación se envía al servidor configurado.
 
-Las pruebas REST del botón usan conexiones simuladas para probar GET, POST, respuesta HTTP 201 y error HTTP. No insertan datos en MySQL.
+Las pruebas REST del botón usan conexiones simuladas para probar GET, POST, respuesta HTTP 201 y error HTTP. No insertan datos en MySQL ni necesitan `MockWebServer` o dependencias Gradle de pruebas externas.
 
 ## Web
 
@@ -188,7 +190,7 @@ Las pruebas REST del botón usan conexiones simuladas para probar GET, POST, res
 4. Para ejecutar las pruebas, pulsa el botón **Ejecutar pruebas** de la página. No se ejecutan al abrirla.
 5. Abre las herramientas de desarrollo del navegador y selecciona **Consola**. Allí aparece `EJECUTAR TESTS`, el resultado de cada caso y el bloque `RESULTADOS :` con los grupos y sus recuentos.
 
-El botón ejecuta pruebas del cliente REST web con respuestas simuladas, la presentación de carga/éxito/error, la lógica PHP, el endpoint REST y la conexión/esquema de base de datos. Los grupos de lógica, REST y BD requieren conexión a una base exclusiva de pruebas.
+El botón ejecuta pruebas del cliente REST web con respuestas simuladas, la fachada de lógica frontend, la presentación de carga/éxito/error, la lógica PHP, el endpoint REST y la conexión/esquema de base de datos. Los grupos de lógica, REST y BD requieren conexión a una base exclusiva de pruebas.
 
 ### Base de datos exclusiva para pruebas web
 
@@ -217,8 +219,11 @@ Los documentos de diseño están en `doc`:
 | [`arduino_design.md`](doc/arduino_design.md) | Ciclo del firmware, codificación iBeacon, clases y pulsador de pruebas. |
 | [`android_design.md`](doc/android_design.md) | Permisos, escaneo BLE, validación, cliente REST y clases Android. |
 | [`web_rest_design.md`](doc/web_rest_design.md) | Endpoint `/mediciones`, métodos, respuestas HTTP y errores. |
+| [`communication_design.md`](doc/communication_design.md) | Contrato formal de comunicación HTTP separado de la lógica del backend. |
+| [`business_logic_design.md`](doc/business_logic_design.md) | Reglas de negocio independientes de HTTP y alineadas con `mediciones`. |
 | [`web_logic_design.md`](doc/web_logic_design.md) | Validación, inserción, consultas y normalización PHP. |
-| [`web_rest_client_design.md`](doc/web_rest_client_design.md) | Petición GET del navegador y manejo de JSON/errores. |
+| [`frontend_business_logic_design.md`](doc/frontend_business_logic_design.md) | Contrato de dominio del frontend web y paridad con las operaciones de negocio. |
+| [`web_rest_client_design.md`](doc/web_rest_client_design.md) | Adaptador HTTP GET del navegador y manejo de JSON/errores. |
 | [`web_ux_design.md`](doc/web_ux_design.md) | Tabla, estados, refresco periódico y funciones de la interfaz. |
 | [`database_connection_design.md`](doc/database_connection_design.md) | Entornos, credenciales y creación de conexiones PDO. |
 | [`database_design.md`](doc/database_design.md) | Tabla, columnas, reglas y ciclo de vida de cada medición. |

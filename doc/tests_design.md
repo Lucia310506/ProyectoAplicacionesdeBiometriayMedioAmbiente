@@ -76,7 +76,7 @@ Las funciones auxiliares y las clases comprobadas se describen en `arduino_desig
 
 | Batería | Activación | Casos principales | Destino de los resultados | Efecto sobre datos |
 |---|---|---|---|---|
-| Web navegador | Botón de `Aplicacion.html` | GET del cliente simulado; carga/éxito/error de la UX; lógica PHP; REST; esquema, selección de entorno y limpieza de BD. | Consola del navegador y estado del botón. | El grupo PHP borra y recrea filas solo en la BD configurada como pruebas. |
+| Web navegador | Botón de `Aplicacion.html` | GET del cliente simulado; contrato de `LogicaFake.js`; carga/éxito/error de la UX; lógica PHP; REST; esquema, selección de entorno y limpieza de BD. | Consola del navegador y estado del botón. | El grupo PHP borra y recrea filas solo en la BD configurada como pruebas. |
 | Android lógica | Botón de pruebas Android | CO2 y temperatura válidos; tipo inválido; `NaN`. | Logcat con tags `TESTS_APP` y `TEST_LOGICAFake`. | No accede a la BD. |
 | Android REST | Parte del mismo botón | GET, ruta/método/JSON, POST con HTTP 201 y HTTP 500. | Logcat con `TEST_PETICIONARIO_REST` y resumen en `TESTS_APP`. | Transporte simulado; no accede al servidor. |
 | Arduino | Pulsador entre D2 y GND | Lectura simulada de CO2 y temperatura. | Monitor serie a 115200 baudios. | No altera datos externos. |
@@ -96,6 +96,7 @@ Las funciones auxiliares y las clases comprobadas se describen en `arduino_desig
 - Debe configurarse una base exclusiva para pruebas antes de ejecutar la parte PHP. La limpieza elimina todas las filas de `mediciones` de esa base.
 - Si falta conexión/configuración PHP, los casos de lógica, REST o BD se registran como error; los casos JavaScript simulados pueden seguir siendo útiles.
 - Las pruebas Android de red usan `HttpURLConnection` falso y prueban el cliente sin depender de disponibilidad de la API.
+- La batería Android se activa desde el botón de la aplicación. No contiene una clase `PeticionarioRESTTest` ni usa `MockWebServer`; la referencia del informe de auditoría a esa dependencia no corresponde a los archivos Gradle y pruebas actuales.
 - La prueba Arduino solo comprueba los valores constantes del `Medidor` actual; no valida sensor físico, cobertura BLE ni recepción en el teléfono.
 
 ## Design Clarifications

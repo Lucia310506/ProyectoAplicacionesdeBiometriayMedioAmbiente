@@ -8,7 +8,7 @@ Presentar estado de carga, error o éxito y representar las mediciones recibidas
 
 ### Fuente de datos REST
 
-La UX utiliza la lógica fake web y la ruta `GET /mediciones`; `pedirMediciones()` delega en `mostrarMediciones()` y recibe `[ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`.
+La UX llama a `LogicaFake.mostrarMediciones()` y recibe `[ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`. La fachada delega la petición HTTP en `PeticionarioREST.pedirMediciones()`.
 
 ### Tipos lógicos
 

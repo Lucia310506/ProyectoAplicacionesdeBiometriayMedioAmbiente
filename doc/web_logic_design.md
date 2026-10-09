@@ -19,17 +19,19 @@ mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
 
 ### Diseño de clase
 
-Este diagrama conserva el diseño lógico del contrato solicitado. Es conceptual: la implementación PHP es un módulo de funciones globales sin clase instanciable ni estado privado persistente. El borde derecho se deja abierto en las salidas públicas; las operaciones públicas se dibujan fuera y se conectan por el hueco. Los atributos privados, cuando existen en una clase, se escriben completamente dentro del contorno.
+Este diagrama conserva el diseño lógico del contrato solicitado. Es conceptual: la implementación PHP es un módulo de funciones globales sin clase instanciable ni estado privado persistente. Los atributos privados quedan completamente dentro. Cada operación pública se coloca sobre la pared vertical (representada por `|`), dejando su espacio abierto; las flechas laterales indican entrada y salida lógica.
 
 ```text
-tipo: Text, valor: R ──> guardarMediciones() ──┐
-                                               │ pública
-       ┌────────────── LogicaNegocio ──────────┘
-       │ - mediciones: Medicion[]
-       │
-       └──────────────────────────────────────┐
-                                              │ pública
-mediciones: Medicion[] <── mostrarMediciones()┘
+                                      -------- LogicaNegocio --------
+                                      |
+                                      | - mediciones: Medicion[]
+                                      |
+tipo: Text, valor: R --> | guardarMediciones() -->
+                                      |
+                                      |
+mediciones: Medicion[] <-- | mostrarMediciones() <--
+                                      |
+                                      --------------------------------
 ```
 
 La lógica PHP valida los datos y delega el almacenamiento/consulta en la conexión PDO. La implementación acepta los tipos `CO2` y `TEMPERATURA`.
@@ -56,7 +58,7 @@ Este archivo es un módulo de funciones globales PHP, no una clase instanciable.
 |---|---|---|
 | `guardarMediciones(string tipo, float valor): void` | `tipo: Text, valor: R --> guardarMediciones() -->` | Rechaza tipos distintos de CO2/TEMPERATURA y números no finitos; inserta con consulta preparada. No devuelve un valor. |
 | `mostrarMediciones(): array` | `--> mostrarMediciones() --> Medicion[]` | Consulta las filas ordenadas de más recientes a más antiguas y normaliza cada una. |
-| `ejecutarPrimeraConsultaValida(PDO conexion, array consultas, ?array parametros): array` | `conexion: PDO, consultas: SQL[], parametros: Dict|Nulo --> ejecutarPrimeraConsultaValida() --> filas: Dict[]` | Prueba las variantes SQL en orden; devuelve filas para una consulta de lectura o una lista vacía tras una inserción. Si todas fallan, propaga el último error PDO. |
+| `ejecutarPrimeraConsultaValida(PDO conexion, array consultas, ?array parametros): array` | `bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]` | Detalle interno de persistencia; prueba consultas en orden, devuelve filas de lectura o lista vacía al insertar y propaga un fallo si ninguna variante funciona. PDO es detalle de implementación. |
 | `normalizarFilaMedicion(array fila): array` | `fila: Dict --> normalizarFilaMedicion() --> Medicion` | Convierte nombres alternativos de columnas y valores a `id` entero, `tipo` texto, `valor` decimal y `fecha` texto. |
 
 Una medición de salida tiene la forma `(id: N, tipo: Text, valor: R, fecha: DateTime)`; el alta recibe únicamente `tipo` y `valor`.
