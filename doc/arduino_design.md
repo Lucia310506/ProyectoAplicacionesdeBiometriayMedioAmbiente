@@ -10,6 +10,7 @@ El firmware lee temperatura y CO2 simulados, representa cada lectura en una tram
 
 - `Medida = { tipo: Text, valor: Z }`
 - `TipoMedida = { CO2, TEMPERATURA }`
+- `TipoBeacon = { CO2 = 11, TEMPERATURA = 12, RUIDO = 13, PRUEBA = 14 }`
 - `EstadoEmision = { INICIADA, DETENIDA, ERROR }`
 
 ### Flujo principal
@@ -18,6 +19,8 @@ El firmware lee temperatura y CO2 simulados, representa cada lectura en una tram
 2. Obtener tipo y valor del medidor.
 3. Codificar tipo/contador en Major y valor en Minor.
 4. Publicar la trama y esperar al siguiente ciclo.
+
+Al pulsar el botón conectado a D2, `loop()` ejecuta `test.h`: emite un iBeacon con tipo reservado `PRUEBA = 14` y valor centinela `0x5A3C`, comprueba que la publicidad se inicia, la mantiene tres segundos para permitir su escaneo y verifica que se detiene.
 
 ### Codificación del anuncio iBeacon
 
@@ -41,35 +44,6 @@ El contador es de 8 bits y vuelve a empezar al desbordarse. Android evita duplic
 
 El sketch coordina `Medidor`, `Publicador`, `EmisoraBLE`, `PuertoSerie` y `LED`. El publicador transforma las medidas en campos del iBeacon; la emisora configura y transmite el anuncio BLE.
 
-## Design Clarifications
-
-### Diseño global del firmware
-
-`HolaMundoIBeacon.ino` coordina objetos globales de LED, puerto serie, publicador y medidor. La prueba se solicita con un botón físico: la interrupción solo registra la pulsación y `loop()` ejecuta `test.h` en el ciclo principal, fuera de la interrupción.
-
-```text
-┌────────────────────────── Firmware global ──────────────────────────────┐
-│ Globales: LED elLED, PuertoSerie elPuerto, Publicador elPublicador,      │
-│           Medidor elMedidor                                               │
-│ PIN_BOTON_TESTS = D2; bandera pruebasSolicitadas                         │
-│ botonPruebasInterrupcion()                                                │
-│ inicializarPlaquita(); setup(); lucecitas(); loop()                      │
-└──────────────────────────────────────────────────────────────────────────┘
-          │ loop publica lecturas                     │ botón activa
-          ▼                                           ▼
-   Medidor → Publicador → EmisoraBLE             test.h / ejecutarTestsArduino()
-```
-
-| Función global | Diseño lógico | Qué hace |
-|---|---|---|
-| `botonPruebasInterrupcion(): void` | `flanco: Interrupcion --> botonPruebasInterrupcion() -->` | Aplica antirrebote y marca que hay una prueba pendiente; no ejecuta pruebas dentro de la interrupción. |
-| `inicializarPlaquita(): void` | `--> inicializarPlaquita() -->` | Reserva el punto de inicialización adicional de la placa. |
-| `setup(): void` | `--> setup() -->` | Inicializa serie, pulsador/interrupción, emisora BLE y medidor. |
-| `lucecitas(): void` | `--> lucecitas() -->` | Ejecuta la secuencia visual del ciclo. |
-| `loop(): void` | `--> loop() -->` | Consume la bandera de prueba en el hilo principal, ejecuta pruebas solicitadas y anuncia CO2/temperatura en ciclos. |
-| `esperar(long tiempo): void` | `tiempo: N --> esperar() -->` | Espera el intervalo mediante `delay`. |
-| `ejecutarTestsArduino(): bool` | `--> ejecutarTestsArduino() --> B` | Comprueba las lecturas simuladas y escribe el resultado por Serial. |
-
 ### Diseño global de clases
 
 Convención del diagrama de clase: los campos privados se dibujan completamente dentro del contorno. Las funciones públicas salen por una abertura del borde y quedan fuera de la caja; no se dibuja el borde cerrándose sobre una función pública. Las tablas siguientes recogen las funciones públicas expuestas por cada clase.
@@ -82,6 +56,18 @@ Convención del diagrama de clase: los campos privados se dibujan completamente 
 | `LED` | `numeroLED`, `encendido`. | `LED(numero)` configura y apaga el pin; `encender()` y `apagar()` sincronizan pin/estado; `alternar()` invierte estado; `brillar(tiempo)` ilumina durante el tiempo indicado. |
 | `EmisoraBLE` | Configuración Bluefruit, fabricante y servicios/anuncios asociados. | Inicializa la emisora, configura potencia/UUID y publica o detiene anuncios iBeacon. La implementación concreta y sus métodos están en `EmisoraBLE.h`. |
 | `ServicioEnEmisora` | Servicio BLE y lista de características asociadas. | Añade características, activa el servicio y convierte a `BLEService&` para interoperar con Bluefruit. |
+
+`Publicador.iniciarBeaconPrueba(contador)` emite el paquete centinela; `estaAnunciando()` comprueba la publicidad y `detenerBeaconPrueba()` la termina. Android descarta el tipo 14, por lo que el paquete no crea una medición en el servidor.
+
+### Activación y casos de la prueba BLE
+
+| Función | Diseño lógico | Qué hace |
+|---|---|---|
+| `botonPruebasInterrupcion(): void` | `flanco: Interrupcion --> botonPruebasInterrupcion() -->` | Registra la pulsación; no ejecuta la batería dentro de la interrupción. |
+| `ejecutarTestsArduino(contador): void` | `contador: N --> ejecutarTestsArduino() -->` | Envía el beacon centinela, confirma el estado de publicidad y muestra el resultado por Serial. |
+| `Publicador.iniciarBeaconPrueba(contador): void` | `contador: N --> iniciarBeaconPrueba() -->` | Publica UUID del proyecto, Major con tipo 14/contador y Minor `0x5A3C`. |
+| `Publicador.estaAnunciando(): bool` | `--> estaAnunciando() --> B` | Informa si Bluefruit mantiene activo el anuncio. |
+| `Publicador.detenerBeaconPrueba(): void` | `--> detenerBeaconPrueba() -->` | Detiene el anuncio después de la ventana de escaneo. |
 
 #### Firmas de BLE y métodos auxiliares
 
@@ -112,25 +98,14 @@ Convención del diagrama de clase: los campos privados se dibujan completamente 
 | `alReves<T>(puntero, n): T*` | `datos: T[], n: N --> alReves() --> T[]` | Invierte el orden de los elementos del arreglo auxiliar. |
 | `stringAUint8AlReves(texto, salida, max): uint8_t*` | `texto: Text, salida: Byte[], max: N --> stringAUint8AlReves() --> Byte[]` | Convierte texto a bytes con el orden requerido por UUID. |
 
-### Diseño global de las pruebas `test.h`
+## Design Clarifications
 
-```text
-┌──────────────────────── test.h ────────────────────────┐
-│ ejecutarTestsArduino(): bool                            │
-│  ├─ medidorDePrueba.medirCO2() == 18                    │
-│  ├─ medidorDePrueba.medirTemperatura() == 8             │
-│  └─ imprime casos y resumen en Serial                   │
-└────────────────────────────────────────────────────────┘
-```
-
-`ejecutarTestsArduino()` crea un `Medidor` de prueba, comprueba ambos valores y devuelve si pasaron. La pulsación D2-GND dispara la solicitud; `loop()` ejecuta la función fuera de la interrupción.
-
-- El medidor actual simula la lectura; no representa un sensor físico calibrado.
-- La representación binaria y los límites de Major/Minor deben conservar el protocolo existente del receptor Android.
+- El beacon de prueba usa un tipo reservado que el receptor Android descarta, para evitar guardar una medición ficticia.
+- El pulsador solo solicita la prueba; la emisión y las comprobaciones se ejecutan desde `loop()`, nunca dentro de la interrupción.
 
 ## General Rules
 
 - **Programming Language:** C++ para Arduino.
 - **Function/Method Headers:** Cada cabecera debe incluir el diseño lógico en un bloque de comentario delimitado por líneas `--------------------`.
 - **Code Readability:** Código claro y autoexplicativo; comentarios inline mínimos.
-- **Automated Testing:** Las pruebas manuales del medidor están en `test.h`; se activan al pulsar un botón conectado entre D2 y GND. No se ejecutan al arrancar.
+- **Automated Testing:** `test.h` comprueba que el beacon de prueba se inicia y se detiene; se activa con el pulsador D2-GND y se ejecuta desde `loop()`.

@@ -6,7 +6,7 @@
 
 La lógica fake web ofrece a la interfaz una operación de dominio para consultar las mediciones. La UX llama a `mostrarMediciones()` y recibe una lista `Medicion[]`; no necesita conocer `fetch`, el código HTTP ni cómo se interpreta el cuerpo de respuesta. El transporte se delega en `PeticionarioREST.js`.
 
-La implementación se encuentra en `EsqueletoWebAppEnPHPConSesion/src/logicaFake/LogicaFake.js`. La ruta forma parte del directorio de fuentes del servidor web ya existente; no se crea un segundo proyecto web ni se duplica la implementación.
+La fuente organizada por componentes se encuentra en `src/frontend_business_logic/LogicaFake.js`. La aplicación desplegable conserva una copia equivalente en `EsqueletoWebAppEnPHPConSesion/src/logicaFake/LogicaFake.js`.
 
 ### Diseño global del módulo
 

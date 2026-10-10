@@ -69,7 +69,7 @@ La tabla usa InnoDB y `utf8mb4`. No hay relaciones con otras tablas ni claves fo
 
 ## Design Clarifications
 
-No se crea una clase `Medicion`; los datos se manejan directamente con tipo y valor. La estructura SQL existente usa MySQL `ENUM` para restringir el tipo.
+- No se crea una clase `Medicion`; los datos se manejan directamente con tipo y valor. La estructura SQL existente usa MySQL `ENUM` para restringir el tipo.
 
 ## General Rules
 

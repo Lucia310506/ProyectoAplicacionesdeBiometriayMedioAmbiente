@@ -43,7 +43,7 @@ flowchart LR
 | Adaptador PDO | Resuelve credenciales por entorno y abre conexiones a MySQL. |
 | Cliente REST web | Consulta GET, analiza JSON y transforma fallos HTTP/red en errores. |
 | UX web | Presenta la lista de mediciones, estados de carga/error y el botón manual de pruebas. |
-| Pruebas | Se activan manualmente por botón o pulsador. Las pruebas de servidor usan una base de pruebas aislada. |
+| Pruebas | Se activan manualmente desde los botones web y Android. Las pruebas de servidor usan una base de pruebas aislada. |
 
 ### Secuencia de alta desde el beacon
 
@@ -75,7 +75,7 @@ flowchart LR
 
 ## Design Clarifications
 
-La carpeta `EsqueletoWebAppEnPHPConSesion` es la raíz del servidor web dentro de este repositorio; sus subcarpetas `src/rest`, `src/logica`, `src/BBDD` y `src/ux` corresponden a componentes distintos. Android tiene su propia raíz y ciclo de compilación.
+- `EsqueletoWebAppEnPHPConSesion` es la raíz web desplegable; sus carpetas `src/rest`, `src/logica`, `src/BBDD` y `src/ux` corresponden a componentes distintos. Android tiene su propia raíz y ciclo de compilación.
 
 ## General Rules
 
