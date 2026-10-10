@@ -55,7 +55,7 @@ Cliente Android / navegador
 
 ### Correspondencia de implementación
 
-El endpoint ejecutable está en `EsqueletoWebAppEnPHPConSesion/src/rest/mediciones.php`. El diseño REST específico y la tabla ampliada de códigos están en [`web_rest_design.md`](web_rest_design.md).
+El endpoint organizado por componentes está en `src/communication/mediciones.php`; la aplicación desplegable conserva una copia en `EsqueletoWebAppEnPHPConSesion/src/rest/mediciones.php`. El diseño REST específico y la tabla ampliada de códigos están en [`web_rest_design.md`](web_rest_design.md).
 
 ## Design Clarifications
 

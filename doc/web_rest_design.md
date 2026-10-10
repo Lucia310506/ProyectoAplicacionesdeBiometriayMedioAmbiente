@@ -28,7 +28,7 @@ El endpoint delega toda persistencia a la lógica de negocio. La lógica utiliza
 
 ### Ubicación de implementación
 
-`EsqueletoWebAppEnPHPConSesion/src/rest/mediciones.php`.
+`src/communication/mediciones.php`; la aplicación desplegable conserva su copia en `EsqueletoWebAppEnPHPConSesion/src/rest/mediciones.php`.
 
 ### Diseño global del módulo `rest/mediciones.php`
 

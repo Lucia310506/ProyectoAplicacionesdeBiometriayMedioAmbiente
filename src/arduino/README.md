@@ -1,0 +1,1 @@
+Esta carpeta reúne el sketch y las cabeceras del firmware descrito en `doc/arduino_design.md`, incluida `test.h`. La copia ejecutable para Arduino IDE se conserva en `HolaMundoIBeacon/`. Al pulsar el botón D2-GND, `loop()` emite un beacon `PRUEBA` durante tres segundos y muestra por Serial si se inició y detuvo correctamente.

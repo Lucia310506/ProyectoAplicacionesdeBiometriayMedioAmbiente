@@ -26,8 +26,6 @@ GET /mediciones        --> PeticionarioREST.hacerPeticionREST() --> callback HTT
 
 `BTLEAlumnos2021hechoapp2/app/src/main/java/com/example/ldiamur/btlealumnos2021app/LogicaFake.java`, `PeticionarioREST.java` y `ServicioEscuharBeacons.java`.
 
-## Design Clarifications
-
 ### Diseño global de las clases Android
 
 `LogicaFake` valida las mediciones, `PeticionarioREST` realiza la comunicación HTTP, `ServicioEscuharBeacons` controla el escaneo BLE y conecta el beacon con la lógica/REST, y `MainActivity` gestiona permisos, botones y la ejecución manual de pruebas. `ConfiguracionRest` centraliza la URL. No se mantiene una lista local de mediciones: `id` y `fecha` proceden del servidor.
@@ -104,6 +102,12 @@ Controla la pantalla Android, permisos de Bluetooth, servicio BLE y botón que a
 | `botonBuscarDispositivosBTLEPulsado(View): void` | `vista: View --> botonBuscarDispositivosBTLEPulsado() -->` | Arranca el servicio persistente de escucha BLE. |
 | `botonBuscarNuestroDispositivoBTLEPulsado(View): void` | `vista: View --> botonBuscarNuestroDispositivoBTLEPulsado() -->` | Arranca el servicio que busca el beacon esperado. |
 | `botonDetenerBusquedaDispositivosBTLEPulsado(View): void` | `vista: View --> botonDetenerBusquedaDispositivosBTLEPulsado() -->` | Detiene el servicio de escucha. |
+| `botonBuscarBeaconPruebaPulsado(View): void` | `vista: View --> botonBuscarBeaconPruebaPulsado() -->` | Inicia el escaneo temporal del beacon centinela y bloquea el botón mientras espera. |
+| `actualizarResultadoBeaconPrueba(boolean): void` | `encontrado: B --> actualizarResultadoBeaconPrueba() -->` | Muestra si se recibió el beacon o venció el tiempo de búsqueda. |
+| `onStart(): void` | `--> onStart() -->` | Registra el receptor interno del resultado de búsqueda. |
+| `onStop(): void` | `--> onStop() -->` | Libera el receptor interno de resultados. |
+| `onCreate(Bundle): void` | `estado: Bundle --> onCreate() -->` | Crea la pantalla y solicita los permisos necesarios. |
+| `onRequestPermissionsResult(int, String[], int[]): void` | `codigo: N, permisos: Texto[], resultados: Z[] --> onRequestPermissionsResult() -->` | Inicializa Bluetooth solo si se conceden todos los permisos. |
 | `iniciarServicioEscucha(): void` | `--> iniciarServicioEscucha() -->` | Construye el intent de inicio y arranca el servicio en primer plano. |
 | `inicializarBlueTooth(): void` | `--> inicializarBlueTooth() -->` | Comprueba permisos y adaptador y habilita Bluetooth. |
 | `permisosNecesarios(): String[]` | `--> permisosNecesarios() --> Texto[]` | Selecciona permisos según la versión Android. |
@@ -127,6 +131,8 @@ Servicio Android en primer plano. Prepara el escáner BLE, valida permisos, inte
 | `prepararEscaner(): void` | `--> prepararEscaner() -->` | Obtiene el escáner Bluetooth LE y sus dependencias. |
 | `tengoPermisoEscaneo(): boolean` | `--> tengoPermisoEscaneo() --> B` | Comprueba el permiso necesario para escanear. |
 | `iniciarEscaneo(): void` | `--> iniciarEscaneo() -->` | Inicia el escaneo y define callbacks de resultado, lote y error. |
+| `iniciarBusquedaBeaconPrueba(): void` | `--> iniciarBusquedaBeaconPrueba() -->` | Activa el escaneo de prueba y programa el fin de búsqueda a los diez segundos. |
+| `finalizarBusquedaBeaconPrueba(): void` | `--> finalizarBusquedaBeaconPrueba() -->` | Detiene el escaneo y comunica a la actividad si encontró el centinela. |
 | `procesarBeacon(ScanResult): void` | `resultado: ScanResult --> procesarBeacon() -->` | Comprueba el anuncio iBeacon, extrae campos y descarta tramas no compatibles. |
 | `enviarMedicionNueva(String, int, int, int): void` | `tipo: Text, valor: Z, tipoMedida: N, contador: N --> enviarMedicionNueva() -->` | Valida/identifica una lectura y delega el envío a la capa correspondiente. |
 | `detenerEscaneo(): void` | `--> detenerEscaneo() -->` | Detiene el escáner activo y libera su callback. |
@@ -185,6 +191,11 @@ Contiene conexiones simuladas y una batería asíncrona GET, POST y error HTTP. 
 - Las pruebas de `MainActivity` se ejecutan al pulsar el botón de la pantalla, no al iniciar la app. La lógica fake se comprueba en el hilo principal y los casos REST simulados corren en segundo plano; el resumen aparece en LogCat.
 - El botón ejecuta la batería REST con conexiones simuladas: GET `/mediciones`, POST con solo tipo y valor, respuesta 201 y error HTTP; así no escribe en la base de datos real.
 - `PeticionarioRESTTest` es una prueba instrumentada separada que usa MockWebServer para ejercitar el `HttpURLConnection` real contra localhost. Comprueba GET/POST, ruta, JSON, respuesta y callback en el hilo principal; requiere SDK Android y un emulador/teléfono conectado.
+
+## Design Clarifications
+
+- `LogicaFake` valida antes de enviar y no conserva mediciones; la URL se centraliza en `ConfiguracionRest`.
+- Las pruebas Android se ejecutan mediante el botón y la prueba instrumentada usa MockWebServer local.
 
 ## General Rules
 

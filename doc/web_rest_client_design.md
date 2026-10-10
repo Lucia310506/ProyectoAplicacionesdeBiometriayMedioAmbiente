@@ -38,7 +38,7 @@ La lógica fake web simula la interfaz de lógica negocio para la UX; el peticio
 
 ### Ubicación de implementación
 
-`EsqueletoWebAppEnPHPConSesion/src/logicaFake/PeticionarioREST.js` (cliente REST) y `LogicaFake.js` (fachada de dominio). `src/ux/Aplicacion.js` consume únicamente `mostrarMediciones()`.
+`src/communication/PeticionarioREST.js` (cliente) y `src/frontend_business_logic/LogicaFake.js` (fachada de dominio). La UX de `src/gui/Aplicacion.js` consume únicamente `mostrarMediciones()`. La aplicación desplegable conserva copias equivalentes bajo `EsqueletoWebAppEnPHPConSesion/src/`.
 
 ### Diseño global del módulo `PeticionarioREST.js`
 

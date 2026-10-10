@@ -8,7 +8,7 @@ El proyecto recoge mediciones de CO2 y temperatura. El firmware Arduino prepara 
 
 | Carpeta | Contenido |
 |---|---|
-| `HolaMundoIBeacon` | Sketch Arduino, clases BLE, medidor simulado y pruebas manuales en `test.h`. |
+| `HolaMundoIBeacon` | Sketch Arduino, clases BLE y medidor simulado. |
 | `BTLEAlumnos2021hechoapp2` | Proyecto Android: permisos Bluetooth, escucha de beacons, lógica fake, cliente REST y botón para pruebas Android. |
 | `EsqueletoWebAppEnPHPConSesion` | Aplicación web, API REST PHP, lógica de negocio, conexión PDO, SQL y pruebas web/PHP. |
 | `doc` | Diseños y correspondencia entre los diseños y sus archivos de implementación. |
@@ -20,7 +20,7 @@ El proyecto recoge mediciones de CO2 y temperatura. El firmware Arduino prepara 
 2. `Publicador` codifica el tipo y el valor en los campos Major y Minor del anuncio iBeacon.
 3. `ServicioEscuharBeacons` en Android analiza el anuncio y extrae tipo, contador y valor.
 4. `LogicaFake` comprueba tipo y valor; `PeticionarioREST` envía `POST /mediciones` con JSON `{ "tipo": "CO2", "valor": 500 }`.
-5. `src/rest/mediciones.php` valida el método y el cuerpo, delega en la lógica PHP y responde HTTP 201 si se guarda.
+5. `EsqueletoWebAppEnPHPConSesion/src/rest/mediciones.php` valida el método y el cuerpo, delega en la lógica PHP y responde HTTP 201 si se guarda.
 6. La web pide `GET /mediciones`. La respuesta es una lista con `id`, `tipo`, `valor` y `fecha`; el servidor genera `id` y `fecha`.
 
 Los tipos admitidos son `CO2` y `TEMPERATURA`. Los valores deben ser números finitos. La tabla está definida en `EsqueletoWebAppEnPHPConSesion/bbdd/Estructura.sql`.
@@ -34,9 +34,10 @@ flowchart LR
   subgraph FW[Firmware Arduino · HolaMundoIBeacon]
     M[Medidor simulado] --> PUB[Publicador]
     PUB --> BLE[Emisora BLE · iBeacon]
-    BUTTON[Pulsador D2-GND] --> INT[Interrupción: marca prueba pendiente]
+    BUTTON[Pulsador D2-GND] --> INT[Interrupción: deja prueba pendiente]
     INT --> LOOP[loop: ejecuta test.h]
-    TEST[test.h] --> SERIAL[Monitor serie · 115200]
+    LOOP --> TEST[Beacon PRUEBA=14 durante 3 s]
+    TEST --> SERIAL[Resultados por Serial]
   end
 
   subgraph AND[Aplicación Android · BTLEAlumnos2021hechoapp2]
@@ -79,7 +80,7 @@ flowchart LR
 
 | Capa | Responsabilidad | Entrada y salida |
 |---|---|---|
-| Firmware Arduino | Simula CO2/temperatura, incrementa el contador, codifica los campos iBeacon y los anuncia por BLE. Atiende el botón de pruebas sin ejecutar trabajo dentro de la interrupción. | Valores simulados → anuncio BLE; pulsación → resultado por Serial. |
+| Firmware Arduino | Simula CO2/temperatura, incrementa el contador, codifica los campos iBeacon y los anuncia por BLE. | Valores simulados → anuncio BLE. |
 | Escucha Android | Mantiene un servicio en primer plano, escanea BLE, valida la trama y extrae tipo, contador y valor. | Anuncio BLE → valores interpretados. |
 | Lógica fake Android | Rechaza tipos no admitidos y valores no finitos antes del envío. No guarda una lista local ni devuelve un booleano de almacenamiento. | Tipo y valor → validación o excepción. |
 | Cliente REST Android | Construye el JSON de alta y hace la petición HTTP de forma asíncrona. | `POST /mediciones` con `tipo`/`valor`; recibe código y cuerpo HTTP. |
@@ -105,31 +106,34 @@ flowchart LR
 - El firmware actual usa lecturas simuladas (`CO2 = 18`, `TEMPERATURA = 8`); la arquitectura aún no representa la lectura calibrada de un sensor físico.
 - Android configura el destino en `ConfiguracionRest.URL_MEDICIONES`. El móvil debe alcanzar esa URL por red.
 - PHP elige producción por defecto. Las pruebas web exigen `MEDICIONES_ENTORNO=pruebas` y credenciales de una base de pruebas independiente.
-- El botón Android conserva pruebas de REST simuladas. `PeticionarioRESTTest` añade pruebas instrumentadas con MockWebServer local para GET y POST. Las pruebas web simulan el cliente en JavaScript y, para la parte PHP, usan MySQL de pruebas. Arduino comprueba sus valores simulados y escribe en Serial.
+- El botón Android conserva pruebas de REST simuladas. `PeticionarioRESTTest` añade pruebas instrumentadas con MockWebServer local para GET y POST. Las pruebas web simulan el cliente en JavaScript y, para la parte PHP, usan MySQL de pruebas.
 - La página y la API comparten el origen en la configuración esperada para que las peticiones del navegador y el endpoint de pruebas respeten same-origin.
 
 ### Estructura por componentes
 
-La carpeta `src/` de la raíz organiza los componentes que pide el diseño. Cada carpeta incluye un mapa a la fuente que se ejecuta dentro de su proyecto nativo.
+La carpeta raíz `src/` contiene código fuente organizado por componente. La aplicación web desplegable conserva copias equivalentes en `EsqueletoWebAppEnPHPConSesion/`; Android y Arduino mantienen sus fuentes en las carpetas nativas.
 
 ```text
 src/
-  communication/             Mapa a los clientes y al endpoint REST
-  business_logic/             Mapa a las reglas de negocio
-  frontend_business_logic/    Mapa a la fachada LogicaFake web
-  gui/                        Mapa a las interfaces web, Android y Arduino
+  communication/             Adaptador PHP y cliente HTTP web
+  business_logic/             Reglas de mediciones PHP
+  frontend_business_logic/    Fachada JavaScript para la UX
+  database/                   Conexión PDO y esquema SQL
+  gui/                        Interfaz web
+  android/                    Clases Java de la aplicación Android
+  arduino/                    Sketch y cabeceras del firmware
+  tests/                      Pruebas web JavaScript y PHP
 ```
 
-Las fuentes ejecutables siguen dentro de las carpetas de Android Studio, Arduino IDE y la aplicación PHP para que cada proyecto conserve su configuración y se pueda desplegar por separado.
+El detalle de responsabilidades y rutas está en `doc/component_map.md`.
 
 ```text
 HolaMundoIBeacon/
-  HolaMundoIBeacon.ino       Coordinación, setup/loop y botón físico
+  HolaMundoIBeacon.ino       Coordinación y ciclo setup/loop
   Medidor.h                  Valores de medida simulados
   Publicador.h               Empaquetado y publicación de mediciones
   EmisoraBLE.h               Adaptador Bluefruit/iBeacon
   LED.h, PuertoSerie.h       Salidas de apoyo
-  test.h                     Pruebas manuales del firmware
 
 BTLEAlumnos2021hechoapp2/app/src/main/
   java/.../MainActivity.java             Pantalla, permisos y botón de pruebas
@@ -140,17 +144,18 @@ BTLEAlumnos2021hechoapp2/app/src/main/
   java/.../PruebasRESTBoton.java         REST simulado para pruebas manuales
   java/.../ConfiguracionRest.java        URL del servidor
 
+La pantalla Android también incluye **Buscar beacon de prueba**. Mantén el firmware Arduino anunciando el centinela (pulsa su botón D2-GND) y pulsa el botón Android durante esos tres segundos. La app busca hasta diez segundos y solo confirma la coincidencia si valida el UUID del proyecto, el tipo `14` y el valor `0x5A3C`. El resultado aparece en pantalla y en Logcat (`TEST_BEACON`); este modo no procesa ni envía mediciones.
+
 EsqueletoWebAppEnPHPConSesion/
-  src/rest/mediciones.php                Endpoint GET/POST /mediciones
+  src/rest/mediciones.php                Adaptador GET/POST /mediciones
   src/logica/mediciones.php               Reglas e interacción de mediciones
   src/BBDD/ConexionMediciones.php         Selección de entorno y PDO
-  src/logicaFake/LogicaFake.js             Fachada de dominio para la UX web
+  src/logicaFake/LogicaFake.js             Fachada de dominio para la UX
   src/logicaFake/PeticionarioREST.js       Adaptador HTTP GET web
   src/ux/Aplicacion.html y Aplicacion.js  Interfaz web
   src/tests/                              Pruebas web, PHP, REST y BD
   bbdd/Estructura.sql                     Esquema MySQL
 ```
-
 ## Preparar MySQL y PHP
 
 1. Crea una base de datos MySQL para el proyecto.
@@ -161,7 +166,7 @@ EsqueletoWebAppEnPHPConSesion/
 
 ### Configurar las credenciales de producción
 
-En `EsqueletoWebAppEnPHPConSesion/src/BBDD/ConfiguracionProduccion.txt` está la plantilla informativa de configuración. El servidor **no lee** ese TXT: sirve para recordar los campos que hay que poner en el archivo local ignorado por Git `ConfiguracionProduccion.php`, dentro de la misma carpeta `src/BBDD`.
+En `EsqueletoWebAppEnPHPConSesion/src/BBDD/ConfiguracionProduccion.txt` está la plantilla informativa de configuración. El servidor **no lee** ese TXT: sirve para recordar los campos que hay que poner en el archivo local ignorado por Git `ConfiguracionProduccion.php`, dentro de la misma carpeta.
 
 Crea `EsqueletoWebAppEnPHPConSesion/src/BBDD/ConfiguracionProduccion.php` con esta forma y sustituye los valores de ejemplo:
 
@@ -182,7 +187,8 @@ El archivo PHP no se incluye en el repositorio porque contiene credenciales. Cr�
 1. Abre `HolaMundoIBeacon/HolaMundoIBeacon.ino` con Arduino IDE.
 2. Selecciona la placa usada por el montaje y asegúrate de tener instalada la librería Bluefruit requerida por el código.
 3. Compila y carga el sketch. En el arranque inicializa el puerto serie, el LED y la emisora; después publica beacons de forma periódica. El medidor actual genera valores simulados, no lee un sensor físico calibrado.
-4. Para ejecutar las pruebas manuales, conecta un pulsador entre D2 y GND. Abre el monitor serie a 115200 baudios y pulsa el botón físico. La interrupción registra la pulsación; `loop()` ejecuta después `test.h` y muestra los resultados por Serial. No se activan automáticamente al encender.
+4. Para ejecutar la prueba BLE, conecta un pulsador entre D2 y GND. Abre el monitor serie a 115200 baudios y pulsa el botón. `loop()` envía un beacon `PRUEBA` (tipo 14, valor centinela `0x5A3C`) durante tres segundos y muestra el inicio/detención y el resumen. Android descarta ese tipo, así que no se guarda como medición.
+
 
 ## Aplicación Android
 
@@ -197,8 +203,8 @@ Las pruebas REST del botón usan conexiones simuladas para probar GET, POST, res
 ## Web
 
 1. Publica `EsqueletoWebAppEnPHPConSesion` en el servidor web.
-2. Configura PHP y PDO MySQL, la base de datos y el archivo local `src/BBDD/ConfiguracionProduccion.php`.
-3. Abre `src/ux/Aplicacion.html` desde el servidor. La página consulta `/mediciones` para obtener las filas y actualiza su contenido.
+2. Configura PHP y PDO MySQL, la base de datos y el archivo local `src/BBDD/ConfiguracionProduccion.php` de la carpeta publicada `EsqueletoWebAppEnPHPConSesion`.
+3. Abre `EsqueletoWebAppEnPHPConSesion/src/ux/Aplicacion.html` desde el servidor. La página consulta `/mediciones` para obtener las filas y actualiza su contenido.
 4. Para ejecutar las pruebas, pulsa el botón **Ejecutar pruebas** de la página. No se ejecutan al abrirla.
 5. Abre las herramientas de desarrollo del navegador y selecciona **Consola**. Allí aparece `EJECUTAR TESTS`, el resultado de cada caso y el bloque `RESULTADOS :` con los grupos y sus recuentos.
 
@@ -228,7 +234,7 @@ Los documentos de diseño están en `doc`:
 |---|---|
 | [`system_design.md`](doc/system_design.md) | Arquitectura, responsabilidades, secuencias de alta/consulta, límites y contratos entre capas. |
 | [`component_map.md`](doc/component_map.md) | Correspondencia de cada diseño con los archivos fuente. |
-| [`arduino_design.md`](doc/arduino_design.md) | Ciclo del firmware, codificación iBeacon, clases y pulsador de pruebas. |
+| [`arduino_design.md`](doc/arduino_design.md) | Ciclo del firmware, codificación iBeacon, clases y . |
 | [`android_design.md`](doc/android_design.md) | Permisos, escaneo BLE, validación, cliente REST y clases Android. |
 | [`web_rest_design.md`](doc/web_rest_design.md) | Endpoint `/mediciones`, métodos, respuestas HTTP y errores. |
 | [`communication_design.md`](doc/communication_design.md) | Contrato formal de comunicación HTTP separado de la lógica del backend. |

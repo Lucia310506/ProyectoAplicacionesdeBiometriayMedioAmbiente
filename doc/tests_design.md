@@ -62,16 +62,6 @@ Botón → MainActivity.botonEjecutarTestsPulsado()
 | `Bateria.probarPost(): void` | `--> probarPost() -->` | Comprueba POST, JSON tipo/valor y respuesta HTTP 201. |
 | `Bateria.probarErrorHttp(): void` | `--> probarErrorHttp() -->` | Comprueba la entrega de una respuesta HTTP de error. |
 
-### Diseño global de pruebas Arduino
-
-Las pruebas de firmware están en `HolaMundoIBeacon/test.h`. El sketch las activa mediante el pulsador D2-GND y muestra resultados por Serial a 115200 baudios. No se ejecutan al iniciar.
-
-```text
-Pulsador D2-GND → interrupción → botonPruebasInterrupcion() → ejecutarTests()
-```
-
-Las funciones auxiliares y las clases comprobadas se describen en `arduino_design.md`.
-
 ### Matriz de cobertura
 
 | Batería | Activación | Casos principales | Destino de los resultados | Efecto sobre datos |
@@ -79,7 +69,8 @@ Las funciones auxiliares y las clases comprobadas se describen en `arduino_desig
 | Web navegador | Botón de `Aplicacion.html` | GET del cliente simulado; contrato de `LogicaFake.js`; carga/éxito/error de la UX; lógica PHP; REST; esquema, selección de entorno y limpieza de BD. | Consola del navegador y estado del botón. | El grupo PHP borra y recrea filas solo en la BD configurada como pruebas. |
 | Android lógica | Botón de pruebas Android | CO2 y temperatura válidos; tipo inválido; `NaN`. | Logcat con tags `TESTS_APP` y `TEST_LOGICAFake`. | No accede a la BD. |
 | Android REST | Parte del mismo botón | GET, ruta/método/JSON, POST con HTTP 201 y HTTP 500. | Logcat con `TEST_PETICIONARIO_REST` y resumen en `TESTS_APP`. | Transporte simulado; no accede al servidor. |
-| Arduino | Pulsador entre D2 y GND | Lectura simulada de CO2 y temperatura. | Monitor serie a 115200 baudios. | No altera datos externos. |
+| Android beacon de prueba | Botón **Buscar beacon de prueba** | UUID de proyecto, prefijo iBeacon, Major con tipo 14 y Minor `0x5A3C`; búsqueda con tiempo límite. | Estado visible en la pantalla y Logcat con `TEST_BEACON`. | Solo observa BLE; no llama a lógica de mediciones ni a REST. |
+| Arduino BLE | Pulsador D2-GND; `loop()` consume la solicitud | Beacon `PRUEBA=14`, valor centinela, publicidad activa y detención posterior. | Monitor serie a 115200 baudios; beacon visible tres segundos para escaneo externo. | Android descarta el tipo de prueba; no llega a REST ni a la base de datos. |
 
 ### Orden de una ejecución web
 
@@ -97,11 +88,12 @@ Las funciones auxiliares y las clases comprobadas se describen en `arduino_desig
 - Si falta conexión/configuración PHP, los casos de lógica, REST o BD se registran como error; los casos JavaScript simulados pueden seguir siendo útiles.
 - Las pruebas Android del botón usan `HttpURLConnection` simulado, sin depender de la disponibilidad de la API.
 - `PeticionarioRESTTest` es una prueba instrumentada independiente que usa `MockWebServer` local para verificar GET, POST, URL, cuerpo JSON y callback. Se ejecuta desde Android Studio o con `:app:connectedDebugAndroidTest` cuando hay un dispositivo o emulador conectado.
-- La prueba Arduino solo comprueba los valores constantes del `Medidor` actual; no valida sensor físico, cobertura BLE ni recepción en el teléfono.
+- `test.h` emite un beacon real `PRUEBA=14` durante tres segundos, verifica que la publicidad BLE se inicia y se detiene y presenta el resultado por Serial. La ISR solo registra la pulsación; `loop()` ejecuta la batería.
+- La búsqueda Android dura como máximo diez segundos y acepta únicamente el UUID del proyecto, el formato iBeacon, Major de tipo 14 y Minor `0x5A3C`; el contador ocupa el byte bajo de Major.
 
 ## Design Clarifications
 
-Las pruebas se activan manualmente con botones: navegador, aplicación Android y pulsador físico del firmware. Las pruebas web de servidor necesitan una BD aislada; Android usa conexiones simuladas; Arduino imprime resultados por Serial.
+- Las pruebas se activan manualmente desde la web, la aplicación Android y el pulsador Arduino. Las pruebas web de servidor necesitan una BD aislada; Android usa conexiones simuladas.
 
 ## General Rules
 
