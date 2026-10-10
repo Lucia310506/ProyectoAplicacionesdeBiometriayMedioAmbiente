@@ -41,11 +41,18 @@ Medicion = {
 Mediciones = Medicion[]
 ```
 
-La función única de este módulo es:
+La función única de este módulo se documenta con el mismo bloque que debe aparecer inmediatamente encima de su implementación:
 
-| Función | Diseño lógico | Qué hace |
-|---|---|---|
-| `async mostrarMediciones(): Promise<Medicion[]>` | `--> mostrarMediciones() --> [Medicion]` | Delega la petición al cliente REST, confirma que el resultado sea una lista y la devuelve con el contrato de dominio. Si el cliente falla o el resultado no es una lista, propaga un error para que la UX muestre el estado de fallo. `Promise` es detalle de implementación; el retorno lógico es `[Medicion]`. |
+```text
+/*
+ * --------------------
+ * --> mostrarMediciones() --> [Medicion]
+ * Delega en el cliente REST, comprueba que el resultado sea una lista y la devuelve a la UX.
+ * --------------------
+ */
+```
+
+En JavaScript se declara como `async mostrarMediciones(): Promise<Medicion[]>`; `Promise` expresa la asincronía de implementación. Su contrato lógico sigue siendo `--> mostrarMediciones() --> [Medicion]`. Los errores del cliente REST y las respuestas que no sean listas se propagan para que la UX muestre el fallo.
 
 No hay una operación frontend `guardarMediciones()` porque la interfaz web actual solo consulta y no crea mediciones. La escritura desde Android se valida en `LogicaFake.guardarMediciones(tipo, valor)` y después se envía por REST.
 
