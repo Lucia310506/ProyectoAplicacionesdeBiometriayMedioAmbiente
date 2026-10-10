@@ -8,8 +8,11 @@
 
 /*
  * --------------------
- * --> mostrarMediciones() --> [Medicion]
- * Devuelve mediciones de dominio sin exponer fetch ni HTTP a la UX.
+ * Entradas: ninguna.
+ * Tipo: Medicion = (id: N, tipo: Text, valor: R, fecha: DateTime).
+ * --> mostrarMediciones() --> Mediciones = [Medicion]
+ * Responsabilidad: obtiene mediciones por REST y las entrega a la UX.
+ * Salida: lista Mediciones; propaga errores REST o si la respuesta no es una lista.
  * --------------------
  */
 async function mostrarMediciones() {

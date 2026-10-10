@@ -46,8 +46,11 @@ La función única de este módulo se documenta con el mismo bloque que debe apa
 ```text
 /*
  * --------------------
- * --> mostrarMediciones() --> [Medicion]
- * Delega en el cliente REST, comprueba que el resultado sea una lista y la devuelve a la UX.
+ * Entradas: ninguna.
+ * Tipo: Medicion = (id: N, tipo: Text, valor: R, fecha: DateTime).
+ * --> mostrarMediciones() --> Mediciones = [Medicion]
+ * Responsabilidad: obtener las mediciones mediante el cliente REST y entregarlas a la UX.
+ * Salida: una lista Mediciones; propaga errores REST o si la respuesta no es una lista.
  * --------------------
  */
 ```
@@ -85,6 +88,6 @@ La batería del botón web comprueba que la fachada devuelve una lista con datos
 ## General Rules
 
 - **Programming Language:** JavaScript.
-- **Function/Method Headers:** Cada función debe llevar inmediatamente encima un bloque de comentario con su firma lógica y una breve descripción, delimitado al principio y al final por líneas de guiones `--------------------`. Mantener exactamente ese formato en todas las funciones documentadas.
+- **Function/Method Headers:** Cada función debe llevar inmediatamente encima un bloque de comentario delimitado al principio y al final por líneas `--------------------`. El bloque debe incluir diseño lógico, responsabilidad, entradas y sus tipos (indicar “ninguna” si no hay parámetros) y tipo de salida. Mantener este formato en todas las funciones documentadas.
 - **Code Readability:** El módulo contiene únicamente la fachada que consume la interfaz.
 - **Automated Testing:** Probar lista correcta, resultado de tipo inválido y errores propagados desde el cliente.
