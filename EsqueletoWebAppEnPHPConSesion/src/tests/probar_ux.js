@@ -32,7 +32,12 @@ function crearDocumento() {
       return null;
     },
     createElement() {
-      return { innerHTML: '', textContent: '' };
+      return {
+        innerHTML: '',
+        textContent: '',
+        hijos: [],
+        appendChild(nodo) { this.hijos.push(nodo); }
+      };
     },
     estado,
     cuerpo
