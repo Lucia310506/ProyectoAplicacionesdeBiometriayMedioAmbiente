@@ -27,8 +27,8 @@ async function mostrarMediciones() {
 }
 
 // Exponer globalmente para tests y uso directo en navegador (window) o vm/Node (global)
-const globalObj = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined' ? global : this);
-globalObj.mostrarMediciones = mostrarMediciones;
+const globalObj2 = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined' ? global : this);
+globalObj2.mostrarMediciones = mostrarMediciones;
 
 // Also explicitly on window for browser tests
 if (typeof window !== 'undefined') {
