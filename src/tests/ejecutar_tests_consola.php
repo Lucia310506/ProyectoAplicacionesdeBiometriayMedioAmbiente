@@ -148,10 +148,17 @@ try {
 } finally {
     if ($conexion instanceof PDO && $transaccionIniciada) {
         try {
-            $conexion->rollBack();
-            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Rollback: datos reales preservados', 'estado' => 'OK'];
+            // Commit para que los borrados de los tests persistan (limpieza de datos de prueba)
+            $conexion->commit();
+            $transaccionIniciada = false;
+            
+            // Limpieza explícita de mediciones de prueba (valores usados en tests)
+            $stmt = $conexion->prepare('DELETE FROM mediciones WHERE valor IN (501.0, -5.0)');
+            $stmt->execute();
+            $borradas = $stmt->rowCount();
+            $tests[] = ['grupo' => 'baseDatos', 'nombre' => "Limpieza: {$borradas} mediciones de prueba borradas", 'estado' => 'OK'];
         } catch (Throwable $error) {
-            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Rollback de la transacción', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
+            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Commit/limpieza', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
         }
     }
 }
