@@ -24,7 +24,7 @@ GET /mediciones        --> PeticionarioREST.hacerPeticionREST() --> callback HTT
 
 ### Ubicación de implementación
 
-`BTLEAlumnos2021hechoapp2/app/src/main/java/com/example/ldiamur/btlealumnos2021app/LogicaFake.java`, `PeticionarioREST.java` y `ServicioEscuharBeacons.java`.
+`src/android/app/src/main/java/com/example/ldiamur/btlealumnos2021app/LogicaFake.java`, `PeticionarioREST.java` y `ServicioEscuharBeacons.java`.
 
 ### Diseño global de las clases Android
 

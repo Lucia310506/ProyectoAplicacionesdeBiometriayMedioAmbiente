@@ -18,7 +18,7 @@ Las copias de despliegue web conservan la misma separación en `src/`: `business
 | Diseño | Implementación fuente principal |
 |---|---|
 | `arduino_design.md` | `src/arduino/` y `HolaMundoIBeacon/` |
-| `android_design.md` | `src/android/` y `BTLEAlumnos2021hechoapp2/app/src/main/java/` |
+| `android_design.md` | `src/android/` |
 | `web_rest_design.md` | `src/communication/mediciones.php` |
 | `web_logic_design.md` | `src/business_logic/mediciones.php` |
 | `communication_design.md` | `src/communication/mediciones.php` |
