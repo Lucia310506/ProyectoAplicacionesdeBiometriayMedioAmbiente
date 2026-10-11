@@ -14,14 +14,14 @@ require_once __DIR__ . '/../database/ConexionMediciones.php';
 // Valida la medición y la inserta usando una consulta preparada.
 // --------------------
 
-function guardarMediciones(string $tipo, float $valor): void {
+function guardarMediciones(string $tipo, float $valor, ?PDO $conexion = null): void {
     if (!in_array($tipo, ['CO2', 'TEMPERATURA'], true)) {
         throw new InvalidArgumentException('tipo debe ser CO2 o TEMPERATURA');
     }
     if (!is_finite($valor)) {
         throw new InvalidArgumentException('valor debe ser un número finito');
     }
-    $conexion = conectarBaseDatos(obtenerEntornoBaseDatos());
+    $conexion = $conexion ?? conectarBaseDatos(obtenerEntornoBaseDatos());
     $parametros = ['tipo' => $tipo, 'valor' => $valor];
     $consultasInsert = [
         'INSERT INTO mediciones (tipo, valor, fecha) VALUES (:tipo, :valor, NOW())',
@@ -37,8 +37,8 @@ function guardarMediciones(string $tipo, float $valor): void {
 // Lee y normaliza las filas para devolver el contrato compartido.
 // --------------------
 
-function mostrarMediciones(): array {
-    $conexion = conectarBaseDatos(obtenerEntornoBaseDatos());
+function mostrarMediciones(?PDO $conexion = null): array {
+    $conexion = $conexion ?? conectarBaseDatos(obtenerEntornoBaseDatos());
     $consultasSelect = [
         "SELECT id AS id, tipo AS tipo, valor AS valor,
                 DATE_FORMAT(fecha, '%Y-%m-%dT%H:%i:%s') AS fecha

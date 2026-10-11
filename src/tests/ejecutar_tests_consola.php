@@ -84,10 +84,10 @@ try {
         // 1. SUBIR
         $tipo = 'TEMPERATURA';
         $valor = -5.0;
-        guardarMediciones($tipo, $valor);
+        guardarMediciones($tipo, $valor, $conexion);
 
         // 2. MOSTRAR (buscar la que acabamos de subir)
-        $mediciones = mostrarMediciones();
+        $mediciones = mostrarMediciones($conexion);
         $encontrada = null;
         foreach ($mediciones as $m) {
             if ($m['tipo'] === $tipo && (float)$m['valor'] === $valor) {
@@ -108,7 +108,7 @@ try {
         $comprobar($stmt->rowCount() === 1, 'No se borró la fila (rowCount !== 1)');
 
         // 4. VERIFICAR QUE YA NO EXISTE
-        $mediciones2 = mostrarMediciones();
+        $mediciones2 = mostrarMediciones($conexion);
         $existe = false;
         foreach ($mediciones2 as $m) {
             if ((int)$m['id'] === (int)$id) {
