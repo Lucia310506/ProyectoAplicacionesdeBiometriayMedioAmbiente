@@ -7,7 +7,7 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 //BD: MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
-require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
+require_once __DIR__ . '/../database/ConexionMediciones.php';
 
 // --------------------
 // tipo: Text, valor: R --> guardarMediciones() -->

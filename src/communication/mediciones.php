@@ -8,7 +8,7 @@
  */
 
 ini_set('display_errors', '0');
-require_once __DIR__ . '/../logica/mediciones.php';
+require_once __DIR__ . '/../business_logic/mediciones.php';
 
 // --------------------
 // metodo: Text, cuerpo: Text --> atenderMediciones() --> (codigo: N, respuesta: Dict|Nulo)

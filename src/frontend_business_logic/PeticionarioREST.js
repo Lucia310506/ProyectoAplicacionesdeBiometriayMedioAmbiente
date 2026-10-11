@@ -31,6 +31,18 @@ async function pedirMediciones() {
   return mediciones;
 }
 
+// Exponer globalmente para tests y uso directo en navegador (window) o vm/Node (global)
+const globalObj = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined' ? global : this);
+globalObj.pedirMediciones = pedirMediciones;
+globalObj.URL_MEDICIONES = URL_MEDICIONES;
+
+// Also explicitly on window for browser tests
+if (typeof window !== 'undefined') {
+  window.pedirMediciones = pedirMediciones;
+  window.URL_MEDICIONES = URL_MEDICIONES;
+}
+
+// Soporte Node/CommonJS para tests
 if (typeof module !== 'undefined') {
   module.exports = { pedirMediciones, URL_MEDICIONES };
 }

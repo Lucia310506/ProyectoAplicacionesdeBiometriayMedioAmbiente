@@ -9,8 +9,8 @@
 
 putenv('MEDICIONES_ENTORNO=pruebas');
 define('PRUEBA_REST', true);
-require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
-require_once __DIR__ . '/../rest/mediciones.php';
+require_once __DIR__ . '/../database/ConexionMediciones.php';
+require_once __DIR__ . '/../communication/mediciones.php';
 
 // condicion: B, mensaje: Text --> comprobarRest() -->
 function comprobarRest(bool $condicion, string $mensaje): void {

@@ -8,8 +8,8 @@
  */
 
 putenv('MEDICIONES_ENTORNO=pruebas');
-require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
-require_once __DIR__ . '/../logica/mediciones.php';
+require_once __DIR__ . '/../database/ConexionMediciones.php';
+require_once __DIR__ . '/../business_logic/mediciones.php';
 
 // condicion: B, mensaje: Text --> comprobar() -->
 function comprobar(bool $condicion, string $mensaje): void {

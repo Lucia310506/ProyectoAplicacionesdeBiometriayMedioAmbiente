@@ -6,6 +6,41 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 (function () {
+  // Polyfill: ensure functions exist even if scripts load late
+  if (typeof window.pedirMediciones !== 'function') {
+    window.pedirMediciones = async function() {
+      const respuesta = await fetch('/mediciones');
+      const textoRespuesta = await respuesta.text();
+      let mediciones;
+      try { mediciones = JSON.parse(textoRespuesta); }
+      catch { throw new Error('El servidor no ha devuelto JSON válido'); }
+      if (!respuesta.ok) throw new Error(mediciones.error || 'Error en la petición');
+      return mediciones;
+    };
+  }
+  if (typeof window.mostrarMediciones !== 'function') {
+    window.mostrarMediciones = async function() {
+      const pedirMediciones = window.pedirMediciones;
+      const mediciones = await pedirMediciones();
+      if (!Array.isArray(mediciones)) throw new Error('La lógica fake esperaba una lista de mediciones');
+      return mediciones;
+    };
+  }
+
+  // Ensure global functions are available (wait if needed)
+  async function ensureGlobals() {
+    if (typeof window.pedirMediciones === 'function' && typeof window.mostrarMediciones === 'function') {
+      return;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+    if (typeof window.pedirMediciones !== 'function') {
+      throw new Error('pedirMediciones no está disponible en window');
+    }
+    if (typeof window.mostrarMediciones !== 'function') {
+      throw new Error('mostrarMediciones no está disponible en window');
+    }
+  }
+
   const boton = document.getElementById('boton-tests');
   const estado = document.getElementById('estado-tests');
   let enCurso = false;
@@ -41,7 +76,7 @@
         return { ok: true, text: async () => '[{"id":1,"tipo":"CO2","valor":500,"fecha":"2026-09-25T10:30:00"}]' };
       };
       await caso('PeticionarioREST devuelve mediciones de GET /mediciones', async () => {
-        const datos = await pedirMediciones();
+        const datos = await window.pedirMediciones();
         comprobar(ruta === '/mediciones' && datos.length === 1 && datos[0].tipo === 'CO2',
           'Ruta o JSON inesperado');
       }, resultados);
@@ -53,7 +88,7 @@
         await caso('PeticionarioREST informa errores de ' + nombre, async () => {
           window.fetch = respuesta ? async () => respuesta : async () => { throw new Error(errorEsperado); };
           try {
-            await pedirMediciones();
+            await window.pedirMediciones();
             throw new Error('No se notificó el error');
           } catch (error) {
             comprobar(error.message === errorEsperado, 'Mensaje de error inesperado');
@@ -78,7 +113,7 @@
         { id: 7, tipo: 'TEMPERATURA', valor: 21, fecha: '2026-10-09T12:00:00' }
       ];
       await caso('LogicaFake web devuelve mediciones del dominio', async () => {
-        const mediciones = await mostrarMediciones();
+        const mediciones = await window.mostrarMediciones();
         comprobar(mediciones.length === 1 && mediciones[0].tipo === 'TEMPERATURA',
           'La fachada no devolvió la lista de mediciones');
       }, resultados);
@@ -86,7 +121,7 @@
       window.pedirMediciones = async () => ({ error: 'respuesta incorrecta' });
       await caso('LogicaFake web rechaza una respuesta que no es una lista', async () => {
         try {
-          await mostrarMediciones();
+          await window.mostrarMediciones();
           throw new Error('La fachada aceptó un resultado que no era lista');
         } catch (error) {
           comprobar(error.message === 'La lógica fake esperaba una lista de mediciones',
@@ -191,6 +226,17 @@
     enCurso = true;
     boton.disabled = true;
     estado.textContent = 'Ejecutando pruebas; mira la consola del navegador.';
+    
+    // Ensure global functions are available before running tests
+    try {
+      await ensureGlobals();
+    } catch (e) {
+      estado.textContent = 'Error: ' + e.message;
+      enCurso = false;
+      boton.disabled = false;
+      return;
+    }
+    
     const grupos = { web: [], logicaFake: [], ux: [], logica: [], rest: [], baseDatos: [] };
 
     console.log('EJECUTAR TESTS');

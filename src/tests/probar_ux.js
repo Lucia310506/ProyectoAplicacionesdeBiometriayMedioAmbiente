@@ -8,8 +8,8 @@
 
 const fs = require('fs');
 const vm = require('vm');
-const codigo = fs.readFileSync(__dirname + '/../ux/Aplicacion.js', 'utf8');
-const codigoLogica = fs.readFileSync(__dirname + '/../logicaFake/LogicaFake.js', 'utf8');
+const codigo = fs.readFileSync(__dirname + '/../gui/Aplicacion.js', 'utf8');
+const codigoLogica = fs.readFileSync(__dirname + '/../frontend_business_logic/LogicaFake.js', 'utf8');
 
 // condicion: B, mensaje: Text --> comprobar() -->
 function comprobar(condicion, mensaje) {

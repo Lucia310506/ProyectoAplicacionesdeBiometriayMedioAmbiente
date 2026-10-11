@@ -37,10 +37,10 @@ if (!$hostOrigen || !$hostSolicitud
     responder(403, ['habilitado' => true, 'error' => 'La solicitud debe proceder del mismo origen.']);
 }
 
-require_once __DIR__ . '/../BBDD/ConexionMediciones.php';
-require_once __DIR__ . '/../logica/mediciones.php';
+require_once __DIR__ . '/../database/ConexionMediciones.php';
+require_once __DIR__ . '/../business_logic/mediciones.php';
 define('PRUEBA_REST', true);
-require_once __DIR__ . '/../rest/mediciones.php';
+require_once __DIR__ . '/../communication/mediciones.php';
 
 $tests = [];
 $conexion = null;
