@@ -55,7 +55,7 @@ Mediciones <-- mostrarMediciones() <--
 
 ### Correspondencia de implementación
 
-La implementación organizada por componentes está en `src/business_logic/mediciones.php`; la conexión está en `src/database/ConexionMediciones.php`. La aplicación web desplegable conserva sus copias en `EsqueletoWebAppEnPHPConSesion/src/logica/mediciones.php` y `EsqueletoWebAppEnPHPConSesion/src/BBDD/ConexionMediciones.php`. El diseño detallado de consultas también aparece en [`web_logic_design.md`](web_logic_design.md).
+La implementación organizada por componentes está en `src/business_logic/mediciones.php`; la conexión está en `src/database/ConexionMediciones.php`. El diseño detallado de consultas también aparece en [`web_logic_design.md`](web_logic_design.md).
 
 ## Design Clarifications
 

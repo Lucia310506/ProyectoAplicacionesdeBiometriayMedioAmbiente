@@ -49,7 +49,7 @@ Este archivo contiene funciones globales, no una clase instanciable. Resuelve la
 
 | Entorno | Archivo local | Variables | Uso previsto |
 |---|---|---|---|
-| Producción | `EsqueletoWebAppEnPHPConSesion/src/BBDD/ConfiguracionProduccion.php` | `MEDICIONES_DB_*_PROD` | Peticiones normales de la API y la web. |
+| Producción | `src/database/ConfiguracionProduccion.php` | `MEDICIONES_DB_*_PROD` | Peticiones normales de la API y la web. |
 | Pruebas | Ninguno | `MEDICIONES_DB_*_TEST` y `MEDICIONES_ENTORNO=pruebas` | Batería que elimina filas en su tabla. Debe ser una base separada. |
 
 El archivo `.txt` de configuración es una guía para la persona que despliega; PHP no lo carga. Las credenciales reales deben quedar fuera del control de versiones.
