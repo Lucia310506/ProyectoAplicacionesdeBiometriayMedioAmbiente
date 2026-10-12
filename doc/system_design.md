@@ -75,7 +75,7 @@ flowchart LR
 
 ## Design Clarifications
 
-- `EsqueletoWebAppEnPHPConSesion` es la raíz web desplegable; sus carpetas `src/rest`, `src/logica`, `src/BBDD` y `src/ux` corresponden a componentes distintos. Android tiene su propia raíz y ciclo de compilación.
+- La carpeta raíz `src/` contiene los componentes organizados por responsabilidad: `communication/`, `business_logic/`, `database/`, `frontend_business_logic/`, `gui/`, `tests/`, `android/`, `arduino/`. Android y Arduino conservan sus estructuras nativas.
 
 ## General Rules
 

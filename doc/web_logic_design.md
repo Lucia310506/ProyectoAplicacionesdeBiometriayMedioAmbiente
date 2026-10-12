@@ -38,7 +38,7 @@ La lógica PHP valida los datos y delega el almacenamiento/consulta en la conexi
 
 ### Ubicación de implementación
 
-`EsqueletoWebAppEnPHPConSesion/src/logica/mediciones.php`.
+`src/business_logic/mediciones.php`.
 
 ### Diseño global del módulo `mediciones.php`
 

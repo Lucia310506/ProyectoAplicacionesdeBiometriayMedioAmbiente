@@ -13,23 +13,11 @@ require_once __DIR__ . '/../database/ConexionMediciones.php';
 require_once __DIR__ . '/../communication/mediciones.php';
 
 // condicion: B, mensaje: Text --> comprobarRest() -->
-/*
- * --------------------
- * condicion: B, mensaje: Text --> comprobarRest() -->
- * Responsabilidad: comprobarRest ejecuta una comprobación de la batería.
- * --------------------
- */
 function comprobarRest(bool $condicion, string $mensaje): void {
     if (!$condicion) { throw new RuntimeException($mensaje); }
 }
 
 // --> probarRest() -->
-/*
- * --------------------
- * --> probarRest() -->
- * Responsabilidad: probarRest ejecuta una comprobación de la batería.
- * --------------------
- */
 function probarRest(): void {
     $conexion = conectarBaseDatos('pruebas');
     try {

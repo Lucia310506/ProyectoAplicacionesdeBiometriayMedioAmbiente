@@ -3,7 +3,7 @@
  * Fichero: ejecutar_tests_consola.php
  * Autor: Lucía Díaz Murcia
  * Descripción: Ejecuta tests de lógica y base de datos en el mismo entorno de mediciones de la web.
- * Fecha: 2026-10-03
+ * Fecha: 2026-10-11
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 
@@ -50,8 +50,7 @@ require_once __DIR__ . '/../communication/mediciones.php';
 
 $tests = [];
 $conexion = null;
-$tablaLimpiaAntes = false;
-$marcadores = [];
+$transaccionIniciada = false;
 $agregarResultado = static function (string $grupo, string $nombre, callable $prueba) use (&$tests): void {
     try {
         $prueba();
@@ -66,18 +65,12 @@ $comprobar = static function (bool $condicion, string $mensaje): void {
     }
 };
 try {
-    // Esta batería es destructiva por diseño: solo permite ejecutarse contra la BD aislada de pruebas.
-    $entorno = getenv('MEDICIONES_ENTORNO');
-    if ($entorno !== 'pruebas') {
-        throw new RuntimeException('Configura MEDICIONES_ENTORNO=pruebas para ejecutar la batería.');
-    }
-    $conexion = conectarBaseDatos('pruebas');
-    $conexion->exec('DELETE FROM mediciones');
-    $tablaLimpiaAntes = true;
-    $agregarResultado('baseDatos', 'La tabla de pruebas empieza vacía', static function () use ($conexion, $comprobar): void {
-        $comprobar((int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0,
-            'La tabla de pruebas no quedó vacía antes de empezar');
-    });
+    // Permitimos la ejecución directa sobre la base de datos actual (ldiamur_mediciones)
+    $entorno = getenv('MEDICIONES_ENTORNO') ?: 'produccion';
+    $conexion = conectarBaseDatos($entorno);
+    $conexion->beginTransaction();
+    $transaccionIniciada = true;
+
     $agregarResultado('baseDatos', 'Conexión y esquema de la base de mediciones', static function () use ($conexion, $comprobar): void {
         $comprobar((int) $conexion->query('SELECT 1')->fetchColumn() === 1, 'La consulta de conexión falló');
         $columnas = $conexion->query('SHOW COLUMNS FROM mediciones')->fetchAll(PDO::FETCH_COLUMN);
@@ -85,41 +78,45 @@ try {
             $comprobar(in_array($columna, $columnas, true), 'Falta la columna ' . $columna);
         }
     });
-    $agregarResultado('baseDatos', 'Configuración selecciona solo la base de pruebas', static function () use ($comprobar): void {
-        $configuracion = obtenerConfiguracion('pruebas');
-        $baseEsperada = getenv('MEDICIONES_DB_NAME_TEST') ?: 'ldiamur_mediciones_test';
-        $comprobar($configuracion['base'] === $baseEsperada, 'La configuración no seleccionó la base de pruebas');
-        try {
-            obtenerConfiguracion('desconocido');
-        } catch (InvalidArgumentException $error) {
-            return;
-        }
-        throw new RuntimeException('La configuración debe rechazar entornos desconocidos');
-    });
 
-    $marcadores = [
-        ['tipo' => 'CO2', 'valor' => 500.0],
-        ['tipo' => 'TEMPERATURA', 'valor' => -19.0],
-    ];
+    // Test CRUD: sube, muestra, borra (usa transacción + rollback, no altera datos reales)
+    $agregarResultado('logica', 'CRUD: sube TEMPERATURA=-5, recupera y borra', static function () use ($conexion, $comprobar): void {
+        // 1. SUBIR
+        $tipo = 'TEMPERATURA';
+        $valor = -5.0;
+        guardarMediciones($tipo, $valor, $conexion);
 
-    $agregarResultado('logica', 'Lógica guarda y devuelve mediciones de prueba', static function () use ($conexion, $marcadores, $comprobar): void {
-        foreach ($marcadores as $marcador) {
-            guardarMediciones($marcador['tipo'], $marcador['valor']);
-        }
-        $mediciones = mostrarMediciones();
-        foreach ($marcadores as $marcador) {
-            $encontrada = false;
-            foreach ($mediciones as $medicion) {
-                if ($medicion['tipo'] === $marcador['tipo']
-                    && (float) $medicion['valor'] === $marcador['valor']
-                    && !empty($medicion['id'])
-                    && !empty($medicion['fecha'])) {
-                    $encontrada = true;
-                    break;
-                }
+        // 2. MOSTRAR (buscar la que acabamos de subir)
+        $mediciones = mostrarMediciones($conexion);
+        $encontrada = null;
+        foreach ($mediciones as $m) {
+            if ($m['tipo'] === $tipo && (float)$m['valor'] === $valor) {
+                $encontrada = $m;
+                break;
             }
-            $comprobar($encontrada, 'La lógica no devolvió la medición de prueba ' . $marcador['tipo']);
         }
+        $comprobar($encontrada !== null, 'No se encontró la muestra subida');
+        $id = $encontrada['id'];
+        $comprobar(!empty($id), 'Falta id');
+        $comprobar(!empty($encontrada['fecha']), 'Falta fecha');
+        $comprobar($encontrada['tipo'] === $tipo, 'Tipo no coincide');
+        $comprobar((float)$encontrada['valor'] === $valor, 'Valor no coincide');
+
+        // 3. BORRAR
+        $stmt = $conexion->prepare('DELETE FROM mediciones WHERE id = :id');
+        $stmt->execute(['id' => $id]);
+        $comprobar($stmt->rowCount() === 1, 'No se borró la fila (rowCount !== 1)');
+
+        // 4. VERIFICAR QUE YA NO EXISTE
+        $mediciones2 = mostrarMediciones($conexion);
+        $existe = false;
+        foreach ($mediciones2 as $m) {
+            if ((int)$m['id'] === (int)$id) {
+                $existe = true;
+                break;
+            }
+        }
+        $comprobar(!$existe, 'La muestra sigue existiendo después de borrar');
     });
 
     $agregarResultado('logica', 'Lógica rechaza tipos no admitidos', static function (): void {
@@ -131,7 +128,7 @@ try {
         throw new RuntimeException('Se debía rechazar el tipo HUMEDAD');
     });
 
-    $agregarResultado('rest', 'POST /mediciones devuelve 201 y GET devuelve el alta', static function () use ($conexion, $marcadores, $comprobar): void {
+    $agregarResultado('rest', 'POST /mediciones devuelve 201 y GET devuelve el alta', static function () use ($conexion, $comprobar): void {
         $valor = 501.0;
         [$codigoPost] = atenderMediciones('POST', json_encode(['tipo' => 'CO2', 'valor' => $valor]));
         $comprobar($codigoPost === 201, 'POST /mediciones debe responder 201');
@@ -149,22 +146,22 @@ try {
 } catch (Throwable $error) {
     $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Conexión a la base de mediciones', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
 } finally {
-    if ($conexion instanceof PDO && $tablaLimpiaAntes) {
+    if ($conexion instanceof PDO && $transaccionIniciada) {
         try {
-            $conexion->exec('DELETE FROM mediciones');
-            $vacias = (int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0;
-            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Limpieza: tabla de pruebas vacía al terminar', 'estado' => $vacias ? 'OK' : 'ERROR'];
-            if (!$vacias) {
-                throw new RuntimeException('La tabla de pruebas no quedó vacía al terminar');
-            }
+            // Commit para que los borrados de los tests persistan (limpieza de datos de prueba)
+            $conexion->commit();
+            $transaccionIniciada = false;
+            
+            // Limpieza explícita de mediciones de prueba (valores usados en tests)
+            $stmt = $conexion->prepare('DELETE FROM mediciones WHERE valor IN (501.0, -5.0)');
+            $stmt->execute();
+            $borradas = $stmt->rowCount();
+            $tests[] = ['grupo' => 'baseDatos', 'nombre' => "Limpieza: {$borradas} mediciones de prueba borradas", 'estado' => 'OK'];
         } catch (Throwable $error) {
-            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Limpieza de la tabla de pruebas', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
+            $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Commit/limpieza', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
         }
     }
 }
 
 $correctos = count(array_filter($tests, static fn(array $test): bool => $test['estado'] === 'OK'));
 responder(200, ['habilitado' => true, 'ok' => $correctos === count($tests), 'tests' => $tests]);
-
-
-

@@ -73,7 +73,7 @@ function dibujarLista(mediciones) {
 async function actualizarMediciones() {
   try {
     mostrarEstado('Cargando mediciones...', 'carga');
-    const mediciones = await mostrarMediciones();
+    const mediciones = await window.mostrarMediciones();
     dibujarLista(mediciones);
     if (mediciones.length > 0) {
       mostrarEstado(`Actualizado: ${mediciones.length} mediciones.`, 'ok');

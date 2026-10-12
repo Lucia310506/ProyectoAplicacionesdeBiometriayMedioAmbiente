@@ -8,26 +8,14 @@
 
 const fs = require('fs');
 const vm = require('vm');
-const codigo = fs.readFileSync(__dirname + '/../communication/PeticionarioREST.js', 'utf8');
+const codigo = fs.readFileSync(__dirname + '/../frontend_business_logic/PeticionarioREST.js', 'utf8');
 
 // condicion: B, mensaje: Text --> comprobar() -->
-/*
- * --------------------
- * condicion: B, mensaje: Text --> comprobar() -->
- * Responsabilidad: comprobar ejecuta una comprobación de la batería.
- * --------------------
- */
 function comprobar(condicion, mensaje) {
   if (!condicion) throw new Error(mensaje);
 }
 
 // --> probarPeticionarioRest() -->
-/*
- * --------------------
- * --> probarPeticionarioRest() -->
- * Responsabilidad: probarPeticionarioRest ejecuta una comprobación de la batería.
- * --------------------
- */
 async function probarPeticionarioRest() {
   let urlRecibida = '';
   const contexto = {

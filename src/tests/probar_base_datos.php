@@ -12,23 +12,11 @@ require_once __DIR__ . '/../database/ConexionMediciones.php';
 require_once __DIR__ . '/../business_logic/mediciones.php';
 
 // condicion: B, mensaje: Text --> comprobar() -->
-/*
- * --------------------
- * condicion: B, mensaje: Text --> comprobar() -->
- * Responsabilidad: comprobar ejecuta una comprobación de la batería.
- * --------------------
- */
 function comprobar(bool $condicion, string $mensaje): void {
     if (!$condicion) { throw new RuntimeException($mensaje); }
 }
 
 // --> probarBaseDatos() -->
-/*
- * --------------------
- * --> probarBaseDatos() -->
- * Responsabilidad: probarBaseDatos ejecuta una comprobación de la batería.
- * --------------------
- */
 function probarBaseDatos(): void {
     $conexion = conectarBaseDatos('pruebas');
     try {

@@ -1,10 +1,10 @@
 # Mapa de componentes y correspondencia con las fuentes
 
-El repositorio conserva los proyectos nativos de Arduino IDE, Android Studio y la aplicación PHP. La carpeta raíz `src/` reúne fuentes por componente, incluidas copias de trabajo para respetar la estructura requerida. La aplicación web desplegable mantiene fuentes equivalentes dentro de `EsqueletoWebAppEnPHPConSesion/`.
+El repositorio conserva los proyectos nativos de Arduino IDE, Android Studio y la aplicación PHP. La carpeta raíz `src/` reúne fuentes por componente, incluidas copias de trabajo para respetar la estructura requerida.
 
 | Carpeta raíz | Componente | Implementación fuente |
 |---|---|---|
-| `src/communication/` | Cliente web y adaptador PHP | `PeticionarioREST.js`, `mediciones.php` |
+| `src/communication/` | Adaptador PHP | `mediciones.php` |
 | `src/business_logic/` | Reglas de negocio PHP | `mediciones.php` |
 | `src/frontend_business_logic/` | Fachada de dominio web | `LogicaFake.js` |
 | `src/database/` | Conexión PDO y esquema | `ConexionMediciones.php`, `Estructura.sql` |
@@ -13,17 +13,17 @@ El repositorio conserva los proyectos nativos de Arduino IDE, Android Studio y l
 | `src/arduino/` | Firmware Arduino | Sketch, cabeceras y `test.h` |
 | `src/tests/` | Pruebas web | JavaScript y PHP |
 
-Las copias de despliegue web conservan la misma separación dentro de `EsqueletoWebAppEnPHPConSesion/src/`: `logica/`, `rest/`, `logicaFake/`, `BBDD/`, `ux/` y `tests/`. Android y Arduino conservan sus configuraciones de compilación en sus carpetas nativas.
+Las copias de despliegue web conservan la misma separación en `src/`: `business_logic/`, `communication/`, `database/`, `frontend_business_logic/`, `gui/`, `tests/`. Android y Arduino conservan sus configuraciones de compilación en sus carpetas nativas.
 
 | Diseño | Implementación fuente principal |
 |---|---|
 | `arduino_design.md` | `src/arduino/` y `HolaMundoIBeacon/` |
-| `android_design.md` | `src/android/` y `BTLEAlumnos2021hechoapp2/app/src/main/java/` |
+| `android_design.md` | `src/android/` |
 | `web_rest_design.md` | `src/communication/mediciones.php` |
 | `web_logic_design.md` | `src/business_logic/mediciones.php` |
 | `communication_design.md` | `src/communication/mediciones.php` |
 | `business_logic_design.md` | `src/business_logic/mediciones.php` |
-| `web_rest_client_design.md` | `src/communication/PeticionarioREST.js` |
+| `web_rest_client_design.md` | `src/frontend_business_logic/PeticionarioREST.js` |
 | `frontend_business_logic_design.md` | `src/frontend_business_logic/LogicaFake.js` |
 | `web_ux_design.md` | `src/gui/Aplicacion.html`, `Aplicacion.js` |
 | `database_design.md` | `src/database/Estructura.sql` |
@@ -49,7 +49,7 @@ Las copias de despliegue web conservan la misma separación dentro de `Esqueleto
 | PHP comunicación | `src/communication/mediciones.php` | Adapta la petición a operaciones de negocio. |
 | PHP lógica | `src/business_logic/mediciones.php` | Valida, persiste, consulta y normaliza mediciones. |
 | PHP datos | `src/database/ConexionMediciones.php`, `Estructura.sql` | Conexión PDO y esquema. |
-| Web comunicación | `src/communication/PeticionarioREST.js` | Cliente GET del navegador. |
+| Web comunicación | `src/frontend_business_logic/PeticionarioREST.js` | Cliente GET del navegador. |
 | Web lógica frontend | `src/frontend_business_logic/LogicaFake.js` | Fachada que entrega datos a la UX. |
 | Web UX | `src/gui/Aplicacion.html`, `Aplicacion.js` | Presenta mediciones y estados de pantalla. |
 | Pruebas web | `src/tests/` | Comprueba cliente, fachada, UX, lógica, REST y BD. |
