@@ -12,12 +12,16 @@ define('PRUEBA_REST', true);
 require_once __DIR__ . '/../database/ConexionMediciones.php';
 require_once __DIR__ . '/../communication/mediciones.php';
 
+// --------------------
 // condicion: B, mensaje: Text --> comprobarRest() -->
+// --------------------
 function comprobarRest(bool $condicion, string $mensaje): void {
     if (!$condicion) { throw new RuntimeException($mensaje); }
 }
 
+// --------------------
 // --> probarRest() -->
+// --------------------
 function probarRest(): void {
     $conexion = conectarBaseDatos('pruebas');
     try {

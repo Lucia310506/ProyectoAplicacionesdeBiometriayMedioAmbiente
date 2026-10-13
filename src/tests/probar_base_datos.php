@@ -11,12 +11,16 @@ putenv('MEDICIONES_ENTORNO=pruebas');
 require_once __DIR__ . '/../database/ConexionMediciones.php';
 require_once __DIR__ . '/../business_logic/mediciones.php';
 
+// --------------------
 // condicion: B, mensaje: Text --> comprobar() -->
+// --------------------
 function comprobar(bool $condicion, string $mensaje): void {
     if (!$condicion) { throw new RuntimeException($mensaje); }
 }
 
+// --------------------
 // --> probarBaseDatos() -->
+// --------------------
 function probarBaseDatos(): void {
     $conexion = conectarBaseDatos('pruebas');
     try {

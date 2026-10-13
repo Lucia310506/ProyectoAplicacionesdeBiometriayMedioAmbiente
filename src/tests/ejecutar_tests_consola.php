@@ -65,8 +65,10 @@ $comprobar = static function (bool $condicion, string $mensaje): void {
     }
 };
 try {
-    // Permitimos la ejecución directa sobre la base de datos actual (ldiamur_mediciones)
     $entorno = getenv('MEDICIONES_ENTORNO') ?: 'produccion';
+    if ($entorno !== 'pruebas') {
+        responder(403, ['habilitado' => false, 'error' => 'Configura MEDICIONES_ENTORNO=pruebas para evitar tocar la base de producción.']);
+    }
     $conexion = conectarBaseDatos($entorno);
     $conexion->beginTransaction();
     $transaccionIniciada = true;

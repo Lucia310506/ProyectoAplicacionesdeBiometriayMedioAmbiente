@@ -11,12 +11,20 @@ const vm = require('vm');
 const codigo = fs.readFileSync(__dirname + '/../gui/Aplicacion.js', 'utf8');
 const codigoLogica = fs.readFileSync(__dirname + '/../frontend_business_logic/LogicaFake.js', 'utf8');
 
+// --------------------
+// --------------------
 // condicion: B, mensaje: Text --> comprobar() -->
+// --------------------
+// --------------------
 function comprobar(condicion, mensaje) {
   if (!condicion) throw new Error(mensaje);
 }
 
+// --------------------
+// --------------------
 // html: Text --> crearDocumento() --> Documento
+// --------------------
+// --------------------
 function crearDocumento() {
   const estado = { textContent: 'Cargando mediciones...', className: '' };
   const cuerpo = {
@@ -44,7 +52,11 @@ function crearDocumento() {
   };
 }
 
+// --------------------
+// --------------------
 // --> probarUx() -->
+// --------------------
+// --------------------
 async function probarUx() {
   const documento = crearDocumento();
   let medicionesSimuladas = [];

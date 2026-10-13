@@ -45,14 +45,18 @@
   const estado = document.getElementById('estado-tests');
   let enCurso = false;
 
+  // --------------------
   // condicion: B, mensaje: Text --> comprobar() -->
   // Falla el caso actual con una explicación breve.
+  // --------------------
   function comprobar(condicion, mensaje) {
     if (!condicion) throw new Error(mensaje);
   }
 
+  // --------------------
   // nombre: Text, prueba: Funcion, resultados: [Dict] --> caso() -->
   // Ejecuta un caso y guarda su resultado sin detener las demás pruebas.
+  // --------------------
   async function caso(nombre, prueba, resultados) {
     console.log('Ejecutando test: ' + nombre);
     try {
@@ -65,8 +69,10 @@
     }
   }
 
+  // --------------------
   // resultados: [Dict] --> probarPeticionarioREST() -->
   // Simula GET, errores HTTP y errores de red del cliente web.
+  // --------------------
   async function probarPeticionarioREST(resultados) {
     const fetchReal = window.fetch;
     let ruta = '';
@@ -133,8 +139,10 @@
     }
   }
 
+  // --------------------
   // resultados: [Dict] --> probarUX() -->
   // Comprueba carga, renderizado de filas y error; restaura la vista al terminar.
+  // --------------------
   async function probarUX(resultados) {
     const estado = document.getElementById('estado');
     const cuerpo = document.getElementById('cuerpo-mediciones');
@@ -172,8 +180,10 @@
     }
   }
 
+  // --------------------
   // resultados: Dict --> probarServidor() -->
   // Ejecuta las pruebas PHP sobre la base aislada configurada para pruebas.
+  // --------------------
   async function probarServidor(resultados) {
     console.log('Ejecutando pruebas PHP y base de datos');
     try {
@@ -198,8 +208,10 @@
     }
   }
 
+  // --------------------
   // grupos: Dict --> imprimirResultados() --> Texto
   // Imprime los resúmenes y devuelve si todos los casos han pasado.
+  // --------------------
   function imprimirResultados(grupos) {
     console.log('RESULTADOS :');
     let todoCorrecto = true;
@@ -219,8 +231,10 @@
     return todoCorrecto;
   }
 
+  // --------------------
   // --> ejecutarPruebasWeb() -->
   // Ejecuta la batería web completa al solicitarla desde el botón.
+  // --------------------
   async function ejecutarPruebasWeb() {
     if (enCurso) return;
     enCurso = true;
