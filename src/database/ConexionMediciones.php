@@ -12,6 +12,21 @@
 // Construye la conexión PDO con la configuración resuelta para el entorno.
 // --------------------
 
+// --------------------
+// nombre: Text --> variableEntorno() --> Texto|Falso
+// Lee una variable desde getenv, $_ENV o $_SERVER para compatibilidad con Apache y PHP-FPM/Plesk.
+// --------------------
+function variableEntorno(string $nombre) {
+    $valor = getenv($nombre);
+    if ($valor === false && isset($_ENV[$nombre])) {
+        $valor = $_ENV[$nombre];
+    }
+    if ($valor === false && isset($_SERVER[$nombre])) {
+        $valor = $_SERVER[$nombre];
+    }
+    return $valor;
+}
+
 function conectarBaseDatos(string $entorno = 'produccion'): PDO {
     $configuracion = obtenerConfiguracion($entorno);
     return new PDO(
@@ -33,17 +48,17 @@ function obtenerConfiguracion(string $entorno = 'produccion'): array {
     }
     $sufijo = $entorno === 'pruebas' ? '_TEST' : '_PROD';
     $configuracion = [];
-    if ($entorno === 'produccion') {
-        $rutaConfiguracion = __DIR__ . '/ConfiguracionProduccion.php';
-        if (is_file($rutaConfiguracion)) {
-            $configuracion = require $rutaConfiguracion;
-        }
+    $rutaConfiguracion = $entorno === 'pruebas'
+        ? __DIR__ . '/ConfiguracionPruebas.php'
+        : __DIR__ . '/ConfiguracionProduccion.php';
+    if (is_file($rutaConfiguracion)) {
+        $configuracion = require $rutaConfiguracion;
     }
-    $host = $configuracion['host'] ?? getenv('MEDICIONES_DB_HOST' . $sufijo);
-    $base = getenv('MEDICIONES_DB_NAME' . $sufijo)
+    $host = $configuracion['host'] ?? variableEntorno('MEDICIONES_DB_HOST' . $sufijo);
+    $base = variableEntorno('MEDICIONES_DB_NAME' . $sufijo)
         ?: ($configuracion['base'] ?? ($entorno === 'pruebas' ? 'ldiamur_mediciones_test' : 'mediciones'));
-    $usuario = $configuracion['usuario'] ?? getenv('MEDICIONES_DB_USER' . $sufijo);
-    $password = $configuracion['password'] ?? getenv('MEDICIONES_DB_PASSWORD' . $sufijo);
+    $usuario = $configuracion['usuario'] ?? variableEntorno('MEDICIONES_DB_USER' . $sufijo);
+    $password = $configuracion['password'] ?? variableEntorno('MEDICIONES_DB_PASSWORD' . $sufijo);
     if ($entorno === 'produccion' && credencialesProduccionIncompletas($host, $base, $usuario, $password)) {
         throw new RuntimeException(
             'Falta ConfiguracionProduccion.php en Plesk. Copia ConfiguracionProduccion.ejemplo.php y escribe host, base, usuario y password.'
@@ -80,5 +95,9 @@ function credencialesProduccionIncompletas($host, $base, $usuario, $password): b
 // --------------------
 
 function obtenerEntornoBaseDatos(): string {
-    return getenv('MEDICIONES_ENTORNO') ?: 'produccion';
+    if (is_file(__DIR__ . '/ConfiguracionPruebas.php')) {
+        return 'pruebas';
+    }
+    $valor = variableEntorno('MEDICIONES_ENTORNO');
+    return $valor !== false && $valor !== '' ? $valor : 'produccion';
 }

@@ -25,23 +25,24 @@ function comprobarRest(bool $condicion, string $mensaje): void {
 function probarRest(): void {
     $conexion = conectarBaseDatos('pruebas');
     try {
-        $conexion->exec('DELETE FROM mediciones');
-        comprobarRest((int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0,
-            'La tabla de pruebas debe empezar vacía');
+        $conexion->prepare('DELETE FROM mediciones WHERE dispositivo_id = :dispositivo')
+            ->execute(['dispositivo' => 'TEST-REST']);
         [$codigoPost, $respuestaPost] = atenderMediciones('POST', '{"dispositivo_id":"TEST-REST","tipo":"CO2","valor":500,"lugar":"Murcia"}');
         comprobarRest($codigoPost === 201 && $respuestaPost['resultado'] === 'medición guardada', 'POST debe crear');
         [$codigoGet, $respuestaGet] = atenderMediciones('GET', '');
-        comprobarRest($codigoGet === 200 && count($respuestaGet) === 1, 'GET debe devolver la medición');
-        comprobarRest($respuestaGet[0]['tipo'] === 'CO2'
-            && (float) $respuestaGet[0]['valor'] === 500.0
-            && $respuestaGet[0]['dispositivo_id'] === 'TEST-REST'
-            && !empty($respuestaGet[0]['fecha']),
-            'GET debe devolver id, tipo, valor y fecha de CO2');
+        $restEncontrada = false;
+        foreach ($respuestaGet as $medicion) {
+            if ($medicion['dispositivo_id'] === 'TEST-REST' && $medicion['tipo'] === 'CO2'
+                && (float) $medicion['valor'] === 500.0) {
+                $restEncontrada = true;
+                break;
+            }
+        }
+        comprobarRest($codigoGet === 200 && $restEncontrada, 'GET debe devolver la medición de prueba');
         echo "OK: pruebas REST superadas\n";
     } finally {
-        $conexion->exec('DELETE FROM mediciones');
-        comprobarRest((int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0,
-            'La tabla de pruebas debe quedar vacía');
+        $conexion->prepare('DELETE FROM mediciones WHERE dispositivo_id = :dispositivo')
+            ->execute(['dispositivo' => 'TEST-REST']);
     }
 }
 

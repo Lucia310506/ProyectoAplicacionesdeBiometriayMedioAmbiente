@@ -44,6 +44,10 @@ if (!$hostOrigen || !$hostSolicitud
 }
 
 require_once __DIR__ . '/../database/ConexionMediciones.php';
+$entorno = obtenerEntornoBaseDatos();
+if ($entorno !== 'pruebas') {
+    responder(403, ['habilitado' => false, 'error' => 'Configura una base de pruebas (ConfiguracionPruebas.php o MEDICIONES_ENTORNO=pruebas).']);
+}
 require_once __DIR__ . '/../business_logic/mediciones.php';
 define('PRUEBA_REST', true);
 require_once __DIR__ . '/../communication/mediciones.php';
@@ -65,10 +69,6 @@ $comprobar = static function (bool $condicion, string $mensaje): void {
     }
 };
 try {
-    $entorno = getenv('MEDICIONES_ENTORNO') ?: 'produccion';
-    if ($entorno !== 'pruebas') {
-        responder(403, ['habilitado' => false, 'error' => 'Configura MEDICIONES_ENTORNO=pruebas para evitar tocar la base de producción.']);
-    }
     $conexion = conectarBaseDatos($entorno);
     $conexion->beginTransaction();
     $transaccionIniciada = true;
