@@ -59,19 +59,6 @@ public class MainActivity extends AppCompatActivity {
     // --------------------------------------------------------------
     /*
      * --------------------
-     * v: vista --> botonBuscarDispositivosBTLEPulsado() <--
-     * Inicia el servicio persistente de escucha BLE desde la interfaz.
-     * --------------------
-     */
-    public void botonBuscarDispositivosBTLEPulsado( View v ) {
-        Log.d(ETIQUETA_LOG, " boton buscar dispositivos BTLE Pulsado" );
-        iniciarServicioEscucha();
-    } // ()
-
-    // --------------------------------------------------------------
-    // --------------------------------------------------------------
-    /*
-     * --------------------
      * v: vista --> botonBuscarNuestroDispositivoBTLEPulsado() <--
      * Inicia la escucha del beacon configurado.
      * --------------------

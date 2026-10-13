@@ -92,7 +92,6 @@ void inicializarPlaquita () {
 // --------------------
 void setup() {
 
-  Globales::elPuerto.esperarDisponible();
   pinMode(PIN_BOTON_TESTS, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(PIN_BOTON_TESTS), botonPruebasInterrupcion, FALLING);
   inicializarPlaquita();

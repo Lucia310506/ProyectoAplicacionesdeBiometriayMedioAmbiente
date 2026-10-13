@@ -30,7 +30,7 @@ private:
   // ............................................................
 public:
   EmisoraBLE laEmisora {
-	"GTI-3A", //  nombre emisora
+	"LuciaGTI", //  nombre emisora
 	  0x004c, // fabricanteID (Apple)
 	  4 // txPower
 	  };

@@ -44,7 +44,7 @@ public class ServicioEscuharBeacons extends Service {
             "com.example.ldiamur.btlealumnos2021app.RESULTADO_BEACON_PRUEBA";
     public static final String EXTRA_BEACON_ENCONTRADO = "beacon_encontrado";
     private static final String ETIQUETA_LOG = ">>>>";
-    private static final String NOMBRE_BEACON = "JU-GTI";
+    private static final String NOMBRE_BEACON = "LuciaGTI";
     private static final String CANAL_ID = "escucha_beacons";
     private static final int ID_NOTIFICACION = 1001;
     private static final int TIPO_BEACON_PRUEBA = 14;
