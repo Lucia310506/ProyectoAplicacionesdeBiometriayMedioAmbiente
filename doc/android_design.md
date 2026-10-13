@@ -4,7 +4,7 @@
 
 ### Modelo compartido
 
-`MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`. No se crea clase `Medicion`. Se pasan `tipo` y `valor`; el servidor crea `id` y `fecha`.
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. No se crea clase `Medicion`. Se pasan `tipo` y `valor`; el servidor crea `id` y `fecha`.
 
 ### Lógica fake y cliente REST
 

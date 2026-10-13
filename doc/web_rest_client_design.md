@@ -4,7 +4,7 @@
 
 ### Modelo de datos
 
-`MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`. No se crea clase `Medicion`. Los datos de entrada del alta son tipo y valor; el servidor asigna id y fecha.
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. No se crea clase `Medicion`. Los datos de entrada del alta son tipo y valor; el servidor asigna id y fecha.
 
 ### Interfaces lógicas
 

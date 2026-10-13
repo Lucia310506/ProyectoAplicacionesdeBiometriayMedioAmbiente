@@ -4,7 +4,7 @@
 
 ### Diseño de datos
 
-`MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`
 
 El servidor crea `id` y `fecha`. No se crea una clase `Medicion`; los datos de entrada se pasan directamente como `tipo` y `valor`.
 
@@ -13,7 +13,7 @@ El servidor crea `id` y `fecha`. No se crea una clase `Medicion`; los datos de e
 ```text
 tipo: Text, valor: R --> guardarMediciones() -->
 
-mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
+mediciones: [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]
              <-- mostrarMediciones() <--
 ```
 

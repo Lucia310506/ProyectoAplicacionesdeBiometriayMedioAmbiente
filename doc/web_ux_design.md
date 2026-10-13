@@ -8,11 +8,11 @@ Presentar estado de carga, error o éxito y representar las mediciones recibidas
 
 ### Fuente de datos REST
 
-La UX llama a `LogicaFake.mostrarMediciones()` y recibe `[ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`. La fachada delega la petición HTTP en `PeticionarioREST.pedirMediciones()`.
+La UX llama a `LogicaFake.mostrarMediciones()` y recibe `[ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. La fachada delega la petición HTTP en `PeticionarioREST.pedirMediciones()`.
 
 ### Tipos lógicos
 
-- `Medicion = (id: N, tipo: Text, valor: R, fecha: DateTime)`
+- `Medicion = (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text)`
 - `Mediciones = [ Medicion ]`
 - `Estado = (texto: Text, clase: Text)`
 

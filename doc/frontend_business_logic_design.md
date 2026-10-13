@@ -33,10 +33,11 @@ UX / Aplicacion.js
 
 ```text
 Medicion = {
-  id: N,
+  dispositivo_id: Text,
+  fecha: DateTime,
   tipo: Text,            // CO2 o TEMPERATURA
   valor: R,
-  fecha: DateTime
+  lugar: Text
 }
 Mediciones = Medicion[]
 ```
@@ -47,7 +48,7 @@ La función única de este módulo se documenta con el mismo bloque que debe apa
 /*
  * --------------------
  * Entradas: ninguna.
- * Tipo: Medicion = (id: N, tipo: Text, valor: R, fecha: DateTime).
+ * Tipo: Medicion = (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text).
  * --> mostrarMediciones() --> Mediciones = [Medicion]
  * Responsabilidad: obtener las mediciones mediante el cliente REST y entregarlas a la UX.
  * Salida: una lista Mediciones; propaga errores REST o si la respuesta no es una lista.

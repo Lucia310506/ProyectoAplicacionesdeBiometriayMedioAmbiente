@@ -39,25 +39,27 @@ La base de datos no define una clase global ni funciones propias: el objeto pers
 │ fecha: DATETIME(6), clave primaria compuesta, DEFAULT CURRENT_TIMESTAMP(6)│
 │ tipo: ENUM('CO2', 'TEMPERATURA'), obligatorio                             │
 │ valor: DOUBLE, obligatorio                                                │
+│ lugar: VARCHAR(100), obligatorio, DEFAULT 'Ubicación no disponible'        │
 └──────────────────────────────────────────────────────────────────────────┘
-Alta: (dispositivo_id, tipo, valor) → INSERT; la BD genera la fecha.
+Alta: (dispositivo_id, tipo, valor, lugar) → INSERT; la BD genera la fecha.
 Lectura: SELECT → mediciones ordenadas por fecha y dispositivo_id descendentes.
 ```
 
 | Operación | Diseño lógico | Qué hace |
 |---|---|---|
-| Alta | `tipo: Text, valor: R --> INSERT mediciones -->` | Persiste una medición válida. `id` y `fecha` se generan en la base de datos. |
-| Lectura | `--> SELECT mediciones --> Medicion[]` | Devuelve id, tipo, valor y fecha de las filas almacenadas. |
+| Alta | `dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> INSERT mediciones -->` | Persiste una medición válida. `fecha` se genera en la base de datos. |
+| Lectura | `--> SELECT mediciones --> Medicion[]` | Devuelve dispositivo_id, fecha, tipo, valor y lugar de las filas almacenadas. |
 | Limpieza de pruebas | `--> DELETE FROM mediciones -->` | Limpia las filas de la base exclusiva de pruebas antes y después de la batería. |
 
 ### Esquema y reglas de datos
 
 | Columna | Tipo | Regla | Origen |
 |---|---|---|---|
-| `id` | `INT` | `NOT NULL`, `AUTO_INCREMENT`, clave primaria | Asignado por MySQL. |
+| `dispositivo_id` | `VARCHAR(64)` | `NOT NULL`, parte de la clave primaria compuesta | Recibido en el JSON y validado también por lógica PHP. |
+| `fecha` | `DATETIME(6)` | `NOT NULL`, default `CURRENT_TIMESTAMP(6)`, parte de la clave primaria compuesta | Asignada por MySQL en la creación de la fila. |
 | `tipo` | `ENUM('CO2','TEMPERATURA')` | `NOT NULL`; solo permite los dos tipos del sistema | Recibido en el JSON y validado también por lógica PHP. |
 | `valor` | `DOUBLE` | `NOT NULL` | Recibido como número y validado como finito por lógica PHP. |
-| `fecha` | `DATETIME` | `NOT NULL`, default `CURRENT_TIMESTAMP` | Asignada por MySQL en la creación de la fila. |
+| `lugar` | `VARCHAR(100)` | `NOT NULL`, default `Ubicación no disponible` | Obtenido en la app o indicado en el JSON. |
 
 La tabla usa InnoDB y `utf8mb4`. No hay relaciones con otras tablas ni claves foráneas. El índice explícito es la clave primaria compuesta `(dispositivo_id, fecha)`.
 
