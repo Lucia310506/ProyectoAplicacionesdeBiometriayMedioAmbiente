@@ -10,11 +10,11 @@ El endpoint REST adapta solicitudes HTTP al contrato lógico de mediciones. Lee 
 
 ```text
 POST /mediciones
-Entrada JSON: { "tipo": Text, "valor": R }
+Entrada JSON: { "dispositivo_id": Text, "tipo": Text, "valor": R, "lugar": Text }
 Salida correcta: HTTP 201, { "resultado": "medición guardada" }
 
 GET /mediciones
-Salida correcta: HTTP 200, [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
+Salida correcta: HTTP 200, [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]
 
 OPTIONS /mediciones
 Salida: HTTP 204

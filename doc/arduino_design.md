@@ -20,7 +20,7 @@ El firmware lee temperatura y CO2 simulados, representa cada lectura en una tram
 3. Codificar tipo/contador en Major y valor en Minor.
 4. Publicar la trama y esperar al siguiente ciclo.
 
-Al pulsar el botón conectado a D2, `loop()` ejecuta `test.h`: emite un iBeacon con tipo reservado `PRUEBA = 14` y valor centinela `0x5A3C`, comprueba que la publicidad se inicia, la mantiene tres segundos para permitir su escaneo y verifica que se detiene.
+Al enviar el carácter `t` por el monitor serie a 115200 baudios, `loop()` ejecuta `test.h`: emite un iBeacon con tipo reservado `PRUEBA = 14` y valor centinela `0x5A3C`, comprueba que la publicidad se inicia, la mantiene tres segundos para permitir su escaneo y verifica que se detiene.
 
 ### Codificación del anuncio iBeacon
 
@@ -63,7 +63,7 @@ Convención del diagrama de clase: los campos privados se dibujan completamente 
 
 | Función | Diseño lógico | Qué hace |
 |---|---|---|
-| `botonPruebasInterrupcion(): void` | `flanco: Interrupcion --> botonPruebasInterrupcion() -->` | Registra la pulsación; no ejecuta la batería dentro de la interrupción. |
+| `procesarComandoSerial(): void` | `comando: Text --> procesarComandoSerial() -->` | Lee el monitor serie y deja la prueba pendiente cuando recibe `t` o `T`. |
 | `ejecutarTestsArduino(contador): void` | `contador: N --> ejecutarTestsArduino() -->` | Envía el beacon centinela, confirma el estado de publicidad y muestra el resultado por Serial. |
 | `Publicador.iniciarBeaconPrueba(contador): void` | `contador: N --> iniciarBeaconPrueba() -->` | Publica UUID del proyecto, Major con tipo 14/contador y Minor `0x5A3C`. |
 | `Publicador.estaAnunciando(): bool` | `--> estaAnunciando() --> B` | Informa si Bluefruit mantiene activo el anuncio. |
@@ -101,11 +101,11 @@ Convención del diagrama de clase: los campos privados se dibujan completamente 
 ## Design Clarifications
 
 - El beacon de prueba usa un tipo reservado que el receptor Android descarta, para evitar guardar una medición ficticia.
-- El pulsador solo solicita la prueba; la emisión y las comprobaciones se ejecutan desde `loop()`, nunca dentro de la interrupción.
+- El comando `t` recibido por el monitor serie solo solicita la prueba; la emisión y las comprobaciones se ejecutan desde `loop()`.
 
 ## General Rules
 
 - **Programming Language:** C++ para Arduino.
 - **Function/Method Headers:** Cada cabecera debe incluir el diseño lógico en un bloque de comentario delimitado por líneas `--------------------`.
 - **Code Readability:** Código claro y autoexplicativo; comentarios inline mínimos.
-- **Automated Testing:** `test.h` comprueba que el beacon de prueba se inicia y se detiene; se activa con el pulsador D2-GND y se ejecuta desde `loop()`.
+- **Automated Testing:** `test.h` comprueba que el beacon de prueba se inicia y se detiene; se activa enviando `t` por el monitor serie y se ejecuta desde `loop()`.

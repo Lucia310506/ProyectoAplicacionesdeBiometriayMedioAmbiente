@@ -53,21 +53,19 @@ namespace Globales {
 
 }; // namespace
 
-// Pulsador entre D2 y GND; la interrupción solo deja la prueba pendiente.
-constexpr uint8_t PIN_BOTON_TESTS = 2;
+// El comando "t" recibido por el puerto serie solicita la prueba BLE.
 volatile bool pruebasSolicitadas = false;
-volatile unsigned long ultimoFlancoBoton = 0;
 
 // --------------------
-// flanco: Interrupcion --> botonPruebasInterrupcion() -->
-// Registra una pulsación estable para que loop() ejecute la prueba BLE.
+// --> procesarComandoSerial() -->
+// Lee un carácter del puerto serie y deja la prueba pendiente cuando es "t" o "T".
 // --------------------
-// Registra una pulsación y filtra el rebote sin ejecutar pruebas dentro de la ISR.
-void botonPruebasInterrupcion() {
-  const unsigned long ahora = millis();
-  if (ahora - ultimoFlancoBoton >= 250) {
-    pruebasSolicitadas = true;
-    ultimoFlancoBoton = ahora;
+void procesarComandoSerial() {
+  if (Serial.available() > 0) {
+    const char comando = static_cast<char>(Serial.read());
+    if (comando == 't' || comando == 'T') {
+      pruebasSolicitadas = true;
+    }
   }
 }
 
@@ -92,9 +90,8 @@ void inicializarPlaquita () {
 // --------------------
 void setup() {
 
-  pinMode(PIN_BOTON_TESTS, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(PIN_BOTON_TESTS), botonPruebasInterrupcion, FALLING);
   inicializarPlaquita();
+  Globales::elPuerto.escribir("Envía 't' por el monitor serie a 115200 baudios para ejecutar la prueba BLE.\n");
 
   // Suspend Loop() to save power
   Globales::elPublicador.encenderEmisora();
@@ -140,10 +137,9 @@ void loop () {
   using namespace Loop;
   using namespace Globales;
 
-  noInterrupts();
+  procesarComandoSerial();
   const bool ejecutarPruebas = pruebasSolicitadas;
   pruebasSolicitadas = false;
-  interrupts();
 
   cont++;
 

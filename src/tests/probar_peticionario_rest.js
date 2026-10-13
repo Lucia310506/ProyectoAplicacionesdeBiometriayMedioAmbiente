@@ -10,12 +10,18 @@ const fs = require('fs');
 const vm = require('vm');
 const codigo = fs.readFileSync(__dirname + '/../frontend_business_logic/PeticionarioREST.js', 'utf8');
 
+// --------------------
 // condicion: B, mensaje: Text --> comprobar() -->
+// Detiene el caso con un error legible si la condición no se cumple.
+// --------------------
 function comprobar(condicion, mensaje) {
   if (!condicion) throw new Error(mensaje);
 }
 
-// --> probarPeticionarioRest() -->
+// --------------------
+// resultados: Test[] --> probarPeticionarioRest() -->
+// Comprueba la ruta GET, la entrega del JSON y el tratamiento de errores HTTP/red.
+// --------------------
 async function probarPeticionarioRest() {
   let urlRecibida = '';
   const contexto = {

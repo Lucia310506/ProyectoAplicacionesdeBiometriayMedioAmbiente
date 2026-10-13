@@ -6,49 +6,50 @@
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
-//BD: MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]
+//BD: MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]
 require_once __DIR__ . '/../database/ConexionMediciones.php';
 
 // --------------------
-// tipo: Text, valor: R --> guardarMediciones() -->
+// dispositivo_id: Text, tipo: Text, valor: R --> guardarMediciones() -->
 // Valida la medición y la inserta usando una consulta preparada.
 // --------------------
 
-function guardarMediciones(string $tipo, float $valor, ?PDO $conexion = null): void {
+function guardarMediciones(string $dispositivoId, string $tipo, float $valor, string $lugar, ?PDO $conexion = null): void {
+    if ($dispositivoId === '') {
+        throw new InvalidArgumentException('dispositivo_id no puede estar vacío');
+    }
     if (!in_array($tipo, ['CO2', 'TEMPERATURA'], true)) {
         throw new InvalidArgumentException('tipo debe ser CO2 o TEMPERATURA');
     }
     if (!is_finite($valor)) {
         throw new InvalidArgumentException('valor debe ser un número finito');
     }
+    if ($lugar === '') {
+        throw new InvalidArgumentException('lugar no puede estar vacío');
+    }
     $conexion = $conexion ?? conectarBaseDatos(obtenerEntornoBaseDatos());
-    $parametros = ['tipo' => $tipo, 'valor' => $valor];
+    $parametros = ['dispositivo_id' => $dispositivoId, 'tipo' => $tipo, 'valor' => $valor, 'lugar' => $lugar];
     $consultasInsert = [
-        'INSERT INTO mediciones (tipo, valor, fecha) VALUES (:tipo, :valor, NOW())',
-        'INSERT INTO mediciones (Tipo, Valor, Fecha) VALUES (:tipo, :valor, NOW())',
-        'INSERT INTO Mediciones (tipo, valor, fecha) VALUES (:tipo, :valor, NOW())',
-        'INSERT INTO Mediciones (Tipo, Valor, Fecha) VALUES (:tipo, :valor, NOW())',
+        'INSERT INTO mediciones (dispositivo_id, tipo, valor, lugar) VALUES (:dispositivo_id, :tipo, :valor, :lugar)',
+        'INSERT INTO Mediciones (dispositivo_id, Tipo, Valor, Lugar) VALUES (:dispositivo_id, :tipo, :valor, :lugar)',
     ];
     ejecutarPrimeraConsultaValida($conexion, $consultasInsert, $parametros);
 }
 
 // --------------------
-// mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- mostrarMediciones() <--
+// dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R ] <-- mostrarMediciones() <--
 // Lee y normaliza las filas para devolver el contrato compartido.
 // --------------------
 
 function mostrarMediciones(?PDO $conexion = null): array {
     $conexion = $conexion ?? conectarBaseDatos(obtenerEntornoBaseDatos());
     $consultasSelect = [
-        "SELECT id AS id, tipo AS tipo, valor AS valor,
-                DATE_FORMAT(fecha, '%Y-%m-%dT%H:%i:%s') AS fecha
-         FROM mediciones ORDER BY fecha DESC, id DESC",
-        "SELECT Id AS id, Tipo AS tipo, Valor AS valor,
-                DATE_FORMAT(Fecha, '%Y-%m-%dT%H:%i:%s') AS fecha
-         FROM mediciones ORDER BY Fecha DESC, Id DESC",
-        "SELECT Id AS id, Tipo AS tipo, Valor AS valor,
-                DATE_FORMAT(Fecha, '%Y-%m-%dT%H:%i:%s') AS fecha
-         FROM Mediciones ORDER BY Fecha DESC, Id DESC",
+        "SELECT dispositivo_id AS dispositivo_id, tipo AS tipo, valor AS valor, lugar AS lugar,
+                DATE_FORMAT(fecha, '%Y-%m-%dT%H:%i:%s.%f') AS fecha
+         FROM mediciones ORDER BY fecha DESC, dispositivo_id DESC",
+        "SELECT dispositivo_id AS dispositivo_id, Tipo AS tipo, Valor AS valor, Lugar AS lugar,
+                DATE_FORMAT(Fecha, '%Y-%m-%dT%H:%i:%s.%f') AS fecha
+         FROM Mediciones ORDER BY Fecha DESC, dispositivo_id DESC",
     ];
     $filas = ejecutarPrimeraConsultaValida($conexion, $consultasSelect, null);
     $mediciones = [];
@@ -78,15 +79,16 @@ function ejecutarPrimeraConsultaValida(PDO $conexion, array $consultas, ?array $
 }
 
 // --------------------
-// fila: Dict --> normalizarFilaMedicion() --> (id: N, tipo: Text, valor: R, fecha: DateTime)
+// fila: Dict --> normalizarFilaMedicion() --> (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R)
 // Normaliza tipos y nombres de columna antes de entregar una medición.
 // --------------------
 
 function normalizarFilaMedicion(array $fila): array {
     return [
-        'id' => (int) ($fila['id'] ?? $fila['Id'] ?? 0),
+        'dispositivo_id' => (string) ($fila['dispositivo_id'] ?? $fila['Dispositivo_Id'] ?? $fila['Dispositivo_id'] ?? ''),
         'tipo' => (string) ($fila['tipo'] ?? $fila['Tipo'] ?? ''),
         'valor' => (float) ($fila['valor'] ?? $fila['Valor'] ?? 0),
+        'lugar' => (string) ($fila['lugar'] ?? $fila['Lugar'] ?? 'Ubicación no disponible'),
         'fecha' => (string) ($fila['fecha'] ?? $fila['Fecha'] ?? ''),
     ];
 }

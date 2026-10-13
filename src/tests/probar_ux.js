@@ -11,12 +11,18 @@ const vm = require('vm');
 const codigo = fs.readFileSync(__dirname + '/../gui/Aplicacion.js', 'utf8');
 const codigoLogica = fs.readFileSync(__dirname + '/../frontend_business_logic/LogicaFake.js', 'utf8');
 
+// --------------------
 // condicion: B, mensaje: Text --> comprobar() -->
+// Detiene el caso con un error legible si la condición no se cumple.
+// --------------------
 function comprobar(condicion, mensaje) {
   if (!condicion) throw new Error(mensaje);
 }
 
+// --------------------
 // html: Text --> crearDocumento() --> Documento
+// Crea el DOM mínimo para probar carga y renderizado sin navegador.
+// --------------------
 function crearDocumento() {
   const estado = { textContent: 'Cargando mediciones...', className: '' };
   const cuerpo = {
@@ -44,7 +50,10 @@ function crearDocumento() {
   };
 }
 
+// --------------------
 // --> probarUx() -->
+// Comprueba carga, representación, recuento y propagación de error.
+// --------------------
 async function probarUx() {
   const documento = crearDocumento();
   let medicionesSimuladas = [];
@@ -69,7 +78,7 @@ async function probarUx() {
   comprobar(documento.estado.textContent.includes('No hay mediciones'), 'Lista vacía visible');
 
   medicionesSimuladas = [
-    { id: 1, tipo: 'CO2', valor: 500, fecha: '2026-09-25T10:30:00' }
+    { dispositivo_id: 'TEST', tipo: 'CO2', valor: 500, lugar: 'Murcia', fecha: '2026-09-25T10:30:00' }
   ];
   await contexto.actualizarMediciones();
   comprobar(documento.cuerpo.hijos.length === 1, 'Debe renderizar las filas del GET');

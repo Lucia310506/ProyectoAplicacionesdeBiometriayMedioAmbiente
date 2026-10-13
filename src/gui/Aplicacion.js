@@ -49,16 +49,22 @@ function dibujarLista(mediciones) {
   ultimas.forEach((medicion) => {
     const fila = document.createElement('tr');
 
+    const celdaDispositivo = document.createElement('td');
     const celdaTipo = document.createElement('td');
     const celdaValor = document.createElement('td');
+    const celdaLugar = document.createElement('td');
     const celdaFecha = document.createElement('td');
 
+    celdaDispositivo.textContent = String(medicion.dispositivo_id ?? medicion.dispositivo ?? '');
     celdaTipo.textContent = String(medicion.tipo);
     celdaValor.textContent = String(medicion.valor);
+    celdaLugar.textContent = String(medicion.lugar ?? 'Ubicación no disponible');
     celdaFecha.textContent = String(medicion.fecha);
 
+    fila.appendChild(celdaDispositivo);
     fila.appendChild(celdaTipo);
     fila.appendChild(celdaValor);
+    fila.appendChild(celdaLugar);
     fila.appendChild(celdaFecha);
 
     cuerpo.appendChild(fila);
@@ -73,7 +79,7 @@ function dibujarLista(mediciones) {
 async function actualizarMediciones() {
   try {
     mostrarEstado('Cargando mediciones...', 'carga');
-    const mediciones = await window.mostrarMediciones();
+    const mediciones = await mostrarMediciones();
     dibujarLista(mediciones);
     if (mediciones.length > 0) {
       mostrarEstado(`Actualizado: ${mediciones.length} mediciones.`, 'ok');

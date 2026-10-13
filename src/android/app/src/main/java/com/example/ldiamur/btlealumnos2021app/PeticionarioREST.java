@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import org.json.JSONObject;
 
@@ -82,27 +83,39 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> crearCuerpoMedicion() --> JSON
-     * Construye el cuerpo del contrato POST sin campos adicionales.
+     * dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> crearCuerpoMedicion() --> JSON
+     * Construye el cuerpo del contrato POST con el identificador y el lugar elegidos por la app.
      * --------------------
      */
-    static String crearCuerpoMedicion(String tipo, double valor) throws Exception {
+    static String crearCuerpoMedicion(String dispositivoId, String tipo, double valor, String lugar) throws Exception {
         JSONObject cuerpo = new JSONObject();
+        cuerpo.put("dispositivo_id", dispositivoId);
         cuerpo.put("tipo", tipo);
         cuerpo.put("valor", valor);
+        cuerpo.put("lugar", lugar);
         return cuerpo.toString();
     }
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> enviarMedicion()
-     * Forma el JSON y envía una medición al endpoint REST.
+     * --> obtenerLugarMedicion() --> Text
+     * Lugar decidido por la app para las mediciones que envía.
      * --------------------
      */
-    public static void enviarMedicion(String tipo, double valor) {
+    public static String obtenerLugarMedicion() {
+        return "Murcia";
+    }
+
+    /*
+     * --------------------
+     * dispositivo_id: Text, tipo: Text, valor: R --> enviarMedicion()
+     * Forma el JSON y envía una medición al endpoint REST con el identificador del sensor BLE.
+     * --------------------
+     */
+    public static void enviarMedicion(String dispositivoId, String tipo, double valor) {
         try {
             new PeticionarioREST().hacerPeticionREST(
-                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(tipo, valor),
+                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(dispositivoId, tipo, valor, obtenerLugarMedicion()),
                     (codigo, respuesta) -> {
                         if (codigo == 201) {
                             Log.i("clienterestandroid", "OK: POST /mediciones respondió HTTP 201");

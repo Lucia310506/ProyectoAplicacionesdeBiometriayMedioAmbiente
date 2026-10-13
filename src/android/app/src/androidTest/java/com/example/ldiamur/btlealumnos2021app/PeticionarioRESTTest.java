@@ -1,6 +1,8 @@
 /*
+ * --------------------
  * Fichero: PeticionarioRESTTest.java
  * Descripción: Comprueba el cliente REST Android contra un servidor HTTP local.
+ * --------------------
  */
 package com.example.ldiamur.btlealumnos2021app;
 
@@ -32,7 +34,11 @@ public class PeticionarioRESTTest {
     private final MockWebServer servidor = new MockWebServer();
     private String urlOriginal;
 
-    /* Inicia el servidor local y dirige temporalmente el cliente hacia él. */
+    /*
+     * --------------------
+     * Inicia el servidor local y dirige temporalmente el cliente hacia él.
+     * --------------------
+     */
     @Before
     public void preparar() throws Exception {
         servidor.start();
@@ -40,14 +46,22 @@ public class PeticionarioRESTTest {
         ConfiguracionRest.URL_MEDICIONES = servidor.url("/mediciones").toString();
     }
 
-    /* Recupera la URL de la aplicación y apaga el servidor tras cada caso. */
+    /*
+     * --------------------
+     * Recupera la URL de la aplicación y apaga el servidor tras cada caso.
+     * --------------------
+     */
     @After
     public void restaurar() throws Exception {
         ConfiguracionRest.URL_MEDICIONES = urlOriginal;
         servidor.shutdown();
     }
 
-    /* Comprueba que GET usa la ruta correcta y entrega el JSON recibido. */
+    /*
+     * --------------------
+     * Comprueba que GET usa la ruta correcta y entrega el JSON recibido.
+     * --------------------
+     */
     @Test
     public void getDevuelveLasMedicionesDelServidor() throws Exception {
         servidor.enqueue(new MockResponse()
@@ -65,7 +79,11 @@ public class PeticionarioRESTTest {
         assertEquals("[{\"id\":7,\"tipo\":\"CO2\",\"valor\":500,\"fecha\":\"2026-10-09T10:00:00\"}]", respuesta.cuerpo);
     }
 
-    /* Comprueba que POST envía solo tipo y valor y recibe HTTP 201. */
+    /*
+     * --------------------
+     * Comprueba que POST envía solo tipo y valor y recibe HTTP 201.
+     * --------------------
+     */
     @Test
     public void postEnviaTipoYValorYRecibe201() throws Exception {
         servidor.enqueue(new MockResponse()
@@ -73,7 +91,7 @@ public class PeticionarioRESTTest {
                 .setHeader("Content-Type", "application/json")
                 .setBody("{\"resultado\":\"guardada\"}"));
 
-        String cuerpo = PeticionarioREST.crearCuerpoMedicion("CO2", 500.0);
+        String cuerpo = PeticionarioREST.crearCuerpoMedicion("TEST-ANDROID", "CO2", 500.0, "Murcia");
         Respuesta respuesta = ejecutar("POST", cuerpo);
         RecordedRequest peticion = servidor.takeRequest(1, TimeUnit.SECONDS);
 
@@ -81,14 +99,20 @@ public class PeticionarioRESTTest {
         assertEquals("POST", peticion.getMethod());
         assertEquals("/mediciones", peticion.getPath());
         JSONObject jsonEnviado = new JSONObject(peticion.getBody().readUtf8());
-        assertEquals(2, jsonEnviado.length());
+        assertEquals(4, jsonEnviado.length());
+        assertEquals("TEST-ANDROID", jsonEnviado.getString("dispositivo_id"));
         assertEquals("CO2", jsonEnviado.getString("tipo"));
         assertEquals(500.0, jsonEnviado.getDouble("valor"), 0.0);
+        assertEquals("Murcia", jsonEnviado.getString("lugar"));
         assertEquals(201, respuesta.codigo);
         assertEquals("{\"resultado\":\"guardada\"}", respuesta.cuerpo);
     }
 
-    /* Ejecuta AsyncTask en UI y espera el callback principal sin bloquearlo. */
+    /*
+     * --------------------
+     * Ejecuta AsyncTask en UI y espera el callback principal sin bloquearlo.
+     * --------------------
+     */
     private Respuesta ejecutar(String metodo, String cuerpo) throws Exception {
         CountDownLatch finalizada = new CountDownLatch(1);
         AtomicReference<Respuesta> resultado = new AtomicReference<>();

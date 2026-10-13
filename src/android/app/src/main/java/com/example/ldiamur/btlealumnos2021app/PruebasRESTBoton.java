@@ -105,7 +105,7 @@ public final class PruebasRESTBoton {
             conexion[0] = new ConexionFalsa(URL_MEDICIONES(), 201, "{\"resultado\":\"guardada\"}");
             String cuerpo;
             try {
-                cuerpo = PeticionarioREST.crearCuerpoMedicion("CO2", 500.0);
+                cuerpo = PeticionarioREST.crearCuerpoMedicion("TEST-BOTON", "CO2", 500.0, "Murcia");
             } catch (Exception error) {
                 comprobar("POST crea el JSON esperado", () -> { throw new IllegalStateException(error); }, this);
                 probarErrorHttp();
@@ -119,8 +119,11 @@ public final class PruebasRESTBoton {
                             exigir("POST".equals(conexion[0].getRequestMethod()), "Método POST incorrecto");
                             JSONObject json = new JSONObject(new String(
                                     conexion[0].cuerpoEnviado.toByteArray(), StandardCharsets.UTF_8));
-                            exigir(json.length() == 2 && "CO2".equals(json.getString("tipo"))
-                                    && json.getDouble("valor") == 500.0, "El JSON debe incluir tipo y valor");
+                            exigir(json.length() == 4
+                                    && "TEST-BOTON".equals(json.getString("dispositivo_id"))
+                                    && "CO2".equals(json.getString("tipo"))
+                                    && json.getDouble("valor") == 500.0
+                                    && "Murcia".equals(json.getString("lugar")), "El JSON debe incluir dispositivo_id, tipo, valor y lugar");
                         }, this);
                         probarErrorHttp();
                     });

@@ -5,7 +5,7 @@
 # Copyright (c) 2026 Lucía Díaz Murcia
 
 # Document root = httpdocs (no cambiar)
-DirectoryIndex src/ux/Aplicacion.html
+DirectoryIndex src/gui/Aplicacion.html
 
 RewriteEngine On
 RewriteRule ^mediciones/?$ src/communication/mediciones.php [L,QSA]

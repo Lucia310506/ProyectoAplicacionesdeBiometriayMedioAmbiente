@@ -8,7 +8,7 @@ El sistema está formado por firmware BLE, aplicación Android, API REST PHP, l�
 
 - Firmware → Android: trama iBeacon con tipo/contador en Major y valor en Minor.
 - Android → API: POST JSON `{ "tipo": Text, "valor": R }`.
-- Web → API: GET JSON `[ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`.
+- Web → API: GET JSON `[ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`.
 - API → lógica → conexión PDO → base MySQL.
 
 ### Vista general de arquitectura
