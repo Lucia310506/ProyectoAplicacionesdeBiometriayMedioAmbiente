@@ -28,13 +28,13 @@ function probarRest(): void {
         $conexion->exec('DELETE FROM mediciones');
         comprobarRest((int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0,
             'La tabla de pruebas debe empezar vacía');
-        [$codigoPost, $respuestaPost] = atenderMediciones('POST', '{"tipo":"CO2","valor":500}');
+        [$codigoPost, $respuestaPost] = atenderMediciones('POST', '{"dispositivo_id":"TEST-REST","tipo":"CO2","valor":500,"lugar":"Murcia"}');
         comprobarRest($codigoPost === 201 && $respuestaPost['resultado'] === 'medición guardada', 'POST debe crear');
         [$codigoGet, $respuestaGet] = atenderMediciones('GET', '');
         comprobarRest($codigoGet === 200 && count($respuestaGet) === 1, 'GET debe devolver la medición');
         comprobarRest($respuestaGet[0]['tipo'] === 'CO2'
             && (float) $respuestaGet[0]['valor'] === 500.0
-            && !empty($respuestaGet[0]['id'])
+            && $respuestaGet[0]['dispositivo_id'] === 'TEST-REST'
             && !empty($respuestaGet[0]['fecha']),
             'GET debe devolver id, tipo, valor y fecha de CO2');
         echo "OK: pruebas REST superadas\n";

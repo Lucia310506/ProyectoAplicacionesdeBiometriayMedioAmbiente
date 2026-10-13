@@ -12,13 +12,13 @@ La lógica opera sobre la tabla definida en `database_design.md`:
 
 ```text
 TABLE mediciones
-  id: INT, NOT NULL, AUTO_INCREMENT, PRIMARY KEY
+  dispositivo_id: VARCHAR(64), NOT NULL, PRIMARY KEY compuesto
+  fecha: DATETIME(6), NOT NULL, DEFAULT CURRENT_TIMESTAMP(6), PRIMARY KEY compuesto
   tipo: ENUM('CO2', 'TEMPERATURA'), NOT NULL
   valor: DOUBLE, NOT NULL
-  fecha: DATETIME, NOT NULL, DEFAULT CURRENT_TIMESTAMP
 ```
 
-`Medicion = (id: N, tipo: Text, valor: R, fecha: DateTime)` y `Mediciones = [ Medicion ]`. La entrada de alta es `(tipo, valor)`; MySQL asigna `id` y `fecha`.
+`Medicion = (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R)` y `Mediciones = [ Medicion ]`. La entrada de alta es `(dispositivo_id, tipo, valor)`; MySQL asigna `fecha`.
 
 Para describir persistencia sin introducir tipos PDO en el contrato lógico se usan estos alias abstractos: `BaseDatos` (acceso a persistencia), `Consulta = Text`, `Parametro = Text | Z | R | B` y `Fila = Medicion`.
 
@@ -27,7 +27,7 @@ Para describir persistencia sin introducir tipos PDO en el contrato lógico se u
 La implementación actual es un archivo de funciones PHP globales, no una clase. No mantiene estado de instancia. Depende de las funciones de conexión de `ConexionMediciones.php`.
 
 ```text
-tipo: Text, valor: R --> guardarMediciones() -->
+dispositivo_id: Text, tipo: Text, valor: R --> guardarMediciones() -->
 
 bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]
 
@@ -40,7 +40,7 @@ Mediciones <-- mostrarMediciones() <--
 
 | Función | Diseño lógico | Responsabilidad |
 |---|---|---|
-| `guardarMediciones(tipo: Text, valor: R)` | `tipo: Text, valor: R --> guardarMediciones() -->` | Rechaza tipos distintos de CO2/TEMPERATURA y valores no finitos; inserta de forma parametrizada en `mediciones`. No devuelve dato. |
+| `guardarMediciones(dispositivo_id: Text, tipo: Text, valor: R)` | `dispositivo_id: Text, dispositivo_id: Text, tipo: Text, valor: R --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA y valores no finitos; inserta de forma parametrizada en `mediciones`. No devuelve dato. |
 | `mostrarMediciones()` | `--> mostrarMediciones() --> [Medicion]` | Lee todas las filas, ordenadas de más reciente a más antigua, y las normaliza. |
 | `ejecutarPrimeraConsultaValida(bd: BaseDatos, consultas: [Consulta], parametros: [Parametro])` | `bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]` | Detalle interno de persistencia: ejecuta consultas candidatas en orden; devuelve filas para lectura o lista vacía en alta; comunica fallo para que la capa externa lo maneje. `PDO` y `PDOException` son detalles de implementación, no tipos del diseño lógico. |
 | `normalizarFilaMedicion(fila: Fila)` | `fila: Fila --> normalizarFilaMedicion() --> Medicion` | Convierte columnas a los tipos estables del contrato (`id`, `tipo`, `valor`, `fecha`). |

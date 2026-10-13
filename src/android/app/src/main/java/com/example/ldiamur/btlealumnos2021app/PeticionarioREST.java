@@ -16,6 +16,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import org.json.JSONObject;
 
@@ -82,27 +83,39 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> crearCuerpoMedicion() --> JSON
-     * Construye el cuerpo del contrato POST sin campos adicionales.
+     * dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> crearCuerpoMedicion() --> JSON
+     * Construye el cuerpo del contrato POST con el identificador y el lugar elegidos por la app.
      * --------------------
      */
-    static String crearCuerpoMedicion(String tipo, double valor) throws Exception {
+    static String crearCuerpoMedicion(String dispositivoId, String tipo, double valor, String lugar) throws Exception {
         JSONObject cuerpo = new JSONObject();
+        cuerpo.put("dispositivo_id", dispositivoId);
         cuerpo.put("tipo", tipo);
         cuerpo.put("valor", valor);
+        cuerpo.put("lugar", lugar);
         return cuerpo.toString();
     }
 
     /*
      * --------------------
+     * --> obtenerLugarMedicion() --> Text
+     * Lugar decidido por la app para las mediciones que envía.
+     * --------------------
+     */
+    public static String obtenerLugarMedicion() {
+        return "Murcia";
+    }
+
+    /*
+     * --------------------
      * tipo: Text, valor: R --> enviarMedicion()
-     * Forma el JSON y envía una medición al endpoint REST.
+     * Forma el JSON y envía una medición al endpoint REST incluyendo el dispositivo.
      * --------------------
      */
     public static void enviarMedicion(String tipo, double valor) {
         try {
             new PeticionarioREST().hacerPeticionREST(
-                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(tipo, valor),
+                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(obtenerDispositivoId(), tipo, valor, obtenerLugarMedicion()),
                     (codigo, respuesta) -> {
                         if (codigo == 201) {
                             Log.i("clienterestandroid", "OK: POST /mediciones respondió HTTP 201");
@@ -192,6 +205,20 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         }
 
         return false;
+    }
+
+    /*
+     * --------------------
+     * --> obtenerDispositivoId() --> Text
+     * Obtiene un identificador estable del dispositivo que envía la medición.
+     * --------------------
+     */
+    private static String obtenerDispositivoId() {
+        String serial = Build.SERIAL == null ? "" : Build.SERIAL;
+        if (serial.trim().isEmpty() || "unknown".equalsIgnoreCase(serial)) {
+            serial = Build.MODEL == null ? "dispositivo" : Build.MODEL;
+        }
+        return serial.replace(" ", "_");
     }
 
     @Override

@@ -2,7 +2,7 @@
 
 ## Component Design
 
-`MEDICIONES = [ (id: N, tipo: Text, valor: R, fecha: DateTime) ]`
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]`
 
 ====================================================================================
 TABLE: mediciones
@@ -10,12 +10,12 @@ DESCRIPTION: Almacena las mediciones ambientales recibidas.
 
 COLUMNS:
 
-+ id | INT | NOT NULL | Auto-Increment
++ dispositivo_id | VARCHAR(64) | NOT NULL
++ fecha | DATETIME(6) | NOT NULL | CURRENT_TIMESTAMP(6)
 + tipo | ENUM('CO2', 'TEMPERATURA') | NOT NULL
 + valor | DOUBLE | NOT NULL
-+ fecha | DATETIME | NOT NULL | CURRENT_TIMESTAMP
 
-PRIMARY KEY: id
+PRIMARY KEY: (dispositivo_id, fecha)
 
 FOREIGN KEYS:
 
@@ -23,8 +23,9 @@ FOREIGN KEYS:
 
 CONSTRAINTS:
 
-+ El servidor recibe tipo y valor; genera id y fecha.
++ El servidor recibe dispositivo_id, tipo y valor; genera la fecha con microsegundos.
 + tipo solo puede ser CO2 o TEMPERATURA.
++ La combinación dispositivo_id + fecha identifica la medición.
 ====================================================================================
 
 ### Diseño global de la base de datos
@@ -33,13 +34,13 @@ La base de datos no define una clase global ni funciones propias: el objeto pers
 
 ```text
 ┌────────────────────────────── mediciones ───────────────────────────────┐
-│ id: INT, clave primaria, autoincremental                                  │
+│ dispositivo_id: VARCHAR(64), clave primaria compuesta                      │
+│ fecha: DATETIME(6), clave primaria compuesta, DEFAULT CURRENT_TIMESTAMP(6)│
 │ tipo: ENUM('CO2', 'TEMPERATURA'), obligatorio                             │
 │ valor: DOUBLE, obligatorio                                                │
-│ fecha: DATETIME, obligatorio, DEFAULT CURRENT_TIMESTAMP                   │
 └──────────────────────────────────────────────────────────────────────────┘
-Alta: (tipo, valor) → INSERT; la BD genera id y fecha.
-Lectura: SELECT → mediciones ordenadas por fecha e id descendentes.
+Alta: (dispositivo_id, tipo, valor) → INSERT; la BD genera la fecha.
+Lectura: SELECT → mediciones ordenadas por fecha y dispositivo_id descendentes.
 ```
 
 | Operación | Diseño lógico | Qué hace |
@@ -57,19 +58,19 @@ Lectura: SELECT → mediciones ordenadas por fecha e id descendentes.
 | `valor` | `DOUBLE` | `NOT NULL` | Recibido como número y validado como finito por lógica PHP. |
 | `fecha` | `DATETIME` | `NOT NULL`, default `CURRENT_TIMESTAMP` | Asignada por MySQL en la creación de la fila. |
 
-La tabla usa InnoDB y `utf8mb4`. No hay relaciones con otras tablas ni claves foráneas. El índice explícito es la clave primaria `id`; no se declara un índice adicional en el esquema actual.
+La tabla usa InnoDB y `utf8mb4`. No hay relaciones con otras tablas ni claves foráneas. El índice explícito es la clave primaria compuesta `(dispositivo_id, fecha)`.
 
 ### Ciclo de vida de una fila
 
-1. La entrada HTTP aporta `tipo` y `valor`; no se aceptan `id` ni `fecha` como campos de alta.
-2. La validación de negocio limita el conjunto de tipos y rechaza valores no finitos.
-3. El INSERT parametrizado almacena la medición y la BD genera identificador y fecha.
-4. El SELECT convierte fecha a formato ISO de fecha/hora y ordena fecha e id en orden descendente.
+1. La entrada HTTP aporta `dispositivo_id`, `tipo` y `valor`; no se acepta `fecha` como campo de alta.
+2. La validación de negocio limita el conjunto de tipos y rechaza valores no finitos y dispositivos vacíos.
+3. El INSERT parametrizado almacena la medición y la BD genera la fecha con microsegundos.
+4. El SELECT convierte fecha a formato ISO de fecha/hora y ordena fecha y dispositivo_id en orden descendente.
 5. `normalizarFilaMedicion()` entrega al REST una representación estable aunque MySQL devuelva variaciones de mayúsculas en los nombres de columnas.
 
 ## Design Clarifications
 
-- No se crea una clase `Medicion`; los datos se manejan directamente con tipo y valor. La estructura SQL existente usa MySQL `ENUM` para restringir el tipo.
+- No se crea una clase `Medicion`; los datos se manejan directamente con dispositivo, tipo y valor. La estructura SQL existente usa MySQL `ENUM` para restringir el tipo.
 
 ## General Rules
 

@@ -51,14 +51,17 @@ function dibujarLista(mediciones) {
 
     const celdaTipo = document.createElement('td');
     const celdaValor = document.createElement('td');
+    const celdaLugar = document.createElement('td');
     const celdaFecha = document.createElement('td');
 
     celdaTipo.textContent = String(medicion.tipo);
     celdaValor.textContent = String(medicion.valor);
+    celdaLugar.textContent = String(medicion.lugar ?? 'Murcia');
     celdaFecha.textContent = String(medicion.fecha);
 
     fila.appendChild(celdaTipo);
     fila.appendChild(celdaValor);
+    fila.appendChild(celdaLugar);
     fila.appendChild(celdaFecha);
 
     cuerpo.appendChild(fila);

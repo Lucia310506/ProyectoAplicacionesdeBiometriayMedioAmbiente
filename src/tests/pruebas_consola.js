@@ -27,7 +27,10 @@
     };
   }
 
-  // Ensure global functions are available (wait if needed)
+  // --------------------
+  // --> ensureGlobals() -->
+  // Espera a que las funciones globales de medición estén disponibles.
+  // --------------------
   async function ensureGlobals() {
     if (typeof window.pedirMediciones === 'function' && typeof window.mostrarMediciones === 'function') {
       return;

@@ -81,7 +81,7 @@ async function probarUx() {
   comprobar(documento.estado.textContent.includes('No hay mediciones'), 'Lista vacía visible');
 
   medicionesSimuladas = [
-    { id: 1, tipo: 'CO2', valor: 500, fecha: '2026-09-25T10:30:00' }
+    { dispositivo_id: 'TEST', tipo: 'CO2', valor: 500, lugar: 'Murcia', fecha: '2026-09-25T10:30:00' }
   ];
   await contexto.actualizarMediciones();
   comprobar(documento.cuerpo.hijos.length === 1, 'Debe renderizar las filas del GET');

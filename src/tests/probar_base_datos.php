@@ -27,8 +27,8 @@ function probarBaseDatos(): void {
         $conexion->exec('DELETE FROM mediciones');
         comprobar((int) $conexion->query('SELECT COUNT(*) FROM mediciones')->fetchColumn() === 0,
             'La tabla de pruebas debe empezar vacía');
-        guardarMediciones('CO2', 500);
-        guardarMediciones('TEMPERATURA', -19);
+        guardarMediciones('DISP-CO2', 'CO2', 500, 'Murcia');
+        guardarMediciones('DISP-TEMPERATURA', 'TEMPERATURA', -19, 'Murcia');
         $mediciones = mostrarMediciones();
         comprobar(count($mediciones) === 2, 'Deben existir dos mediciones');
         $porTipo = []; foreach ($mediciones as $medicion) { $porTipo[$medicion['tipo']] = $medicion; }

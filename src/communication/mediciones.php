@@ -22,10 +22,12 @@ function atenderMediciones(string $metodo, string $cuerpo): array {
         }
         if ($metodo === 'POST') {
             $datos = json_decode($cuerpo, true);
-            if (!is_array($datos) || !isset($datos['tipo']) || !isset($datos['valor']) || !is_numeric($datos['valor'])) {
-                return [400, ['error' => 'Se requieren tipo y valor numérico']];
+            if (!is_array($datos) || !isset($datos['dispositivo_id']) || (string) $datos['dispositivo_id'] === ''
+                || !isset($datos['tipo']) || !isset($datos['valor']) || !is_numeric($datos['valor'])
+                || !isset($datos['lugar']) || (string) $datos['lugar'] === '') {
+                return [400, ['error' => 'Se requieren dispositivo_id, tipo, valor numérico y lugar']];
             }
-            guardarMediciones((string) $datos['tipo'], (float) $datos['valor']);
+            guardarMediciones((string) $datos['dispositivo_id'], (string) $datos['tipo'], (float) $datos['valor'], (string) $datos['lugar']);
             return [201, ['resultado' => 'medición guardada']];
         }
         if ($metodo === 'GET') {

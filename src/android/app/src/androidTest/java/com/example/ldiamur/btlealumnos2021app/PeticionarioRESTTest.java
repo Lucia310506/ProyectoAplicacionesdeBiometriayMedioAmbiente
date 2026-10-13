@@ -91,7 +91,7 @@ public class PeticionarioRESTTest {
                 .setHeader("Content-Type", "application/json")
                 .setBody("{\"resultado\":\"guardada\"}"));
 
-        String cuerpo = PeticionarioREST.crearCuerpoMedicion("CO2", 500.0);
+        String cuerpo = PeticionarioREST.crearCuerpoMedicion("TEST-ANDROID", "CO2", 500.0, "Murcia");
         Respuesta respuesta = ejecutar("POST", cuerpo);
         RecordedRequest peticion = servidor.takeRequest(1, TimeUnit.SECONDS);
 
@@ -99,9 +99,11 @@ public class PeticionarioRESTTest {
         assertEquals("POST", peticion.getMethod());
         assertEquals("/mediciones", peticion.getPath());
         JSONObject jsonEnviado = new JSONObject(peticion.getBody().readUtf8());
-        assertEquals(2, jsonEnviado.length());
+        assertEquals(4, jsonEnviado.length());
+        assertEquals("TEST-ANDROID", jsonEnviado.getString("dispositivo_id"));
         assertEquals("CO2", jsonEnviado.getString("tipo"));
         assertEquals(500.0, jsonEnviado.getDouble("valor"), 0.0);
+        assertEquals("Murcia", jsonEnviado.getString("lugar"));
         assertEquals(201, respuesta.codigo);
         assertEquals("{\"resultado\":\"guardada\"}", respuesta.cuerpo);
     }

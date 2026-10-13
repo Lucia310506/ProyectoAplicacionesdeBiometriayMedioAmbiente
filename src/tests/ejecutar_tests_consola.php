@@ -86,34 +86,35 @@ try {
         // 1. SUBIR
         $tipo = 'TEMPERATURA';
         $valor = -5.0;
-        guardarMediciones($tipo, $valor, $conexion);
+        guardarMediciones('TEST-CRUD', $tipo, $valor, 'Murcia', $conexion);
 
         // 2. MOSTRAR (buscar la que acabamos de subir)
         $mediciones = mostrarMediciones($conexion);
         $encontrada = null;
         foreach ($mediciones as $m) {
-            if ($m['tipo'] === $tipo && (float)$m['valor'] === $valor) {
+            if ($m['dispositivo_id'] === 'TEST-CRUD' && $m['tipo'] === $tipo && (float)$m['valor'] === $valor) {
                 $encontrada = $m;
                 break;
             }
         }
         $comprobar($encontrada !== null, 'No se encontró la muestra subida');
-        $id = $encontrada['id'];
-        $comprobar(!empty($id), 'Falta id');
-        $comprobar(!empty($encontrada['fecha']), 'Falta fecha');
+        $dispositivo = $encontrada['dispositivo_id'];
+        $fecha = $encontrada['fecha'];
+        $comprobar(!empty($dispositivo), 'Falta dispositivo_id');
+        $comprobar(!empty($fecha), 'Falta fecha');
         $comprobar($encontrada['tipo'] === $tipo, 'Tipo no coincide');
         $comprobar((float)$encontrada['valor'] === $valor, 'Valor no coincide');
 
         // 3. BORRAR
-        $stmt = $conexion->prepare('DELETE FROM mediciones WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $stmt = $conexion->prepare('DELETE FROM mediciones WHERE dispositivo_id = :dispositivo_id');
+        $stmt->execute(['dispositivo_id' => $dispositivo]);
         $comprobar($stmt->rowCount() === 1, 'No se borró la fila (rowCount !== 1)');
 
         // 4. VERIFICAR QUE YA NO EXISTE
         $mediciones2 = mostrarMediciones($conexion);
         $existe = false;
         foreach ($mediciones2 as $m) {
-            if ((int)$m['id'] === (int)$id) {
+            if ($m['dispositivo_id'] === $dispositivo) {
                 $existe = true;
                 break;
             }
@@ -123,7 +124,7 @@ try {
 
     $agregarResultado('logica', 'Lógica rechaza tipos no admitidos', static function (): void {
         try {
-            guardarMediciones('HUMEDAD', 50.0);
+            guardarMediciones('TEST-LOGICA', 'HUMEDAD', 50.0, 'Murcia');
         } catch (InvalidArgumentException $esperado) {
             return;
         }
@@ -132,13 +133,13 @@ try {
 
     $agregarResultado('rest', 'POST /mediciones devuelve 201 y GET devuelve el alta', static function () use ($conexion, $comprobar): void {
         $valor = 501.0;
-        [$codigoPost] = atenderMediciones('POST', json_encode(['tipo' => 'CO2', 'valor' => $valor]));
+        [$codigoPost] = atenderMediciones('POST', json_encode(['dispositivo_id' => 'TEST-REST', 'tipo' => 'CO2', 'valor' => $valor, 'lugar' => 'Murcia']));
         $comprobar($codigoPost === 201, 'POST /mediciones debe responder 201');
         [$codigoGet, $respuestaGet] = atenderMediciones('GET', '');
         $comprobar($codigoGet === 200 && is_array($respuestaGet), 'GET /mediciones debe responder una lista');
         $encontrada = false;
         foreach ($respuestaGet as $medicion) {
-            if ($medicion['tipo'] === 'CO2' && (float) $medicion['valor'] === $valor) {
+            if ($medicion['dispositivo_id'] === 'TEST-REST' && $medicion['tipo'] === 'CO2' && (float) $medicion['valor'] === $valor) {
                 $encontrada = true;
                 break;
             }
@@ -154,8 +155,8 @@ try {
             $conexion->commit();
             $transaccionIniciada = false;
             
-            // Limpieza explícita de mediciones de prueba (valores usados en tests)
-            $stmt = $conexion->prepare('DELETE FROM mediciones WHERE valor IN (501.0, -5.0)');
+            // Limpieza explícita de mediciones de prueba generadas por la batería
+            $stmt = $conexion->prepare("DELETE FROM mediciones WHERE dispositivo_id LIKE 'TEST-%' OR dispositivo_id LIKE 'DISP-%'");
             $stmt->execute();
             $borradas = $stmt->rowCount();
             $tests[] = ['grupo' => 'baseDatos', 'nombre' => "Limpieza: {$borradas} mediciones de prueba borradas", 'estado' => 'OK'];
