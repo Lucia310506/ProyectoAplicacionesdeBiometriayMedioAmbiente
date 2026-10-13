@@ -70,7 +70,7 @@ Botón → MainActivity.botonEjecutarTestsPulsado()
 | Android lógica | Botón de pruebas Android | CO2 y temperatura válidos; tipo inválido; `NaN`. | Logcat con tags `TESTS_APP` y `TEST_LOGICAFake`. | No accede a la BD. |
 | Android REST | Parte del mismo botón | GET, ruta/método/JSON, POST con HTTP 201 y HTTP 500. | Logcat con `TEST_PETICIONARIO_REST` y resumen en `TESTS_APP`. | Transporte simulado; no accede al servidor. |
 | Android beacon de prueba | Botón **Buscar beacon de prueba** | UUID de proyecto, prefijo iBeacon, Major con tipo 14 y Minor `0x5A3C`; búsqueda con tiempo límite. | Estado visible en la pantalla y Logcat con `TEST_BEACON`. | Solo observa BLE; no llama a lógica de mediciones ni a REST. |
-| Arduino BLE | Pulsador D2-GND; `loop()` consume la solicitud | Beacon `PRUEBA=14`, valor centinela, publicidad activa y detención posterior. | Monitor serie a 115200 baudios; beacon visible tres segundos para escaneo externo. | Android descarta el tipo de prueba; no llega a REST ni a la base de datos. |
+| Arduino BLE | Comando `t` por monitor serie; `loop()` consume la solicitud | Beacon `PRUEBA=14`, valor centinela, publicidad activa y detención posterior. | Monitor serie a 115200 baudios; beacon visible tres segundos para escaneo externo. | Android descarta el tipo de prueba; no llega a REST ni a la base de datos. |
 
 ### Orden de una ejecución web
 
@@ -88,12 +88,12 @@ Botón → MainActivity.botonEjecutarTestsPulsado()
 - Si falta conexión/configuración PHP, los casos de lógica, REST o BD se registran como error; los casos JavaScript simulados pueden seguir siendo útiles.
 - Las pruebas Android del botón usan `HttpURLConnection` simulado, sin depender de la disponibilidad de la API.
 - `PeticionarioRESTTest` es una prueba instrumentada independiente que usa `MockWebServer` local para verificar GET, POST, URL, cuerpo JSON y callback. Se ejecuta desde Android Studio o con `:app:connectedDebugAndroidTest` cuando hay un dispositivo o emulador conectado.
-- `test.h` emite un beacon real `PRUEBA=14` durante tres segundos, verifica que la publicidad BLE se inicia y se detiene y presenta el resultado por Serial. La ISR solo registra la pulsación; `loop()` ejecuta la batería.
+- `test.h` emite un beacon real `PRUEBA=14` durante tres segundos, verifica que la publicidad BLE se inicia y se detiene y presenta el resultado por Serial. El comando `t` se procesa en `loop()` y la batería se ejecuta allí.
 - La búsqueda Android dura como máximo diez segundos y acepta únicamente el UUID del proyecto, el formato iBeacon, Major de tipo 14 y Minor `0x5A3C`; el contador ocupa el byte bajo de Major.
 
 ## Design Clarifications
 
-- Las pruebas se activan manualmente desde la web, la aplicación Android y el pulsador Arduino. Las pruebas web de servidor necesitan una BD aislada; Android usa conexiones simuladas.
+- Las pruebas se activan manualmente desde la web, la aplicación Android y el monitor serie Arduino (`t`). Las pruebas web de servidor necesitan una BD aislada; Android usa conexiones simuladas.
 
 ## General Rules
 

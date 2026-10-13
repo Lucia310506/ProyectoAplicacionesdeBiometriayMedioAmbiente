@@ -61,7 +61,7 @@ Arduino → BLE → Android → HTTP POST → comunicación PHP → lógica → 
 UX web → lógica frontend → cliente HTTP → comunicación PHP → lógica → PDO → MySQL
 Botón web → pruebas JavaScript/PHP → lógica y base de pruebas
 Botón Android → pruebas manuales de lógica/REST → Logcat
-Pulsador Arduino → loop() → test.h → iBeacon PRUEBA=14 → Monitor serie
+Comando t por serie → loop() → test.h → iBeacon PRUEBA=14 → Monitor serie
 ```
 
 La batería Arduino emite un beacon reservado para pruebas que el receptor Android descarta.

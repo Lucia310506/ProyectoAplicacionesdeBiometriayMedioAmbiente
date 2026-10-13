@@ -34,8 +34,8 @@ flowchart LR
   subgraph FW[Firmware Arduino · HolaMundoIBeacon]
     M[Medidor simulado] --> PUB[Publicador]
     PUB --> BLE[Emisora BLE · iBeacon]
-    BUTTON[Pulsador D2-GND] --> INT[Interrupción: deja prueba pendiente]
-    INT --> LOOP[loop: ejecuta test.h]
+    SERIAL[Monitor serie: envía 't'] --> SERIALCMD[loop: activa prueba pendiente]
+    SERIALCMD --> LOOP[loop: ejecuta test.h]
     LOOP --> TEST[Beacon PRUEBA=14 durante 3 s]
     TEST --> SERIAL[Resultados por Serial]
   end
@@ -187,7 +187,7 @@ El archivo PHP no se incluye en el repositorio porque contiene credenciales. Cr�
 1. Abre `HolaMundoIBeacon/HolaMundoIBeacon.ino` con Arduino IDE.
 2. Selecciona la placa usada por el montaje y asegúrate de tener instalada la librería Bluefruit requerida por el código.
 3. Compila y carga el sketch. En el arranque inicializa el puerto serie, el LED y la emisora; después publica beacons de forma periódica. El medidor actual genera valores simulados, no lee un sensor físico calibrado.
-4. Para ejecutar la prueba BLE, conecta un pulsador entre D2 y GND. Abre el monitor serie a 115200 baudios y pulsa el botón. `loop()` envía un beacon `PRUEBA` (tipo 14, valor centinela `0x5A3C`) durante tres segundos y muestra el inicio/detención y el resumen. Android descarta ese tipo, así que no se guarda como medición.
+4. Para ejecutar la prueba BLE, abre el monitor serie a 115200 baudios y envía el carácter `t`. `loop()` envía un beacon `PRUEBA` (tipo 14, valor centinela `0x5A3C`) durante tres segundos y muestra el inicio/detención y el resumen. Android descarta ese tipo, así que no se guarda como medición.
 
 
 ## Aplicación Android
