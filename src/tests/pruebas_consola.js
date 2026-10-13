@@ -6,25 +6,9 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  */
 (function () {
-  // Polyfill: ensure functions exist even if scripts load late
-  if (typeof window.pedirMediciones !== 'function') {
-    window.pedirMediciones = async function() {
-      const respuesta = await fetch('/mediciones');
-      const textoRespuesta = await respuesta.text();
-      let mediciones;
-      try { mediciones = JSON.parse(textoRespuesta); }
-      catch { throw new Error('El servidor no ha devuelto JSON válido'); }
-      if (!respuesta.ok) throw new Error(mediciones.error || 'Error en la petición');
-      return mediciones;
-    };
-  }
-  if (typeof window.mostrarMediciones !== 'function') {
-    window.mostrarMediciones = async function() {
-      const pedirMediciones = window.pedirMediciones;
-      const mediciones = await pedirMediciones();
-      if (!Array.isArray(mediciones)) throw new Error('La lógica fake esperaba una lista de mediciones');
-      return mediciones;
-    };
+  // Comprueba explícitamente que se han cargado los componentes del cliente REST.
+  if (typeof window.pedirMediciones !== 'function' || typeof window.mostrarMediciones !== 'function') {
+    throw new Error('Faltan los componentes PeticionarioREST.js o LogicaFake.js; no se puede ejecutar la batería');
   }
 
   // --------------------

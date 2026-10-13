@@ -12,18 +12,16 @@ const codigo = fs.readFileSync(__dirname + '/../gui/Aplicacion.js', 'utf8');
 const codigoLogica = fs.readFileSync(__dirname + '/../frontend_business_logic/LogicaFake.js', 'utf8');
 
 // --------------------
-// --------------------
 // condicion: B, mensaje: Text --> comprobar() -->
-// --------------------
+// Detiene el caso con un error legible si la condición no se cumple.
 // --------------------
 function comprobar(condicion, mensaje) {
   if (!condicion) throw new Error(mensaje);
 }
 
 // --------------------
-// --------------------
 // html: Text --> crearDocumento() --> Documento
-// --------------------
+// Crea el DOM mínimo para probar carga y renderizado sin navegador.
 // --------------------
 function crearDocumento() {
   const estado = { textContent: 'Cargando mediciones...', className: '' };
@@ -53,9 +51,8 @@ function crearDocumento() {
 }
 
 // --------------------
-// --------------------
 // --> probarUx() -->
-// --------------------
+// Comprueba carga, representación, recuento y propagación de error.
 // --------------------
 async function probarUx() {
   const documento = crearDocumento();

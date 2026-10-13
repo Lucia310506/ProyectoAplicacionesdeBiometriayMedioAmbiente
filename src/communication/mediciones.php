@@ -38,7 +38,7 @@ function atenderMediciones(string $metodo, string $cuerpo): array {
         return [422, ['error' => $error->getMessage()]];
     } catch (Throwable $error) {
         error_log($error->getMessage());
-        return [500, ['error' => $error->getMessage()]];
+        return [500, ['error' => 'Error interno del servidor']];
     }
 }
 

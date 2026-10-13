@@ -10,7 +10,7 @@
 
 ```text
 POST /mediciones
-(tipo: Text, valor: R) --> guardarMediciones() -->
+(dispositivo_id: Text, tipo: Text, valor: R, lugar: Text) --> guardarMediciones() -->
 JSON de entrada: { "tipo": "CO2", "valor": 500 }
 El POST Android devuelve una respuesta HTTP 201 cuando se guarda correctamente; el cliente debe informar errores HTTP.
 

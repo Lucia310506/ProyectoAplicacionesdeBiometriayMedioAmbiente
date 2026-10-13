@@ -11,7 +11,7 @@ El servidor crea `id` y `fecha`. No se crea una clase `Medicion`; los datos de e
 ### Diseño lógico
 
 ```text
-tipo: Text, valor: R --> guardarMediciones() -->
+dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->
 
 mediciones: [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]
              <-- mostrarMediciones() <--
@@ -56,12 +56,12 @@ Este archivo es un módulo de funciones globales PHP, no una clase instanciable.
 
 | Función | Diseño lógico | Qué hace |
 |---|---|---|
-| `guardarMediciones(string tipo, float valor): void` | `tipo: Text, valor: R --> guardarMediciones() -->` | Rechaza tipos distintos de CO2/TEMPERATURA y números no finitos; inserta con consulta preparada. No devuelve un valor. |
+| `guardarMediciones(string dispositivo_id, string tipo, float valor, string lugar): void` | `dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA, números no finitos y lugar vacío; inserta con consulta preparada. No devuelve un valor. |
 | `mostrarMediciones(): array` | `--> mostrarMediciones() --> Medicion[]` | Consulta las filas ordenadas de más recientes a más antiguas y normaliza cada una. |
 | `ejecutarPrimeraConsultaValida(PDO conexion, array consultas, ?array parametros): array` | `bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]` | Detalle interno de persistencia; prueba consultas en orden, devuelve filas de lectura o lista vacía al insertar y propaga un fallo si ninguna variante funciona. PDO es detalle de implementación. |
 | `normalizarFilaMedicion(array fila): array` | `fila: Dict --> normalizarFilaMedicion() --> Medicion` | Convierte nombres alternativos de columnas y valores a `id` entero, `tipo` texto, `valor` decimal y `fecha` texto. |
 
-Una medición de salida tiene la forma `(id: N, tipo: Text, valor: R, fecha: DateTime)`; el alta recibe únicamente `tipo` y `valor`.
+Una medición de salida tiene la forma `(dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text)`; el alta recibe `dispositivo_id`, `tipo`, `valor` y `lugar`.
 
 ### Flujo interno de operaciones
 
