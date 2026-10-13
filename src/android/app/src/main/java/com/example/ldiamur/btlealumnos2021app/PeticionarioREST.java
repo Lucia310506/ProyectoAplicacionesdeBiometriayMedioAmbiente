@@ -108,14 +108,14 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
 
     /*
      * --------------------
-     * tipo: Text, valor: R --> enviarMedicion()
-     * Forma el JSON y envía una medición al endpoint REST incluyendo el dispositivo.
+     * dispositivo_id: Text, tipo: Text, valor: R --> enviarMedicion()
+     * Forma el JSON y envía una medición al endpoint REST con el identificador del sensor BLE.
      * --------------------
      */
-    public static void enviarMedicion(String tipo, double valor) {
+    public static void enviarMedicion(String dispositivoId, String tipo, double valor) {
         try {
             new PeticionarioREST().hacerPeticionREST(
-                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(obtenerDispositivoId(), tipo, valor, obtenerLugarMedicion()),
+                    "POST", ConfiguracionRest.URL_MEDICIONES, crearCuerpoMedicion(dispositivoId, tipo, valor, obtenerLugarMedicion()),
                     (codigo, respuesta) -> {
                         if (codigo == 201) {
                             Log.i("clienterestandroid", "OK: POST /mediciones respondió HTTP 201");
@@ -205,20 +205,6 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
         }
 
         return false;
-    }
-
-    /*
-     * --------------------
-     * --> obtenerDispositivoId() --> Text
-     * Obtiene un identificador estable del dispositivo que envía la medición.
-     * --------------------
-     */
-    private static String obtenerDispositivoId() {
-        String serial = Build.SERIAL == null ? "" : Build.SERIAL;
-        if (serial.trim().isEmpty() || "unknown".equalsIgnoreCase(serial)) {
-            serial = Build.MODEL == null ? "dispositivo" : Build.MODEL;
-        }
-        return serial.replace(" ", "_");
     }
 
     @Override

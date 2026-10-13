@@ -2,7 +2,7 @@
 
 ## Component Design
 
-`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]`
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`
 
 ====================================================================================
 TABLE: mediciones
@@ -14,6 +14,7 @@ COLUMNS:
 + fecha | DATETIME(6) | NOT NULL | CURRENT_TIMESTAMP(6)
 + tipo | ENUM('CO2', 'TEMPERATURA') | NOT NULL
 + valor | DOUBLE | NOT NULL
++ lugar | VARCHAR(100) | NOT NULL | Ubicación no disponible
 
 PRIMARY KEY: (dispositivo_id, fecha)
 

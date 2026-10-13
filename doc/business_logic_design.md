@@ -18,7 +18,7 @@ TABLE mediciones
   valor: DOUBLE, NOT NULL
 ```
 
-`Medicion = (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R)` y `Mediciones = [ Medicion ]`. La entrada de alta es `(dispositivo_id, tipo, valor)`; MySQL asigna `fecha`.
+`Medicion = (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text)` y `Mediciones = [ Medicion ]`. La entrada de alta es `(dispositivo_id, tipo, valor, lugar)`; MySQL asigna `fecha`.
 
 Para describir persistencia sin introducir tipos PDO en el contrato lógico se usan estos alias abstractos: `BaseDatos` (acceso a persistencia), `Consulta = Text`, `Parametro = Text | Z | R | B` y `Fila = Medicion`.
 
@@ -27,7 +27,7 @@ Para describir persistencia sin introducir tipos PDO en el contrato lógico se u
 La implementación actual es un archivo de funciones PHP globales, no una clase. No mantiene estado de instancia. Depende de las funciones de conexión de `ConexionMediciones.php`.
 
 ```text
-dispositivo_id: Text, tipo: Text, valor: R --> guardarMediciones() -->
+dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->
 
 bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]
 
@@ -40,7 +40,7 @@ Mediciones <-- mostrarMediciones() <--
 
 | Función | Diseño lógico | Responsabilidad |
 |---|---|---|
-| `guardarMediciones(dispositivo_id: Text, tipo: Text, valor: R)` | `dispositivo_id: Text, dispositivo_id: Text, tipo: Text, valor: R --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA y valores no finitos; inserta de forma parametrizada en `mediciones`. No devuelve dato. |
+| `guardarMediciones(dispositivo_id: Text, tipo: Text, valor: R, lugar: Text)` | `dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA, valores no finitos y lugar vacío; inserta de forma parametrizada en `mediciones`. No devuelve dato. |
 | `mostrarMediciones()` | `--> mostrarMediciones() --> [Medicion]` | Lee todas las filas, ordenadas de más reciente a más antigua, y las normaliza. |
 | `ejecutarPrimeraConsultaValida(bd: BaseDatos, consultas: [Consulta], parametros: [Parametro])` | `bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]` | Detalle interno de persistencia: ejecuta consultas candidatas en orden; devuelve filas para lectura o lista vacía en alta; comunica fallo para que la capa externa lo maneje. `PDO` y `PDOException` son detalles de implementación, no tipos del diseño lógico. |
 | `normalizarFilaMedicion(fila: Fila)` | `fila: Fila --> normalizarFilaMedicion() --> Medicion` | Convierte columnas a los tipos estables del contrato (`id`, `tipo`, `valor`, `fecha`). |

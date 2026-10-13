@@ -297,10 +297,10 @@ public class ServicioEscuharBeacons extends Service {
         // Major empaqueta tipo en el byte alto y contador en el bajo; Minor se interpreta con signo.
         if (tipoMedida == 11) {
             Log.d(ETIQUETA_LOG, "Servicio: CO2 = " + valor + " ppm (muestra " + contador + ")");
-            enviarMedicionNueva("CO2", valor, tipoMedida, contador);
+            enviarMedicionNueva("CO2", valor, tipoMedida, contador, dispositivoBluetooth.getAddress());
         } else if (tipoMedida == 12) {
             Log.d(ETIQUETA_LOG, "Servicio: temperatura = " + valor + " °C (muestra " + contador + ")");
-            enviarMedicionNueva("TEMPERATURA", valor, tipoMedida, contador);
+            enviarMedicionNueva("TEMPERATURA", valor, tipoMedida, contador, dispositivoBluetooth.getAddress());
         }
     }
 
@@ -310,7 +310,7 @@ public class ServicioEscuharBeacons extends Service {
      * Evita duplicados y delega la medición a lógica fake y REST.
      * --------------------
      */
-    private void enviarMedicionNueva(String tipo, int valor, int tipoMedida, int contador) {
+    private void enviarMedicionNueva(String tipo, int valor, int tipoMedida, int contador, String dispositivoId) {
         if (ultimoTipoMedida == tipoMedida && ultimoContador == contador) {
             return;
         }
@@ -318,7 +318,7 @@ public class ServicioEscuharBeacons extends Service {
         ultimoContador = contador;
         try {
             LogicaFake.guardarMediciones(tipo, valor);
-            PeticionarioREST.enviarMedicion(tipo, valor);
+            PeticionarioREST.enviarMedicion(dispositivoId, tipo, valor);
         } catch (IllegalArgumentException error) {
             Log.e(ETIQUETA_LOG, "Medición descartada: " + error.getMessage());
         }

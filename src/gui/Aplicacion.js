@@ -49,16 +49,19 @@ function dibujarLista(mediciones) {
   ultimas.forEach((medicion) => {
     const fila = document.createElement('tr');
 
+    const celdaDispositivo = document.createElement('td');
     const celdaTipo = document.createElement('td');
     const celdaValor = document.createElement('td');
     const celdaLugar = document.createElement('td');
     const celdaFecha = document.createElement('td');
 
+    celdaDispositivo.textContent = String(medicion.dispositivo_id ?? medicion.dispositivo ?? '');
     celdaTipo.textContent = String(medicion.tipo);
     celdaValor.textContent = String(medicion.valor);
-    celdaLugar.textContent = String(medicion.lugar ?? 'Murcia');
+    celdaLugar.textContent = String(medicion.lugar ?? 'Ubicación no disponible');
     celdaFecha.textContent = String(medicion.fecha);
 
+    fila.appendChild(celdaDispositivo);
     fila.appendChild(celdaTipo);
     fila.appendChild(celdaValor);
     fila.appendChild(celdaLugar);
