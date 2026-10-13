@@ -144,7 +144,7 @@ BTLEAlumnos2021hechoapp2/app/src/main/
   java/.../PruebasRESTBoton.java         REST simulado para pruebas manuales
   java/.../ConfiguracionRest.java        URL del servidor
 
-La pantalla Android también incluye **Buscar beacon de prueba**. Mantén el firmware Arduino anunciando el centinela (pulsa su botón D2-GND) y pulsa el botón Android durante esos tres segundos. La app busca hasta diez segundos y solo confirma la coincidencia si valida el UUID del proyecto, el tipo `14` y el valor `0x5A3C`. El resultado aparece en pantalla y en Logcat (`TEST_BEACON`); este modo no procesa ni envía mediciones.
+La pantalla Android también incluye **Buscar beacon de prueba**. Mantén el firmware Arduino anunciando el centinela (envía `t` por el monitor serie) y pulsa el botón Android durante esos tres segundos. La app busca hasta diez segundos y solo confirma la coincidencia si valida el UUID del proyecto, el tipo `14` y el valor `0x5A3C`. El resultado aparece en pantalla y en Logcat (`TEST_BEACON`); este modo no procesa ni envía mediciones.
 
 EsqueletoWebAppEnPHPConSesion/
   src/rest/mediciones.php                Adaptador GET/POST /mediciones

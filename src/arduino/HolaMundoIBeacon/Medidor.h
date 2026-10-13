@@ -27,7 +27,6 @@ public:
 // Construye el simulador sin recursos externos.
 // --------------------
 
-  // Construye el simulador sin recursos externos.
   Medidor(  ) {
   } // ()
 
@@ -38,7 +37,6 @@ public:
 // Reserva la inicialización para sensores físicos.
 // --------------------
 
-  // Reserva la inicialización para sensores físicos.
   void iniciarMedidor() {
 	// las cosas que no se puedan hacer en el constructor, if any
   } // ()
@@ -50,9 +48,8 @@ public:
 // Devuelve la lectura simulada de CO2.
 // --------------------
 
-  // Devuelve la lectura simulada de CO2.
   int medirCO2() {
-	return 18;
+	return 4 ;
   } // ()
 
   // .....................................................
@@ -62,9 +59,8 @@ public:
 // Devuelve la lectura simulada de temperatura.
 // --------------------
 
-  // Devuelve la lectura simulada de temperatura.
   int medirTemperatura() {
-	return 8; // qué frío !
+	return 12; // qué frío !
   } // ()
 	
 }; // class

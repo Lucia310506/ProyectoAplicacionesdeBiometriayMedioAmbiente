@@ -50,7 +50,7 @@ public:
 	PRUEBA = 14
   };
 
-  static constexpr int16_t VALOR_BEACON_PRUEBA = 0x5A3C;
+  static constexpr int16_t VALOR_BEACON_PRUEBA = 0x5A3C; //Variable Beacon de pruebas.
 
   // ............................................................
   // ............................................................
@@ -59,7 +59,6 @@ public:
 // Prepara el beacon sin activar la radio durante la construcción.
 // --------------------
 
-  // Prepara el beacon sin activar la radio durante la construcción.
   Publicador( ) {
 	// ATENCION: no hacerlo aquí. (*this).laEmisora.encenderEmisora();
 	// Pondremos un método para llamarlo desde el setup() más tarde
@@ -71,8 +70,6 @@ public:
 // --> encenderEmisora() 
 // Activa la emisora BLE una vez inicializada la placa.
 // --------------------
-
-  // Activa la emisora BLE una vez inicializada la placa.
   void encenderEmisora() {
 	(*this).laEmisora.encenderEmisora();
   } // ()
@@ -83,8 +80,6 @@ public:
 // valorCO2: N, contador: N, tiempoEspera: Z --> publicarCO2() -->
 // Emite CO2 y detiene el anuncio al terminar el intervalo.
 // --------------------
-
-  // Emite CO2 y detiene el anuncio al terminar el intervalo.
   void publicarCO2( int16_t valorCO2, uint8_t contador,
 					long tiempoEspera ) {
 
@@ -120,7 +115,6 @@ public:
 // Emite temperatura y detiene el anuncio al terminar el intervalo.
 // --------------------
 
-  // Emite temperatura y detiene el anuncio al terminar el intervalo.
   void publicarTemperatura( int16_t valorTemperatura,
 							uint8_t contador, long tiempoEspera ) {
 
