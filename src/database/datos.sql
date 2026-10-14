@@ -4,6 +4,6 @@
 -- Fecha: 2026-09-25
 -- Copyright (c) 2026 Lucía Díaz Murcia
 
-INSERT INTO mediciones (tipo, valor, fecha) VALUES
-('CO2', 500, '2026-09-25 10:30:00'),
-('TEMPERATURA', -19, '2026-09-25 10:31:00');
+INSERT INTO mediciones (dispositivo_id, tipo, valor, fecha, lugar) VALUES
+('DISP-CO2', 'CO2', 500, '2026-09-25 10:30:00', 'Murcia'),
+('DISP-TEMPERATURA', 'TEMPERATURA', -19, '2026-09-25 10:31:00', 'Murcia');

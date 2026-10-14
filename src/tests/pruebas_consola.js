@@ -144,11 +144,11 @@
         comprobar(estado.className === 'carga' && estado.textContent.includes('Cargando'),
           'No mostró el estado de carga');
       }, resultados);
-      terminarCarga([{ id: 1, tipo: 'CO2', valor: 500, fecha: '2026-09-25T10:30:00' }]);
+      terminarCarga([{ dispositivo_id: 'TEST', tipo: 'CO2', valor: 500, lugar: 'Murcia', fecha: '2026-09-25T10:30:00' }]);
       await actualizacion;
 
       await caso('UX dibuja las mediciones recibidas por GET', async () => {
-        comprobar(cuerpo.rows.length === 1 && cuerpo.rows[0].cells[0].textContent === 'CO2',
+        comprobar(cuerpo.rows.length === 1 && cuerpo.rows[0].cells[0].textContent === 'TEST' && cuerpo.rows[0].cells[1].textContent === 'CO2',
           'No dibujó la fila recibida');
         comprobar(estado.className === 'ok', 'No mostró estado de éxito');
       }, resultados);

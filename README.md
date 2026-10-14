@@ -182,6 +182,20 @@ return [
 
 El archivo PHP no se incluye en el repositorio porque contiene credenciales. Créalo también en el servidor de publicación. No escribas claves reales en el TXT de plantilla ni en archivos públicos. Para producción, se permite también obtener valores de variables de entorno `MEDICIONES_DB_HOST_PROD`, `MEDICIONES_DB_NAME_PROD`, `MEDICIONES_DB_USER_PROD` y `MEDICIONES_DB_PASSWORD_PROD`.
 
+### Variables en Plesk
+
+En Plesk (PHP-FPM), las variables de Apache tipo `SetEnv` pueden no llegar a PHP. Define las variables en la configuración de PHP del dominio o en un archivo `.user.ini` en la raíz del sitio:
+
+```ini
+MEDICIONES_ENTORNO=pruebas
+MEDICIONES_DB_HOST_TEST=host_de_pruebas
+MEDICIONES_DB_NAME_TEST=nombre_base_de_pruebas
+MEDICIONES_DB_USER_TEST=usuario_de_pruebas
+MEDICIONES_DB_PASSWORD_TEST=contrasena_de_pruebas
+```
+
+La aplicación PHP lee esas variables desde `getenv`, `$_ENV` y `$_SERVER`, por lo que funciona tanto con Apache mod_php como con PHP-FPM/Plesk. Para producción, deja `MEDICIONES_ENTORNO` sin valor o en `produccion`.
+
 ## Firmware Arduino
 
 1. Abre `HolaMundoIBeacon/HolaMundoIBeacon.ino` con Arduino IDE.
@@ -222,7 +236,9 @@ MEDICIONES_DB_USER_TEST=usuario_de_pruebas
 MEDICIONES_DB_PASSWORD_TEST=contrasena_de_pruebas
 ```
 
-La ruta web `src/tests/ejecutar_tests_consola.php` solo admite POST del mismo origen y exige `MEDICIONES_ENTORNO=pruebas`. Al ejecutarse, confirma que la tabla empieza vacía, que existe el esquema esperado, inserta datos de prueba, comprueba lógica y REST y limpia las filas al terminar. Los errores de configuración o de conexión aparecen como casos `ERROR` en la consola.
+También puedes habilitar las pruebas creando `src/database/ConfiguracionPruebas.php` con las credenciales de la base exclusiva de pruebas. Si ese archivo existe, el ejecutor web se activa automáticamente, sin depender de variables de entorno ni de Apache mod_env. Esto es especialmente útil en Plesk/PHP-FPM.
+
+La ruta web `src/tests/ejecutar_tests_consola.php` solo admite POST del mismo origen y exige una base de pruebas habilitada. Al ejecutarse, confirma que la tabla empieza vacía, que existe el esquema esperado, inserta datos de prueba, comprueba lógica y REST y limpia las filas al terminar. Los errores de configuración o de conexión aparecen como casos `ERROR` en la consola.
 
 También existen `src/tests/probar_base_datos.php` y `src/tests/probar_rest.php` para ejecutar esas comprobaciones PHP por separado desde un entorno que tenga PHP CLI y acceso a MySQL. Usan igualmente la base exclusiva de pruebas y borran filas antes y después. `probar_peticionario_rest.js` y `probar_ux.js` contienen casos JavaScript equivalentes a los incluidos en el botón de la web.
 
