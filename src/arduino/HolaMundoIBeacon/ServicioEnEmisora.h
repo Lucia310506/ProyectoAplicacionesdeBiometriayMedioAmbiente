@@ -5,6 +5,7 @@
  * Descripción: Controla el servicio atribuyendole características.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
@@ -146,7 +147,7 @@ public:
 	// .........................................................
 // --------------------
 // tam: N --> asignarTamanyoDatos() -->
-// Limita el tamaño máximo del valor GATT.
+// Limita el tamaño máximo de la caracteristica .
 // --------------------
 	void asignarTamanyoDatos( uint8_t tam ) {
 	  // no puedo escribir AUN si el constructor llama a esto: Serial.print( " (*this).laCaracteristica.setFixedLen( tam = " );

@@ -5,6 +5,7 @@
  * Descripción: Esta clase publica los datos de temperatura y CO2 en un beacon.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 // --------------------------------------------------------------
 // Jordi Bataller i Mascarell
@@ -21,6 +22,7 @@ class Publicador {
   // ............................................................
 private:
 
+  // UUID del beacon: identifica el grupo o familia del emisor (16 bytes).
   uint8_t beaconUUID[16] = { 
 	'E', 'P', 'S', 'G', '-', 'G', 'T', 'I', 
 	'-', 'P', 'R', 'O', 'Y', '-', '3', 'A'
@@ -84,10 +86,11 @@ public:
 					long tiempoEspera ) {
 
 	// 1. empezamos anuncio
+	// Major: combina el tipo de magnitud (CO2) en el byte alto y un contador en el bajo.
 	uint16_t major = (MedicionesID::CO2 << 8) + contador;
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
-											valorCO2, // minor
+											valorCO2, // Minor: valor medido (CO2) con signo compactado.
 											(*this).RSSI // rssi
 									);
 
@@ -118,10 +121,11 @@ public:
   void publicarTemperatura( int16_t valorTemperatura,
 							uint8_t contador, long tiempoEspera ) {
 
+	// Major: mismo esquema para el tipo TEMPERATURA.
 	uint16_t major = (MedicionesID::TEMPERATURA << 8) + contador;
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
-											valorTemperatura, // minor
+											valorTemperatura, // Minor: valor medido (temperatura) con signo.
 											(*this).RSSI // rssi
 									);
 	esperar( tiempoEspera );

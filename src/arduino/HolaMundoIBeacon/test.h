@@ -5,6 +5,7 @@
  * Descripción: Pruebas manuales de emisión de un iBeacon de prueba.
  * Fecha: 2026-10-10
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 #ifndef TEST_H_INCLUIDO
 #define TEST_H_INCLUIDO

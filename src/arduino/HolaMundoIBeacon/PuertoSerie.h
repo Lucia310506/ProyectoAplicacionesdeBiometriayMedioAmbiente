@@ -6,6 +6,7 @@
  * Descripción: Controla el funcionamiento del puerto Serie.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
@@ -28,21 +29,7 @@ public:
 // --------------------
   PuertoSerie (long baudios) {
 	Serial.begin( baudios );
-	// mejor no poner esto aquí: while ( !Serial ) delay(10);   
-  } // ()
-
-  // .........................................................
-  // .........................................................
-// --------------------
-// esperarDisponible() 
-// Espera a que el monitor serie esté conectado.
-// --------------------
-  void esperarDisponible() {
-
-	while ( !Serial ) {
-	  delay(10);   
-	}
-
+	
   } // ()
 
   // .........................................................

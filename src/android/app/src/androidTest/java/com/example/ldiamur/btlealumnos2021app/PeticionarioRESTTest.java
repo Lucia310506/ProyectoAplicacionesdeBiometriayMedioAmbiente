@@ -4,6 +4,14 @@
  * Descripción: Comprueba el cliente REST Android contra un servidor HTTP local.
  * --------------------
  */
+/*
+ * Fichero: PeticionarioRESTTest.java
+ * Autor: Lucía Díaz Murcia
+ * Descripción: Prueba unitaria del cliente REST Android con fuentes falsas.
+ * Fecha: 2026-09-25
+ * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
+ */
 package com.example.ldiamur.btlealumnos2021app;
 
 import static org.junit.Assert.assertEquals;

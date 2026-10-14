@@ -4,6 +4,7 @@
  * Descripción: Ejecuta las pruebas web solo cuando se pulsa el botón.
  * Fecha: 2026-10-09
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 (function () {
   // Comprueba explícitamente que se han cargado los componentes del cliente REST.

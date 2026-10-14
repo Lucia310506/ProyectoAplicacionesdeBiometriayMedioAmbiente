@@ -3,6 +3,7 @@
 -- Descripción: Estructura de la tabla MEDICIONES según el diseño obligatorio.
 -- Fecha: 2026-09-25
 -- Copyright (c) 2026 Lucía Díaz Murcia
+-- Aportación: crear el archivo y hacerlo funcional
 
 CREATE TABLE IF NOT EXISTS mediciones (
   dispositivo_id VARCHAR(64) NOT NULL,

@@ -5,6 +5,7 @@
  * Descripción: Lógica de negocio de las mediciones ambientales.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 //BD: MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]
 require_once __DIR__ . '/../database/ConexionMediciones.php';

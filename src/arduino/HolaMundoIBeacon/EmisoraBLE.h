@@ -5,6 +5,7 @@
  * Descripción: Controla el funcionamiento de la emisora.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
@@ -109,9 +110,7 @@ public:
 
   }  // ()
   
-  // .........................................................
-  // estaAnunciando() -> Boleano
-  // .........................................................
+ 
 // --------------------
 // --> estaAnunciando() --> B
 // Consulta el estado de emisión de Bluefruit.
@@ -227,21 +226,14 @@ public:
 	(*this).detenerAnuncio(); 
 
 	Bluefruit.Advertising.clearData();
-	Bluefruit.ScanResponse.clearData(); // hace falta?
+	Bluefruit.ScanResponse.clearData();
 
-	// Bluefruit.setTxPower( (*this).txPower ); creo que no lo pongo porque es uno de los bytes de la parte de carga que utilizo
 	Bluefruit.setName( (*this).nombreEmisora );
 	Bluefruit.ScanResponse.addName();
 
 	Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
 
-	// con este parece que no va  !
-	// Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE);
-
-	//
-	// hasta ahora habrá, supongo, ya puestos los 5 primeros bytes. Efectivamente.
-	// Falta poner 4 bytes fijos (company ID, beacon type, longitud) y 21 de carga
-	//
+	
 	uint8_t restoPrefijoYCarga[4+21] = {
 	  0x4c, 0x00, // companyID 2
 	  0x02, // ibeacon type 1byte
@@ -257,7 +249,7 @@ public:
 	//
 	// addData() hay que usarlo sólo una vez. Por eso copio la carga
 	// en el anterior array, donde he dejado 21 sitios libres
-	//
+	//memcpy(destino, origen, numeroDeBytes) ; copia una cantidad determinada de bytes de una zona de memoria a otra.
 	memcpy( &restoPrefijoYCarga[4], &carga[0], ( tamanyoCarga > 21 ? 21 : tamanyoCarga ) ); 
 
 	//
@@ -268,14 +260,14 @@ public:
 								   4+21 );
 
 	//
-	// ? qué valores poner aquí ?
+	//
 	//
 	Bluefruit.Advertising.restartOnDisconnect(true);
 	Bluefruit.Advertising.setInterval(100, 100);    // in unit of 0.625 ms
 
 	Bluefruit.Advertising.setFastTimeout( 1 );      // number of seconds in fast mode
 	//
-	// empieza el anuncio, 0 = tiempo indefinido (ya lo pararán)
+	// empieza el anuncio, 0 = tiempo indefinido
 	//
 	Bluefruit.Advertising.start( 0 ); 
 

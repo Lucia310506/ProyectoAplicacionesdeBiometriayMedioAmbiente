@@ -5,6 +5,7 @@
  * Descripción: Configura conexiones PDO para desarrollo, producción y pruebas.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 // --------------------

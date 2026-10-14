@@ -4,6 +4,7 @@
  * Descripción: Cliente REST de solo lectura para las mediciones web.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 // Un único punto para XAMPP o Plesk. Relativo a ux/Aplicacion.html.

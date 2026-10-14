@@ -5,6 +5,7 @@
  * Descripción: Ejecuta tests de lógica y base de datos en el mismo entorno de mediciones de la web.
  * Fecha: 2026-10-11
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 ini_set('display_errors', '0');

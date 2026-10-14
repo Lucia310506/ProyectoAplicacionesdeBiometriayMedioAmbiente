@@ -4,6 +4,7 @@
  * Descripción: Lógica fake que procesa las mediciones recibidas del beacon.
  * Fecha: 2026-10-03
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 package com.example.ldiamur.btlealumnos2021app;
 

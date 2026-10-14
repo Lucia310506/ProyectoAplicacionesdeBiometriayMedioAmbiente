@@ -5,6 +5,7 @@
  * Descripción: Controla el funcionamiento de la LED.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 #ifndef LED_H_INCLUIDO
 #define LED_H_INCLUIDO

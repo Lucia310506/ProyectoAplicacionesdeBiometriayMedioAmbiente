@@ -10,6 +10,7 @@
  * Descripción: Programa principal que ejecuta la emisión del beacon.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 // https://learn.sparkfun.com/tutorials/nrf52840-development-with-arduino-and-circuitpython
 
@@ -35,7 +36,6 @@ namespace Globales {
 
   PuertoSerie elPuerto ( /* velocidad = */ 115200 ); // 115200 o 9600 o ...
 
-  // Serial1 en el ejemplo de Curro creo que es la conexión placa-sensor 
 };
 
 #include "EmisoraBLE.h"

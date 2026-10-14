@@ -5,6 +5,7 @@
  * Descripción: Simula las mediciones.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 #ifndef MEDIDOR_H_INCLUIDO
 #define MEDIDOR_H_INCLUIDO
@@ -49,7 +50,7 @@ public:
 // --------------------
 
   int medirCO2() {
-	return 4 ;
+	return 4 ; // COMENTARIO: sin sensor físico conectado se devuelve un valor fijo para las pruebas BLE.
   } // ()
 
   // .....................................................

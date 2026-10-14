@@ -4,6 +4,7 @@
  * Descripción: Pruebas de interfaz con respuestas REST simuladas.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 const fs = require('fs');

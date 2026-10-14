@@ -4,6 +4,7 @@
  * Descripción: Servicio en segundo plano que escucha beacons y publica mediciones.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 package com.example.ldiamur.btlealumnos2021app;
 

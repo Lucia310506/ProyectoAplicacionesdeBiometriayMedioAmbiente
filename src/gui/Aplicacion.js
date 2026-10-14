@@ -4,6 +4,7 @@
  * Descripción: Actualiza la lista web con las mediciones recibidas por REST.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 // --------------------
