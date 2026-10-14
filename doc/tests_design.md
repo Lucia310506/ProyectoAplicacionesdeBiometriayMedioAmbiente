@@ -77,7 +77,7 @@ Botón → MainActivity.botonEjecutarTestsPulsado()
 1. El listener del botón impide una segunda ejecución concurrente y desactiva el control.
 2. Los casos del cliente REST sustituyen `window.fetch` por respuestas preparadas y lo restauran en `finally`.
 3. Los casos de UX sustituyen la función de petición y guardan el estado/filas actuales; restauran el DOM incluso si falla un caso.
-4. La batería del servidor envía POST same-origin al ejecutor PHP. El PHP exige `MEDICIONES_ENTORNO=pruebas`, obtiene PDO, limpia la tabla, comprueba el esquema, inserta mediciones centinela y verifica lógica/REST.
+4. La batería del servidor envía POST same-origin al ejecutor PHP. El PHP permite la ejecución si existe `ConfiguracionProduccion.php` o si `MEDICIONES_ENTORNO=pruebas` se define explícitamente, obtiene PDO, comprueba el esquema, inserta mediciones centinela, verifica lógica/REST y solo borra filas de prueba `TEST-*`.
 5. En el bloque `finally`, PHP limpia de nuevo la tabla y agrega el resultado de limpieza.
 6. El navegador agrupa resultados y muestra conteos `OK (correctos/total)` o `ERROR` en consola; reactiva el botón.
 

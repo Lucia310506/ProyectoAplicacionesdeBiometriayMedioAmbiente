@@ -50,7 +50,7 @@ Este archivo contiene funciones globales, no una clase instanciable. Resuelve la
 | Entorno | Archivo local | Variables | Uso previsto |
 |---|---|---|---|
 | Producción | `src/database/ConfiguracionProduccion.php` | `MEDICIONES_DB_*_PROD` | Peticiones normales de la API y la web. |
-| Pruebas | Ninguno | `MEDICIONES_DB_*_TEST` y `MEDICIONES_ENTORNO=pruebas` | Batería que elimina filas en su tabla. Debe ser una base separada. |
+| Pruebas | `src/database/ConfiguracionProduccion.php` (también puede habilitarse con `MEDICIONES_ENTORNO=pruebas`) | `MEDICIONES_DB_*_PROD` o variables de Plesk | La batería actual usa la misma configuración/base de producción pero solo elimina filas de prueba identificadas como `TEST-*`/`DISP-%`. Debe usarse sobre una base dedicada cuando sea posible. |
 
 El archivo `.txt` de configuración es una guía para la persona que despliega; PHP no lo carga. Las credenciales reales deben quedar fuera del control de versiones.
 
