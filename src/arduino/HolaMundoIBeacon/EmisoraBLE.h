@@ -1,11 +1,11 @@
 // -*- mode: c++ -*-
 /*
  * Fichero: EmisoraBLE.h
- * Autor: Lucía Díaz Murcia
- * Descripción: Controla el funcionamiento de la emisora.
+ * Autor: LucÃƒÆ’Ã‚Â­a DÃƒÆ’Ã‚Â­az Murcia
+ * DescripciÃƒÆ’Ã‚Â³n: Controla el funcionamiento de la emisora.
  * Fecha: 2026-09-25
- * Copyright (c) 2026 Lucía Díaz Murcia
- * Aportación: crear el archivo y hacerlo funcional
+ * Copyright (c) 2026 LucÃƒÆ’Ã‚Â­a DÃƒÆ’Ã‚Â­az Murcia
+ * AportaciÃƒÆ’Ã‚Â³n: crear el archivo y hacerlo funcional
  */
 // ----------------------------------------------------------
 // Jordi Bataller i Mascarell
@@ -14,7 +14,7 @@
 #ifndef EMISORA_H_INCLUIDO
 #define EMISORA_H_INCLUIDO
 
-// Buena introducción: https://learn.adafruit.com/introduction-to-bluetooth-low-energy/gap
+// Buena introducciÃƒÆ’Ã‚Â³n: https://learn.adafruit.com/introduction-to-bluetooth-low-energy/gap
 // https://os.mbed.com/blog/entry/BLE-Beacons-URIBeacon-AltBeacons-iBeacon/
 
 // fuente: https://www.instructables.com/id/Beaconeddystone-and-Adafruit-NRF52-Advertise-Your-/
@@ -47,7 +47,7 @@ public:
   // .........................................................
 // --------------------
 // nombreEmisora_: Texto, fabricante: N, txPower_: Z --> EmisoraBLE() --> EmisoraBLE
-// Guarda los parámetros de emisión sin activar el hardware.
+// Guarda los parÃƒÆ’Ã‚Â¡metros de emisiÃƒÆ’Ã‚Â³n sin activar el hardware.
 // --------------------
   EmisoraBLE( const char * nombreEmisora_, const uint16_t fabricanteID_,
 			  const int8_t txPower_ ) 
@@ -83,15 +83,16 @@ public:
   // .........................................................
 // --------------------
 // cbce:callbacks, cbce:callbacks  --> encenderEmisora() 
-// Activa la emisora e instala los callbacks de conexión.
+// Activa la emisora e instala los callbacks de conexiÃƒÆ’Ã‚Â³n.
 // --------------------
   void encenderEmisora( CallbackConexionEstablecida cbce,
 						CallbackConexionTerminada cbct ) {
 
 	encenderEmisora();
 
-	instalarCallbackConexionEstablecida( cbce );
-	instalarCallbackConexionTerminada( cbct );
+	// COMENTARIO: registro directo sin funciones wrapper para las conexiones BLE.
+	Bluefruit.Periph.setConnectCallback( cbce );
+	Bluefruit.Periph.setDisconnectCallback( cbct );
 
   } // ()
 
@@ -99,7 +100,7 @@ public:
   // .........................................................
 // --------------------
 // --> detenerAnuncio() 
-// Detiene la radio solo si está anunciando.
+// Detiene la radio solo si estÃƒÆ’Ã‚Â¡ anunciando.
 // --------------------
   void detenerAnuncio() {
 
@@ -113,7 +114,7 @@ public:
  
 // --------------------
 // --> estaAnunciando() --> B
-// Consulta el estado de emisión de Bluefruit.
+// Consulta el estado de emisiÃƒÆ’Ã‚Â³n de Bluefruit.
 // --------------------
   bool estaAnunciando() {
 	return Bluefruit.Advertising.isRunning();
@@ -143,12 +144,12 @@ public:
 	elBeacon.setManufacturer( (*this).fabricanteID );
 
 	//
-	// parece que esto debe ponerse todo aquí
+	// parece que esto debe ponerse todo aquÃƒÆ’Ã‚Â­
 	//
 
 	Bluefruit.setTxPower( (*this).txPower );
 	Bluefruit.setName( (*this).nombreEmisora );
-	Bluefruit.ScanResponse.addName(); // para que envíe el nombre de emisora (?!)
+	Bluefruit.ScanResponse.addName(); // para que envÃƒÆ’Ã‚Â­e el nombre de emisora (?!)
 
 	//
 	// pongo el beacon
@@ -156,13 +157,13 @@ public:
 	Bluefruit.Advertising.setBeacon( elBeacon );
 
 	//
-	// ? qué valorers poner aquí
+	// ? quÃƒÆ’Ã‚Â© valorers poner aquÃƒÆ’Ã‚Â­
 	//
 	Bluefruit.Advertising.restartOnDisconnect(true); // no hace falta, pero lo pongo
 	Bluefruit.Advertising.setInterval(100, 100);    // in unit of 0.625 ms
 
 	//
-	// empieza el anuncio, 0 = tiempo indefinido (ya lo pararán)
+	// empieza el anuncio, 0 = tiempo indefinido (ya lo pararÃƒÆ’Ã‚Â¡n)
 	//
 	Bluefruit.Advertising.start( 0 ); 
 	
@@ -181,7 +182,7 @@ public:
   //
   // 0x1AFF says the following data is 26 bytes long and is Manufacturer Specific Data.
   //
-  // 0x004C is Apple’s Bluetooth Sig ID and is the part of this spec that makes it Apple-dependent.
+  // 0x004C is AppleÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s Bluetooth Sig ID and is the part of this spec that makes it Apple-dependent.
   //
   // 0x02 is a secondary ID that denotes a proximity beacon, which is used by all iBeacons.
   //
@@ -194,7 +195,7 @@ public:
   //       0x1a, 0xff,             // advHeader 2 (0x1a = 26 = 25(lenght de 0x4c a 0xca)+1)   0xFF -> BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA
   //       0x4c, 0x00,             // companyID 2bytes
   //       0x02,                   // ibeacon type 1 byte
-  //       0x15,                   // ibeacon length 1 byte (dec=21 lo que va a continuación: desde  la 'f' hasta 0x01)
+  //       0x15,                   // ibeacon length 1 byte (dec=21 lo que va a continuaciÃƒÆ’Ã‚Â³n: desde  la 'f' hasta 0x01)
   // 
   // 2. uuid: 16bytes
   // 'f', 'i', 's', 't', 'r', 'o', 'f', 'i', 's', 't', 'r', 'o', 0xa7, 0x10, 0x96, 0xe0
@@ -210,166 +211,13 @@ public:
   // 0x01, // este es el byte 31 = BLE_GAP_ADV_SET_DATA_SIZE_MAX, parece que sobra
   //
   // .........................................................
-  // Para enviar como carga libre los últimos 21 bytes de un iBeacon (lo que normalmente sería uuid-16 major-2 minor-2 txPower-1)
+  // Para enviar como carga libre los últimos 21 bytes de un iBeacon (lo que normalmente serÃƒÆ’Ã‚Â­a uuid-16 major-2 minor-2 txPower-1)
   // .........................................................
   /*
   void emitirAnuncioIBeaconLibre( const char * carga ) {
 
 	const uint8_t tamanyoCarga = strlen( carga );
   */
-// --------------------
-// carga: texto, tamanyoCarga: N --> emitirAnuncioIBeaconLibre() <--
-// Publica una carga libre truncada al espacio de datos iBeacon.
-// --------------------
-  void emitirAnuncioIBeaconLibre( const char * carga, const uint8_t tamanyoCarga ) {
-
-	(*this).detenerAnuncio(); 
-
-	Bluefruit.Advertising.clearData();
-	Bluefruit.ScanResponse.clearData();
-
-	Bluefruit.setName( (*this).nombreEmisora );
-	Bluefruit.ScanResponse.addName();
-
-	Bluefruit.Advertising.addFlags(BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE);
-
-	
-	uint8_t restoPrefijoYCarga[4+21] = {
-	  0x4c, 0x00, // companyID 2
-	  0x02, // ibeacon type 1byte
-	  21, // ibeacon length 1byte (dec=21)  longitud del resto // 0x15 // ibeacon length 1byte (dec=21)  longitud del resto
-	  '-', '-', '-', '-', 
-	  '-', '-', '-', '-', 
-	  '-', '-', '-', '-', 
-	  '-', '-', '-', '-', 
-	  '-', '-', '-', '-', 
-	  '-'
-	};
-
-	//
-	// addData() hay que usarlo sólo una vez. Por eso copio la carga
-	// en el anterior array, donde he dejado 21 sitios libres
-	//memcpy(destino, origen, numeroDeBytes) ; copia una cantidad determinada de bytes de una zona de memoria a otra.
-	memcpy( &restoPrefijoYCarga[4], &carga[0], ( tamanyoCarga > 21 ? 21 : tamanyoCarga ) ); 
-
-	//
-	// copio la carga para emitir
-	//
-	Bluefruit.Advertising.addData( BLE_GAP_AD_TYPE_MANUFACTURER_SPECIFIC_DATA,
-								   &restoPrefijoYCarga[0],
-								   4+21 );
-
-	//
-	//
-	//
-	Bluefruit.Advertising.restartOnDisconnect(true);
-	Bluefruit.Advertising.setInterval(100, 100);    // in unit of 0.625 ms
-
-	Bluefruit.Advertising.setFastTimeout( 1 );      // number of seconds in fast mode
-	//
-	// empieza el anuncio, 0 = tiempo indefinido
-	//
-	Bluefruit.Advertising.start( 0 ); 
-
-	Globales::elPuerto.escribir( "emitiriBeacon libre  Bluefruit.Advertising.start( 0 );  \n");
-  } // ()
-
-  // .........................................................
-  // .........................................................
-// --------------------
-// servicio: ServicioEnEmisora --> anyadirServicio() --> B
-// Registra un servicio GATT con la emisora.
-// --------------------
-  bool anyadirServicio( ServicioEnEmisora & servicio ) {
-
-	Globales::elPuerto.escribir( " Bluefruit.Advertising.addService( servicio ); \n");
-
-	bool r = Bluefruit.Advertising.addService( servicio );
-
-	if ( ! r ) {
-	  Serial.println( " SERVICION NO AÑADIDO \n");
-	}
-	
-
-	return r;
-	 // nota: uso conversión de tipo de servicio (ServicioEnEmisora) a BLEService
-	 // para addService()
-  } // ()
-
-  
-  // .........................................................
-  // .........................................................
-// --------------------
-// servicio: ServicioEnEmisora --> anyadirServicioConSusCaracteristicas() --> B
-// Añade el servicio GATT sin características adicionales.
-// --------------------
-  bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio ) { 
-	return (*this).anyadirServicio( servicio );
-  } // 
-
-  // .........................................................
-  template <typename ... T>
-// --------------------
-// servicio: ServicioEnEmisora, características: Caracteristica[], restoCaracteristicas:T --> anyadirServicioConSusCaracteristicas() --> B
-// Registra las características antes de añadir el servicio.
-// --------------------
-  bool anyadirServicioConSusCaracteristicas( ServicioEnEmisora & servicio,
-											 ServicioEnEmisora::Caracteristica & caracteristica,
-											 T& ... restoCaracteristicas) {
-
-	servicio.anyadirCaracteristica( caracteristica );
-
-	return anyadirServicioConSusCaracteristicas( servicio, restoCaracteristicas... );
-	
-  } // ()
-
-  // .........................................................
-  template <typename ... T>
-// --------------------
-// servicio: ServicioEnEmisora, restoCaracteristicas: T --> anyadirServicioConSusCaracteristicasYActivar() --> B
-// Añade las características y activa el servicio GATT.
-// --------------------
-  bool anyadirServicioConSusCaracteristicasYActivar( ServicioEnEmisora & servicio,
-													 // ServicioEnEmisora::Caracteristica & caracteristica,
-													 T& ... restoCaracteristicas) {
-
-	bool r = anyadirServicioConSusCaracteristicas( servicio, restoCaracteristicas... );
-
-	servicio.activarServicio();
-
-	return r;
-	
-  } // ()
-
-  // .........................................................
-  // .........................................................
-// --------------------
-// cb: CallbackConexionEstablecida --> instalarCallbackConexionEstablecida() 
-// Registra la notificación de conexión BLE.
-// --------------------
-  void instalarCallbackConexionEstablecida( CallbackConexionEstablecida cb ) {
-	Bluefruit.Periph.setConnectCallback( cb );
-  } // ()
-
-  // .........................................................
-  // .........................................................
-// --------------------
-// cb: CallbackConexionTerminada --> instalarCallbackConexionTerminada() 
-// Registra la notificación de cierre de conexión BLE.
-// --------------------
-  void instalarCallbackConexionTerminada( CallbackConexionTerminada cb ) {
-	Bluefruit.Periph.setDisconnectCallback( cb );
-  } // ()
-
-  // .........................................................
-  // .........................................................
-// --------------------
-// connHandle: N --> getConexion() --> BLEConnection
-// Recupera la conexión asociada al identificador BLE.
-// --------------------
-  BLEConnection * getConexion( uint16_t connHandle ) {
-	return Bluefruit.Connection( connHandle );
-  } // ()
 
 }; // class
 
