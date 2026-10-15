@@ -16,6 +16,7 @@ TABLE mediciones
   fecha: DATETIME(6), NOT NULL, DEFAULT CURRENT_TIMESTAMP(6), PRIMARY KEY compuesto
   tipo: ENUM('CO2', 'TEMPERATURA'), NOT NULL
   valor: DOUBLE, NOT NULL
+  lugar: VARCHAR(100), NOT NULL, DEFAULT 'Ubicación no disponible'
 ```
 
 `Medicion = (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text)` y `Mediciones = [ Medicion ]`. La entrada de alta es `(dispositivo_id, tipo, valor, lugar)`; MySQL asigna `fecha`.

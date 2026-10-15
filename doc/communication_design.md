@@ -14,7 +14,7 @@ Entrada JSON: { "dispositivo_id": Text, "tipo": Text, "valor": R, "lugar": Text 
 Salida correcta: HTTP 201, { "resultado": "medición guardada" }
 
 GET /mediciones
-Salida correcta: HTTP 200, [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]
+Salida correcta: HTTP 200, [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]
 
 OPTIONS /mediciones
 Salida: HTTP 204
