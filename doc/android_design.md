@@ -4,7 +4,7 @@
 
 ### Modelo compartido
 
-`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. No se crea clase `Medicion`. Se pasan `tipo` y `valor`; el servidor crea `id` y `fecha`.
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. No se crea clase `Medicion`. El cliente envía el identificador del sensor, el tipo y el valor; el servidor genera la fecha.
 
 ### Lógica fake y cliente REST
 
@@ -28,7 +28,7 @@ GET /mediciones        --> PeticionarioREST.hacerPeticionREST() --> callback HTT
 
 ### Diseño global de las clases Android
 
-`LogicaFake` valida las mediciones, `PeticionarioREST` realiza la comunicación HTTP, `ServicioEscuharBeacons` controla el escaneo BLE y conecta el beacon con la lógica/REST, y `MainActivity` gestiona permisos, botones y la ejecución manual de pruebas. `ConfiguracionRest` centraliza la URL. No se mantiene una lista local de mediciones: `id` y `fecha` proceden del servidor.
+`LogicaFake` valida las mediciones, `PeticionarioREST` realiza la comunicación HTTP, `ServicioEscuharBeacons` controla el escaneo BLE y conecta el beacon con la lógica/REST, y `MainActivity` gestiona permisos, botones y la ejecución manual de pruebas. `ConfiguracionRest` centraliza la URL. No se mantiene una lista local de mediciones: la fecha procede del servidor.
 
 Convención del diagrama de clase: los campos privados quedan completamente dentro del contorno. Las operaciones públicas se dibujan fuera y entran por una abertura del borde; el borde no se cierra atravesando la operación. Los diagramas siguientes muestran relaciones entre clases; las tablas identifican la visibilidad al describir cada firma.
 
