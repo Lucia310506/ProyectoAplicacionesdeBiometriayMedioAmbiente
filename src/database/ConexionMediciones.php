@@ -34,7 +34,7 @@ function conectarBaseDatos(string $entorno = 'produccion'): PDO {
         "mysql:host={$configuracion['host']};dbname={$configuracion['base']};charset=utf8mb4",
         $configuracion['usuario'],
         $configuracion['password'],
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC] //dEVUELVE EXCEPCIONES Y ARRAYS
     );
 }
 

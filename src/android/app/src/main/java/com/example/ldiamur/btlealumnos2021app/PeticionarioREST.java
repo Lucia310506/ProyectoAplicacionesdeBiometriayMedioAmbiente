@@ -22,6 +22,7 @@ import android.util.Log;
 import org.json.JSONObject;
 
 public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
+    String lugarmedicion="Gandia";
 
     interface AbridorConexion {
         HttpURLConnection abrir(URL url) throws IOException;
@@ -104,7 +105,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
      * --------------------
      */
     public static String obtenerLugarMedicion() {
-        return "Murcia";
+        return "lugarmedicion";
     }
 
     /*
