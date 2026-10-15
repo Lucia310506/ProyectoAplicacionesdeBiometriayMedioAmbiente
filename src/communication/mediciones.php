@@ -42,7 +42,7 @@ function atenderMediciones(string $metodo, string $cuerpo): array {
         return [500, ['error' => 'Error interno del servidor']];
     }
 }
-
+//permitir que los tests carguen este archivo y llamen directamente a atenderMediciones() sin generar automáticamente una respuesta HTTP.
 if (!defined('PRUEBA_REST')) {
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
