@@ -67,7 +67,7 @@
     try {
       window.fetch = async (url) => {
         ruta = url;
-        return { ok: true, text: async () => '[{"id":1,"tipo":"CO2","valor":500,"fecha":"2026-09-25T10:30:00"}]' };
+        return { ok: true, text: async () => '[{"dispositivo_id":"S1","tipo":"CO2","valor":500,"lugar":"Murcia","fecha":"2026-09-25T10:30:00"}]' };
       };
       await caso('PeticionarioREST devuelve mediciones de GET /mediciones', async () => {
         const datos = await window.pedirMediciones();

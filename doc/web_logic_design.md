@@ -47,7 +47,7 @@ Este archivo es un módulo de funciones globales PHP, no una clase instanciable.
 ```text
 ┌────────────────────────────── mediciones.php ───────────────────────────────┐
 │ Estado propio: ninguno                                                       │
-│ guardarMediciones(tipo, valor): void                                         │
+│ guardarMediciones(dispositivo_id, tipo, valor, lugar): void                  │
 │ mostrarMediciones(): Medicion[]                                              │
 │ ejecutarPrimeraConsultaValida(PDO, SQL[], parametros?): fila[]               │
 │ normalizarFilaMedicion(fila): Medicion                                       │
@@ -66,7 +66,7 @@ Una medición de salida tiene la forma `(dispositivo_id: Text, fecha: DateTime, 
 ### Flujo interno de operaciones
 
 ```text
-guardarMediciones(tipo, valor)
+guardarMediciones(dispositivo_id, tipo, valor, lugar)
   ├─ validar tipo ∈ {CO2, TEMPERATURA}
   ├─ validar que valor sea finito
   ├─ resolver entorno y conexión PDO
