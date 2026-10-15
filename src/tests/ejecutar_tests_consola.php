@@ -139,6 +139,11 @@ try {
             $comprobar($codigo === 204, 'OPTIONS /mediciones debe responder 204');
         });
 
+        $agregarResultado('rest', 'Método no permitido devuelve 405', static function () use ($comprobar): void {
+            [$codigo] = atenderMediciones('DELETE', '');
+            $comprobar($codigo === 405, 'DELETE /mediciones debe responder 405');
+        });
+
         $agregarResultado('rest', 'POST /mediciones devuelve 400 sin campos obligatorios', static function () use ($comprobar): void {
             [$codigo] = atenderMediciones('POST', json_encode(['tipo' => 'CO2', 'valor' => 1]));
             $comprobar($codigo === 400, 'El POST incompleto debe responder 400');
