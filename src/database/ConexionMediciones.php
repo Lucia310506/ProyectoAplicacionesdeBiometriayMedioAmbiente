@@ -8,10 +8,7 @@
  * Aportación: crear el archivo y hacerlo funcional
  */
 
-// --------------------
-// entorno: Text --> conectarBaseDatos() --> PDO
-// Construye la conexión PDO con la configuración resuelta para el entorno.
-// --------------------
+
 
 // --------------------
 // nombre: Text --> variableEntorno() --> Texto|Falso
@@ -27,7 +24,10 @@ function variableEntorno(string $nombre) {
     }
     return $valor;
 }
-
+// --------------------
+// entorno: Text --> conectarBaseDatos() --> PDO
+// Construye la conexión PDO con la configuración resuelta para el entorno.
+// --------------------
 function conectarBaseDatos(string $entorno = 'produccion'): PDO {
     $configuracion = obtenerConfiguracion($entorno);
     return new PDO(
