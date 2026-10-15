@@ -54,7 +54,7 @@ flowchart LR
 5. `LogicaFake.guardarMediciones` valida tipo CO2/TEMPERATURA y valor finito.
 6. `PeticionarioREST.enviarMedicion` crea el JSON y hace POST a la URL configurada.
 7. El endpoint valida JSON y método, luego delega a la lógica PHP.
-8. La lógica selecciona PDO, prepara el INSERT y MySQL genera `id` y `fecha`.
+8. La lógica selecciona PDO, prepara el INSERT y MySQL genera la `fecha`.
 9. La API responde 201 cuando el alta acaba correctamente; Android registra el estado HTTP.
 
 ### Secuencia de consulta web

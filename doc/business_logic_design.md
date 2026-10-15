@@ -40,10 +40,10 @@ Mediciones <-- mostrarMediciones() <--
 
 | Función | Diseño lógico | Responsabilidad |
 |---|---|---|
-| `guardarMediciones(dispositivo_id: Text, tipo: Text, valor: R, lugar: Text)` | `dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA, valores no finitos y lugar vacío; inserta de forma parametrizada en `mediciones`. No devuelve dato. |
-| `mostrarMediciones()` | `--> mostrarMediciones() --> [Medicion]` | Lee todas las filas, ordenadas de más reciente a más antigua, y las normaliza. |
+| `guardarMediciones(dispositivo_id: Text, tipo: Text, valor: R, lugar: Text, conexion?: PDO opcional)` | `dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA, valores no finitos y lugar vacío; inserta de forma parametrizada en `mediciones`. No devuelve dato. |
+| `mostrarMediciones(conexion?: PDO opcional)` | `--> mostrarMediciones() --> [Medicion]` | Lee todas las filas, ordenadas de más reciente a más antigua, y las normaliza. |
 | `ejecutarPrimeraConsultaValida(bd: BaseDatos, consultas: [Consulta], parametros: [Parametro])` | `bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]` | Detalle interno de persistencia: ejecuta consultas candidatas en orden; devuelve filas para lectura o lista vacía en alta; comunica fallo para que la capa externa lo maneje. `PDO` y `PDOException` son detalles de implementación, no tipos del diseño lógico. |
-| `normalizarFilaMedicion(fila: Fila)` | `fila: Fila --> normalizarFilaMedicion() --> Medicion` | Convierte columnas a los tipos estables del contrato (`id`, `tipo`, `valor`, `fecha`). |
+| `normalizarFilaMedicion(fila: Fila)` | `fila: Fila --> normalizarFilaMedicion() --> Medicion` | Convierte columnas a los tipos estables del contrato (`dispositivo_id`, `tipo`, `valor`, `lugar`, `fecha`). |
 
 ### Reglas y fallos
 

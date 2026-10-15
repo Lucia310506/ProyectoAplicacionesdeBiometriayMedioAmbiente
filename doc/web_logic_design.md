@@ -6,7 +6,7 @@
 
 `MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`
 
-El servidor crea `id` y `fecha`. No se crea una clase `Medicion`; los datos de entrada se pasan directamente como `tipo` y `valor`.
+El servidor crea `fecha`; no crea ni devuelve un `id` autogenerado. La alta recibe dispositivo, tipo, valor y lugar. No se crea una clase `Medicion`.
 
 ### Diseño lógico
 
@@ -59,7 +59,7 @@ Este archivo es un módulo de funciones globales PHP, no una clase instanciable.
 | `guardarMediciones(string dispositivo_id, string tipo, float valor, string lugar): void` | `dispositivo_id: Text, tipo: Text, valor: R, lugar: Text --> guardarMediciones() -->` | Rechaza dispositivo vacío, tipos distintos de CO2/TEMPERATURA, números no finitos y lugar vacío; inserta con consulta preparada. No devuelve un valor. |
 | `mostrarMediciones(): array` | `--> mostrarMediciones() --> Medicion[]` | Consulta las filas ordenadas de más recientes a más antiguas y normaliza cada una. |
 | `ejecutarPrimeraConsultaValida(PDO conexion, array consultas, ?array parametros): array` | `bd: BaseDatos, consultas: [Consulta], parametros: [Parametro] --> ejecutarPrimeraConsultaValida() --> [Fila]` | Detalle interno de persistencia; prueba consultas en orden, devuelve filas de lectura o lista vacía al insertar y propaga un fallo si ninguna variante funciona. PDO es detalle de implementación. |
-| `normalizarFilaMedicion(array fila): array` | `fila: Dict --> normalizarFilaMedicion() --> Medicion` | Convierte nombres alternativos de columnas y valores a `id` entero, `tipo` texto, `valor` decimal y `fecha` texto. |
+| `normalizarFilaMedicion(array fila): array` | `fila: Dict --> normalizarFilaMedicion() --> Medicion` | Convierte nombres alternativos de columnas y valores a `dispositivo_id` texto, `tipo` texto, `valor` decimal, `lugar` texto y `fecha` texto. |
 
 Una medición de salida tiene la forma `(dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text)`; el alta recibe `dispositivo_id`, `tipo`, `valor` y `lugar`.
 
@@ -70,7 +70,7 @@ guardarMediciones(tipo, valor)
   ├─ validar tipo ∈ {CO2, TEMPERATURA}
   ├─ validar que valor sea finito
   ├─ resolver entorno y conexión PDO
-  └─ ejecutar INSERT preparado; MySQL asigna id/fecha
+  └─ ejecutar INSERT preparado; MySQL asigna fecha
 
 mostrarMediciones()
   ├─ resolver entorno y conexión PDO
@@ -91,7 +91,7 @@ Las variantes de consultas responden a diferencias históricas de mayúsculas en
 
 ## Design Clarifications
 
-- Los datos de alta son solo tipo y valor; la base de datos asigna identificador y fecha.
+- Los datos de alta incluyen dispositivo, tipo, valor y lugar; la base de datos asigna la fecha.
 - Las pruebas usan exclusivamente la base de datos de pruebas y vacían/verifican la tabla antes y después de cada caso.
 
 ## General Rules

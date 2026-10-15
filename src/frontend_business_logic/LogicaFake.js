@@ -10,7 +10,7 @@
 /*
  * --------------------
  * Entradas: ninguna.
- * Tipo: Medicion = (id: N, tipo: Text, valor: R, fecha: DateTime).
+ * Tipo: Medicion = (dispositivo_id: Text, tipo: Text, valor: R, lugar: Text, fecha: DateTime).
  * --> mostrarMediciones() --> Mediciones = [Medicion]
  * Responsabilidad: obtiene mediciones por REST y las entrega a la UX.
  * Salida: lista Mediciones; propaga errores REST o si la respuesta no es una lista.

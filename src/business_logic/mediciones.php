@@ -7,7 +7,7 @@
  * Copyright (c) 2026 Lucía Díaz Murcia
  * Aportación: crear el archivo y hacerlo funcional
  */
-//BD: MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R) ]
+//BD: MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]
 require_once __DIR__ . '/../database/ConexionMediciones.php';
 
 // --------------------

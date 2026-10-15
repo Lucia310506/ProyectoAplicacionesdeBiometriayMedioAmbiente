@@ -4,21 +4,21 @@
 
 ### Modelo compartido
 
-`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. No se crea una clase `Medicion`. El cliente envía `tipo` y `valor`; el servidor crea `id` y `fecha`.
+`MEDICIONES = [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]`. No se crea una clase `Medicion`. El cliente envía dispositivo, tipo, valor y lugar; el servidor crea la fecha.
 
 ### Rutas REST
 
 ```text
 POST /mediciones
 (dispositivo_id: Text, tipo: Text, valor: R, lugar: Text) --> guardarMediciones() -->
-JSON de entrada: { "tipo": "CO2", "valor": 500 }
+JSON de entrada: { "dispositivo_id": "sensor_1", "tipo": "CO2", "valor": 500, "lugar": "Ubicación no disponible" }
 El POST Android devuelve una respuesta HTTP 201 cuando se guarda correctamente; el cliente debe informar errores HTTP.
 
 GET /mediciones
 mostrarMediciones() --> [ (dispositivo_id: Text, fecha: DateTime, tipo: Text, valor: R, lugar: Text) ]
 JSON de salida: [
-  { "id": 1, "tipo": "CO2", "valor": 500, "fecha": "2026-09-25T10:30:00" },
-  { "id": 2, "tipo": "TEMPERATURA", "valor": -19, "fecha": "2026-09-25T10:31:00" }
+  { "dispositivo_id": "S1", "tipo": "CO2", "valor": 500, "lugar": "Murcia", "fecha": "2026-09-25T10:30:00" },
+  { "dispositivo_id": "S2", "tipo": "TEMPERATURA", "valor": -19, "lugar": "Murcia", "fecha": "2026-09-25T10:31:00" }
 ]
 ```
 
