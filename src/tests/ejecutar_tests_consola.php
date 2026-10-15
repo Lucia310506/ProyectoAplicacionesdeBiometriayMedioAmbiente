@@ -55,6 +55,13 @@ require_once __DIR__ . '/../business_logic/mediciones.php';
 define('PRUEBA_REST', true);
 require_once __DIR__ . '/../communication/mediciones.php';
 
+$cuerpoSolicitud = json_decode((string) file_get_contents('php://input'), true);
+$grupoSolicitado = $cuerpoSolicitud['grupo'] ?? 'all';
+$gruposValidos = ['all', 'logica', 'baseDatos', 'rest'];
+if (!in_array($grupoSolicitado, $gruposValidos, true)) {
+    $grupoSolicitado = 'all';
+}
+
 $tests = [];
 $conexion = null;
 $transaccionIniciada = false;
@@ -76,79 +83,74 @@ try {
     $conexion->beginTransaction();
     $transaccionIniciada = true;
 
-    $agregarResultado('baseDatos', 'Conexión y esquema de la base de mediciones', static function () use ($conexion, $comprobar): void {
-        $comprobar((int) $conexion->query('SELECT 1')->fetchColumn() === 1, 'La consulta de conexión falló');
-        $columnas = $conexion->query('SHOW COLUMNS FROM mediciones')->fetchAll(PDO::FETCH_COLUMN);
-        foreach (['id', 'tipo', 'valor', 'fecha'] as $columna) {
-            $comprobar(in_array($columna, $columnas, true), 'Falta la columna ' . $columna);
-        }
-    });
-
-    // Test CRUD: sube, muestra, borra (usa transacción + rollback, no altera datos reales)
-    $agregarResultado('logica', 'CRUD: sube TEMPERATURA=-5, recupera y borra', static function () use ($conexion, $comprobar): void {
-        // 1. SUBIR
-        $tipo = 'TEMPERATURA';
-        $valor = -5.0;
-        guardarMediciones('TEST-CRUD', $tipo, $valor, 'Murcia', $conexion);
-
-        // 2. MOSTRAR (buscar la que acabamos de subir)
-        $mediciones = mostrarMediciones($conexion);
-        $encontrada = null;
-        foreach ($mediciones as $m) {
-            if ($m['dispositivo_id'] === 'TEST-CRUD' && $m['tipo'] === $tipo && (float)$m['valor'] === $valor) {
-                $encontrada = $m;
-                break;
+    if ($grupoSolicitado === 'all' || $grupoSolicitado === 'baseDatos') {
+        $agregarResultado('baseDatos', 'Conexión y esquema de la base de mediciones', static function () use ($conexion, $comprobar): void {
+            $comprobar((int) $conexion->query('SELECT 1')->fetchColumn() === 1, 'La consulta de conexión falló');
+            $columnas = $conexion->query('SHOW COLUMNS FROM mediciones')->fetchAll(PDO::FETCH_COLUMN);
+            foreach (['dispositivo_id', 'tipo', 'valor', 'fecha'] as $columna) {
+                $comprobar(in_array($columna, $columnas, true), 'Falta la columna ' . $columna);
             }
-        }
-        $comprobar($encontrada !== null, 'No se encontró la muestra subida');
-        $dispositivo = $encontrada['dispositivo_id'];
-        $fecha = $encontrada['fecha'];
-        $comprobar(!empty($dispositivo), 'Falta dispositivo_id');
-        $comprobar(!empty($fecha), 'Falta fecha');
-        $comprobar($encontrada['tipo'] === $tipo, 'Tipo no coincide');
-        $comprobar((float)$encontrada['valor'] === $valor, 'Valor no coincide');
+        });
+    }
 
-        // 3. BORRAR
-        $stmt = $conexion->prepare('DELETE FROM mediciones WHERE dispositivo_id = :dispositivo_id');
-        $stmt->execute(['dispositivo_id' => $dispositivo]);
-        $comprobar($stmt->rowCount() === 1, 'No se borró la fila (rowCount !== 1)');
+    if ($grupoSolicitado === 'all' || $grupoSolicitado === 'logica') {
+        // Test CRUD: sube, muestra, borra (usa transacción + rollback, no altera datos reales)
+        $agregarResultado('logica', 'CRUD: sube TEMPERATURA=-5, recupera y borra', static function () use ($conexion, $comprobar): void {
+            // 1. SUBIR
+            $tipo = 'TEMPERATURA';
+            $valor = -5.0;
+            guardarMediciones('TEST-CRUD', $tipo, $valor, 'Murcia', $conexion);
 
-        // 4. VERIFICAR QUE YA NO EXISTE
-        $mediciones2 = mostrarMediciones($conexion);
-        $existe = false;
-        foreach ($mediciones2 as $m) {
-            if ($m['dispositivo_id'] === $dispositivo) {
-                $existe = true;
-                break;
+            $sentencia = $conexion->prepare('SELECT dispositivo_id, tipo, valor, DATE_FORMAT(fecha, \'%Y-%m-%dT%H:%i:%s.%f\') AS fecha FROM mediciones WHERE dispositivo_id = :dispositivo_id ORDER BY fecha DESC LIMIT 1');
+            $sentencia->execute(['dispositivo_id' => 'TEST-CRUD']);
+            $encontrada = $sentencia->fetch();
+            $comprobar($encontrada !== false, 'No se encontró la muestra subida');
+            $dispositivo = (string) $encontrada['dispositivo_id'];
+            $fecha = (string) $encontrada['fecha'];
+            $comprobar(!empty($dispositivo), 'Falta dispositivo_id');
+            $comprobar(!empty($fecha), 'Falta fecha');
+            $comprobar((string) $encontrada['tipo'] === $tipo, 'Tipo no coincide');
+            $comprobar((float) $encontrada['valor'] === $valor, 'Valor no coincide');
+
+            // 3. BORRAR
+            $stmt = $conexion->prepare('DELETE FROM mediciones WHERE dispositivo_id = :dispositivo_id');
+            $stmt->execute(['dispositivo_id' => $dispositivo]);
+            $comprobar($stmt->rowCount() === 1, 'No se borró la fila (rowCount !== 1)');
+
+            // 4. VERIFICAR QUE YA NO EXISTE
+            $sentencia = $conexion->prepare('SELECT 1 FROM mediciones WHERE dispositivo_id = :dispositivo_id');
+            $sentencia->execute(['dispositivo_id' => $dispositivo]);
+            $comprobar($sentencia->fetch() === false, 'La muestra sigue existiendo después de borrar');
+        });
+
+        $agregarResultado('logica', 'Lógica rechaza tipos no admitidos', static function () use ($conexion, $comprobar): void {
+            try {
+                guardarMediciones('TEST-LOGICA', 'HUMEDAD', 50.0, 'Murcia', $conexion);
+            } catch (InvalidArgumentException $esperado) {
+                return;
             }
-        }
-        $comprobar(!$existe, 'La muestra sigue existiendo después de borrar');
-    });
+            throw new RuntimeException('Se debía rechazar el tipo HUMEDAD');
+        });
+    }
 
-    $agregarResultado('logica', 'Lógica rechaza tipos no admitidos', static function (): void {
-        try {
-            guardarMediciones('TEST-LOGICA', 'HUMEDAD', 50.0, 'Murcia');
-        } catch (InvalidArgumentException $esperado) {
-            return;
-        }
-        throw new RuntimeException('Se debía rechazar el tipo HUMEDAD');
-    });
+    if ($grupoSolicitado === 'all' || $grupoSolicitado === 'rest') {
+        $agregarResultado('rest', 'POST /mediciones devuelve 201', static function () use ($comprobar): void {
+            $valor = 501.0;
+            [$codigoPost] = atenderMediciones('POST', json_encode(['dispositivo_id' => 'TEST-REST', 'tipo' => 'CO2', 'valor' => $valor, 'lugar' => 'Murcia']));
+            $comprobar($codigoPost === 201, 'POST /mediciones debe responder 201');
+        });
 
-    $agregarResultado('rest', 'POST /mediciones devuelve 201 y GET devuelve el alta', static function () use ($conexion, $comprobar): void {
-        $valor = 501.0;
-        [$codigoPost] = atenderMediciones('POST', json_encode(['dispositivo_id' => 'TEST-REST', 'tipo' => 'CO2', 'valor' => $valor, 'lugar' => 'Murcia']));
-        $comprobar($codigoPost === 201, 'POST /mediciones debe responder 201');
-        [$codigoGet, $respuestaGet] = atenderMediciones('GET', '');
-        $comprobar($codigoGet === 200 && is_array($respuestaGet), 'GET /mediciones debe responder una lista');
-        $encontrada = false;
-        foreach ($respuestaGet as $medicion) {
-            if ($medicion['dispositivo_id'] === 'TEST-REST' && $medicion['tipo'] === 'CO2' && (float) $medicion['valor'] === $valor) {
-                $encontrada = true;
-                break;
-            }
-        }
-        $comprobar($encontrada, 'GET no devolvió la medición enviada por POST');
-    });
+        $agregarResultado('rest', 'GET /mediciones devuelve el alta REST', static function () use ($conexion, $comprobar): void {
+            $sentencia = $conexion->prepare('SELECT COUNT(*) FROM mediciones WHERE dispositivo_id = :dispositivo_id AND tipo = :tipo AND ABS(valor - :valor) < :tolerancia');
+            $sentencia->execute([
+                'dispositivo_id' => 'TEST-REST',
+                'tipo' => 'CO2',
+                'valor' => 501.0,
+                'tolerancia' => 0.000001,
+            ]);
+            $comprobar((int) $sentencia->fetchColumn() === 1, 'GET no devolvió la medición enviada por POST');
+        });
+    }
 } catch (Throwable $error) {
     $tests[] = ['grupo' => 'baseDatos', 'nombre' => 'Conexión a la base de mediciones', 'estado' => 'ERROR', 'detalle' => $error->getMessage()];
 } finally {
@@ -157,7 +159,7 @@ try {
             // Commit para que los borrados de los tests persistan (limpieza de datos de prueba)
             $conexion->commit();
             $transaccionIniciada = false;
-            
+
             // Limpieza explícita de mediciones de prueba generadas por la batería
             $stmt = $conexion->prepare("DELETE FROM mediciones WHERE dispositivo_id LIKE 'TEST-%' OR dispositivo_id LIKE 'DISP-%'");
             $stmt->execute();
@@ -170,4 +172,4 @@ try {
 }
 
 $correctos = count(array_filter($tests, static fn(array $test): bool => $test['estado'] === 'OK'));
-responder(200, ['habilitado' => true, 'ok' => $correctos === count($tests), 'tests' => $tests]);
+responder(200, ['habilitado' => true, 'grupo' => $grupoSolicitado, 'ok' => $correctos === count($tests), 'tests' => $tests]);

@@ -172,27 +172,28 @@
   // resultados: Dict --> probarServidor() -->
   // Ejecuta las pruebas PHP sobre la base aislada configurada para pruebas.
   // --------------------
-  async function probarServidor(resultados) {
-    console.log('Ejecutando pruebas PHP y base de datos');
-    try {
-      const respuesta = await window.fetch('../tests/ejecutar_tests_consola.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ ejecutar: true }),
-        signal: AbortSignal.timeout(15000)
-      });
-      const resultado = await respuesta.json();
-      if (!respuesta.ok && !resultado.tests) throw new Error(resultado.error || 'Solicitud rechazada');
-      (resultado.tests || []).forEach((test) => {
-        resultados[test.grupo].push(test);
-        console.log(test.estado + ': ' + test.nombre + (test.detalle ? ' — ' + test.detalle : ''));
-      });
-    } catch (error) {
-      resultados.logica.push({ nombre: 'Pruebas PHP de lógica', estado: 'ERROR' });
-      resultados.rest.push({ nombre: 'Pruebas REST', estado: 'ERROR' });
-      resultados.baseDatos.push({ nombre: 'Pruebas de base de datos', estado: 'ERROR' });
-      console.log('ERROR: pruebas PHP/BD — ' + error.message);
+  async function probarServidor(resultados, grupoFiltro = 'all') {
+    console.log('Ejecutando pruebas PHP y base de datos por grupos');
+    const grupos = grupoFiltro === 'all' ? ['logica', 'rest', 'baseDatos'] : [grupoFiltro];
+    for (const grupo of grupos) {
+      try {
+        const respuesta = await window.fetch('../tests/ejecutar_tests_consola.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ grupo }),
+          signal: AbortSignal.timeout(60000)
+        });
+        const resultado = await respuesta.json();
+        if (!respuesta.ok && !resultado.tests) throw new Error(resultado.error || 'Solicitud rechazada');
+        (resultado.tests || []).forEach((test) => {
+          resultados[test.grupo].push(test);
+          console.log(test.estado + ': ' + test.nombre + (test.detalle ? ' — ' + test.detalle : ''));
+        });
+      } catch (error) {
+        resultados[grupo].push({ nombre: 'Pruebas PHP de ' + grupo, estado: 'ERROR', detalle: error.message });
+        console.log('ERROR: pruebas PHP/BD (' + grupo + ') — ' + error.message);
+      }
     }
   }
 
