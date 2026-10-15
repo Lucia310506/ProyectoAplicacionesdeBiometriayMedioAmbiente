@@ -4,6 +4,7 @@
  * Descripción: Prueba automática del GET del PeticionarioREST web.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 const fs = require('fs');

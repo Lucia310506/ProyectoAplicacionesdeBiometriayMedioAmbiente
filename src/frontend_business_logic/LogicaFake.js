@@ -4,6 +4,7 @@
  * Descripción: Fachada de dominio para las consultas que necesita la interfaz web.
  * Fecha: 2026-10-09
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 /*

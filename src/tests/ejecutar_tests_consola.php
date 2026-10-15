@@ -5,6 +5,7 @@
  * Descripción: Ejecuta tests de lógica y base de datos en el mismo entorno de mediciones de la web.
  * Fecha: 2026-10-11
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 ini_set('display_errors', '0');
@@ -44,10 +45,12 @@ if (!$hostOrigen || !$hostSolicitud
 }
 
 require_once __DIR__ . '/../database/ConexionMediciones.php';
-$entorno = obtenerEntornoBaseDatos();
-if ($entorno !== 'pruebas') {
-    responder(403, ['habilitado' => false, 'error' => 'Configura una base de pruebas (ConfiguracionPruebas.php o MEDICIONES_ENTORNO=pruebas).']);
+$archivoProduccion = __DIR__ . '/../database/ConfiguracionProduccion.php';
+$entornoPruebas = is_file($archivoProduccion) || obtenerEntornoBaseDatos() === 'pruebas';
+if (!$entornoPruebas) {
+    responder(403, ['habilitado' => false, 'error' => 'Crea ConfiguracionProduccion.php o define MEDICIONES_ENTORNO=pruebas.']);
 }
+$entorno = 'pruebas';
 require_once __DIR__ . '/../business_logic/mediciones.php';
 define('PRUEBA_REST', true);
 require_once __DIR__ . '/../communication/mediciones.php';

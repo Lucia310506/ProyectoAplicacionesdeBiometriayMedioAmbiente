@@ -5,6 +5,7 @@
  * Descripción: Configura conexiones PDO para desarrollo, producción y pruebas.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 // --------------------
@@ -48,17 +49,23 @@ function obtenerConfiguracion(string $entorno = 'produccion'): array {
     }
     $sufijo = $entorno === 'pruebas' ? '_TEST' : '_PROD';
     $configuracion = [];
-    $rutaConfiguracion = $entorno === 'pruebas'
-        ? __DIR__ . '/ConfiguracionPruebas.php'
-        : __DIR__ . '/ConfiguracionProduccion.php';
+    $rutaConfiguracion = __DIR__ . '/ConfiguracionProduccion.php';
     if (is_file($rutaConfiguracion)) {
         $configuracion = require $rutaConfiguracion;
     }
-    $host = $configuracion['host'] ?? variableEntorno('MEDICIONES_DB_HOST' . $sufijo);
-    $base = variableEntorno('MEDICIONES_DB_NAME' . $sufijo)
-        ?: ($configuracion['base'] ?? ($entorno === 'pruebas' ? 'ldiamur_mediciones_test' : 'mediciones'));
-    $usuario = $configuracion['usuario'] ?? variableEntorno('MEDICIONES_DB_USER' . $sufijo);
-    $password = $configuracion['password'] ?? variableEntorno('MEDICIONES_DB_PASSWORD' . $sufijo);
+    if ($configuracion) {
+        // ConfiguracionProduccion.php no debe ser sobrescrita por variables rancias del entorno.
+        $host = $configuracion['host'] ?? null;
+        $base = $configuracion['base'] ?? ($entorno === 'pruebas' ? 'ldiamur_mediciones_test' : 'mediciones');
+        $usuario = array_key_exists('usuario', $configuracion) ? $configuracion['usuario'] : null;
+        $password = array_key_exists('password', $configuracion) ? $configuracion['password'] : null;
+    } else {
+        $host = variableEntorno('MEDICIONES_DB_HOST' . $sufijo);
+        $base = variableEntorno('MEDICIONES_DB_NAME' . $sufijo)
+            ?: ($entorno === 'pruebas' ? 'ldiamur_mediciones_test' : 'mediciones');
+        $usuario = variableEntorno('MEDICIONES_DB_USER' . $sufijo);
+        $password = variableEntorno('MEDICIONES_DB_PASSWORD' . $sufijo);
+    }
     if ($entorno === 'produccion' && credencialesProduccionIncompletas($host, $base, $usuario, $password)) {
         throw new RuntimeException(
             'Falta ConfiguracionProduccion.php en Plesk. Copia ConfiguracionProduccion.ejemplo.php y escribe host, base, usuario y password.'

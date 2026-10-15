@@ -6,7 +6,7 @@
 
 La lógica fake web ofrece a la interfaz una operación de dominio para consultar las mediciones. La UX llama a `mostrarMediciones()` y recibe una lista `Medicion[]`; no necesita conocer `fetch`, el código HTTP ni cómo se interpreta el cuerpo de respuesta. El transporte se delega en `PeticionarioREST.js`.
 
-La fuente organizada por componentes se encuentra en `src/frontend_business_logic/LogicaFake.js`.
+La fuente organizada por componentes se encuentra en `src/frontend_business_logic/LogicaFake.js`. El contrato del navegador conserva el campo `lugar` además de `dispositivo_id`, `fecha`, `tipo` y `valor`.
 
 ### Diseño global del módulo
 
@@ -64,7 +64,7 @@ No hay una operación frontend `guardarMediciones()` porque la interfaz web actu
 
 | Operación | Contrato de negocio backend | Contrato consumido por frontend | Paridad |
 |---|---|---|---|
-| Leer mediciones | `--> mostrarMediciones() --> [Medicion]` devuelve `id`, `tipo`, `valor`, `fecha`. | `--> mostrarMediciones() --> [Medicion]` presenta el mismo contrato al cliente GUI; la implementación materializa la asincronía con `Promise`. | Identidad de firma lógica y resultado de dominio. |
+| Leer mediciones | `--> mostrarMediciones() --> [Medicion]` devuelve `dispositivo_id`, `tipo`, `valor`, `fecha` y `lugar`. | `--> mostrarMediciones() --> [Medicion]` presenta el mismo contrato al cliente GUI, incluido `lugar`; la implementación materializa la asincronía con `Promise`. | Identidad de firma lógica y resultado de dominio. |
 | Guardar medición | `guardarMediciones(tipo, valor): void`; valida y persiste. | No expuesto por la UX web actual. | No aplica: la interfaz no ofrece alta. |
 
 La fachada puede fallar por conectividad/HTTP y la lógica PHP puede fallar por validación o base de datos. La fachada no altera ni oculta esos errores; la UX es responsable de presentarlos.

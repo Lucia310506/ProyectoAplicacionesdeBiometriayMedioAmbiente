@@ -5,6 +5,7 @@
  * Descripción: Esta clase publica los datos de temperatura y CO2 en un beacon.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 // --------------------------------------------------------------
 // Jordi Bataller i Mascarell
@@ -21,6 +22,7 @@ class Publicador {
   // ............................................................
 private:
 
+  // UUID del beacon: identifica el grupo o familia del emisor (16 bytes).
   uint8_t beaconUUID[16] = { 
 	'E', 'P', 'S', 'G', '-', 'G', 'T', 'I', 
 	'-', 'P', 'R', 'O', 'Y', '-', '3', 'A'
@@ -29,8 +31,10 @@ private:
   // ............................................................
   // ............................................................
 public:
+  // COMENTARIO: el nombre de esta emisora actúa como identificador del sensor si no hay MAC disponible.
+  // El sufijo "-01" debe cambiarse en cada placa para que cada sensor sea único.
   EmisoraBLE laEmisora {
-	"LuciaGTI", //  nombre emisora
+	"LuciaGTI-01", //  nombre emisora + sensor ID
 	  0x004c, // fabricanteID (Apple)
 	  4 // txPower
 	  };
@@ -48,6 +52,14 @@ public:
 	TEMPERATURA = 12,
 	RUIDO = 13,
 	PRUEBA = 14
+  };
+
+  // Identificadores de las sondas físicas instaladas en una placa.
+  // Solo se reserva un nibble (15 sensores), ampliable cuando se necesite más espacio.
+  enum SensorID {
+	SENSOR_01 = 1,
+	SENSOR_02 = 2,
+	SENSOR_03 = 3
   };
 
   static constexpr int16_t VALOR_BEACON_PRUEBA = 0x5A3C; //Variable Beacon de pruebas.
@@ -81,13 +93,14 @@ public:
 // Emite CO2 y detiene el anuncio al terminar el intervalo.
 // --------------------
   void publicarCO2( int16_t valorCO2, uint8_t contador,
-					long tiempoEspera ) {
+					long tiempoEspera, uint8_t idSensor = SensorID::SENSOR_01 ) {
 
 	// 1. empezamos anuncio
-	uint16_t major = (MedicionesID::CO2 << 8) + contador;
+	// Encoding del mayor: sensor en nibble 15-12, tipo CO2 en nibble 11-8 y contador en bits 7-0.
+	uint16_t major = (idSensor << 12) | (MedicionesID::CO2 << 8) | (contador & 0xff);
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
-											valorCO2, // minor
+											valorCO2, // Minor: valor medido (CO2) con signo compactado.
 											(*this).RSSI // rssi
 									);
 
@@ -116,12 +129,13 @@ public:
 // --------------------
 
   void publicarTemperatura( int16_t valorTemperatura,
-							uint8_t contador, long tiempoEspera ) {
+							uint8_t contador, long tiempoEspera, uint8_t idSensor = SensorID::SENSOR_01 ) {
 
-	uint16_t major = (MedicionesID::TEMPERATURA << 8) + contador;
+	// Major: mismo esquema para el tipo TEMPERATURA.
+	uint16_t major = (idSensor << 12) | (MedicionesID::TEMPERATURA << 8) | (contador & 0xff);
 	(*this).laEmisora.emitirAnuncioIBeacon( (*this).beaconUUID, 
 											major,
-											valorTemperatura, // minor
+											valorTemperatura, // Minor: valor medido (temperatura) con signo.
 											(*this).RSSI // rssi
 									);
 	esperar( tiempoEspera );
@@ -134,7 +148,7 @@ public:
   // Anuncia un iBeacon con tipo PRUEBA y un valor centinela reconocible.
   // --------------------
   void iniciarBeaconPrueba( uint8_t contador ) {
-	const uint16_t major = (MedicionesID::PRUEBA << 8) | contador;
+	const uint16_t major = (SensorID::SENSOR_01 << 12) | (MedicionesID::PRUEBA << 8) | (contador & 0xff);
 	(*this).laEmisora.emitirAnuncioIBeacon(
 	  (*this).beaconUUID,
 	  major,

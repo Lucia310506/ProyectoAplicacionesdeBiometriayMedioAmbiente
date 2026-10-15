@@ -5,6 +5,7 @@
  * Descripción: Prueba de integración de las rutas REST con la base de pruebas.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 putenv('MEDICIONES_ENTORNO=pruebas');

@@ -4,6 +4,7 @@
  * Descripción: Clase principal que ejecuta las comprobaciones y gestiona los permisos de Bluetooth.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 package com.example.ldiamur.btlealumnos2021app;
 // ------------------------------------------------------------------

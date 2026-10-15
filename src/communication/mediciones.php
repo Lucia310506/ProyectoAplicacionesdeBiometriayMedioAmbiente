@@ -5,6 +5,7 @@
  * Descripción: Implementa las rutas REST GET y POST de mediciones.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 
 ini_set('display_errors', '0');

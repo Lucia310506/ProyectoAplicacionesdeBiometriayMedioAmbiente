@@ -4,6 +4,7 @@
  * Descripción: Servicio en segundo plano que escucha beacons y publica mediciones.
  * Fecha: 2026-09-25
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 package com.example.ldiamur.btlealumnos2021app;
 
@@ -44,7 +45,7 @@ public class ServicioEscuharBeacons extends Service {
             "com.example.ldiamur.btlealumnos2021app.RESULTADO_BEACON_PRUEBA";
     public static final String EXTRA_BEACON_ENCONTRADO = "beacon_encontrado";
     private static final String ETIQUETA_LOG = ">>>>";
-    private static final String NOMBRE_BEACON = "LuciaGTI";
+    private static final String PREFIJO_NOMBRE_BEACON = "LuciaGTI";
     private static final String CANAL_ID = "escucha_beacons";
     private static final int ID_NOTIFICACION = 1001;
     private static final int TIPO_BEACON_PRUEBA = 14;
@@ -57,6 +58,7 @@ public class ServicioEscuharBeacons extends Service {
     private BluetoothLeScanner elEscanner;
     private ScanCallback callbackDelEscaneo;
     private int ultimoTipoMedida = -1;
+    private int ultimoSensorId = -1;
     private int ultimoContador = -1;
     private boolean modoBusquedaPrueba = false;
     private boolean beaconPruebaEncontrado = false;
@@ -219,13 +221,17 @@ public class ServicioEscuharBeacons extends Service {
         ScanFilter filtro = modoBusquedaPrueba
                 ? new ScanFilter.Builder().setManufacturerData(0x004c,
                         new byte[]{0x02, 0x15}, new byte[]{(byte) 0xff, (byte) 0xff}).build()
-                : new ScanFilter.Builder().setDeviceName(NOMBRE_BEACON).build();
+                : null;
         ScanSettings ajustes = new ScanSettings.Builder()
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .build();
 
-        elEscanner.startScan(Collections.singletonList(filtro), ajustes, callbackDelEscaneo);
-        Log.d(ETIQUETA_LOG, "Servicio: escuchando beacons " + NOMBRE_BEACON);
+        if (filtro == null) {
+            elEscanner.startScan((List<ScanFilter>) null, ajustes, callbackDelEscaneo);
+        } else {
+            elEscanner.startScan(Collections.singletonList(filtro), ajustes, callbackDelEscaneo);
+        }
+        Log.d(ETIQUETA_LOG, "Servicio: escuchando beacons con prefijo " + PREFIJO_NOMBRE_BEACON);
     }
 
     /*
@@ -240,12 +246,20 @@ public class ServicioEscuharBeacons extends Service {
         }
 
         BluetoothDevice dispositivoBluetooth = resultado.getDevice();
+        String nombreSensor = dispositivoBluetooth.getName();
+        if (!modoBusquedaPrueba
+                && (nombreSensor == null || !nombreSensor.startsWith(PREFIJO_NOMBRE_BEACON))) {
+            return;
+        }
+        String dispositivoIdSensor = (nombreSensor == null || nombreSensor.trim().isEmpty())
+                ? "SENSOR_DESCONOCIDO" : nombreSensor;
         byte[] bytes = resultado.getScanRecord().getBytes();
         int rssi = resultado.getRssi();
         TramaIBeacon trama = new TramaIBeacon(bytes);
 
         int major = Utilidades.bytesToInt(trama.getMajor());
-        int tipoMedida = major >> 8;
+        int sensorId = (major >> 12) & 0x0F;
+        int tipoMedida = (major >> 8) & 0x0F;
         int contador = major & 0xff;
         int valor = Utilidades.bytesToInt(trama.getMinor());
         if (modoBusquedaPrueba) {
@@ -297,10 +311,10 @@ public class ServicioEscuharBeacons extends Service {
         // Major empaqueta tipo en el byte alto y contador en el bajo; Minor se interpreta con signo.
         if (tipoMedida == 11) {
             Log.d(ETIQUETA_LOG, "Servicio: CO2 = " + valor + " ppm (muestra " + contador + ")");
-            enviarMedicionNueva("CO2", valor, tipoMedida, contador, dispositivoBluetooth.getAddress());
+            enviarMedicionNueva("CO2", valor, tipoMedida, contador, dispositivoIdSensor, sensorId);
         } else if (tipoMedida == 12) {
             Log.d(ETIQUETA_LOG, "Servicio: temperatura = " + valor + " °C (muestra " + contador + ")");
-            enviarMedicionNueva("TEMPERATURA", valor, tipoMedida, contador, dispositivoBluetooth.getAddress());
+            enviarMedicionNueva("TEMPERATURA", valor, tipoMedida, contador, dispositivoIdSensor, sensorId);
         }
     }
 
@@ -310,15 +324,19 @@ public class ServicioEscuharBeacons extends Service {
      * Evita duplicados y delega la medición a lógica fake y REST.
      * --------------------
      */
-    private void enviarMedicionNueva(String tipo, int valor, int tipoMedida, int contador, String dispositivoId) {
-        if (ultimoTipoMedida == tipoMedida && ultimoContador == contador) {
+    private void enviarMedicionNueva(String tipo, int valor, int tipoMedida, int contador, String dispositivoId, int sensorId) {
+        // COMENTARIO: el mismo sensor puede tener CO2 y temperatura con el mismo contador, por eso dedup por tipo y sensor.
+        if (ultimoTipoMedida == tipoMedida && ultimoSensorId == sensorId && ultimoContador == contador) {
             return;
         }
         ultimoTipoMedida = tipoMedida;
+        ultimoSensorId = sensorId;
         ultimoContador = contador;
+        // COMENTARIO: solo se guarda en la base de datos el identificador de la sonda, sin el nombre del Arduino.
+        String dispositivoSensor = "S" + sensorId;
         try {
             LogicaFake.guardarMediciones(tipo, valor);
-            PeticionarioREST.enviarMedicion(dispositivoId, tipo, valor);
+            PeticionarioREST.enviarMedicion(dispositivoSensor, tipo, valor);
         } catch (IllegalArgumentException error) {
             Log.e(ETIQUETA_LOG, "Medición descartada: " + error.getMessage());
         }

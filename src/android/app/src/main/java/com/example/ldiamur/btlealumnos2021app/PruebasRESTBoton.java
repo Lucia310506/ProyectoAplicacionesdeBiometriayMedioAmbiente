@@ -4,6 +4,7 @@
  * Descripción: Pruebas REST ejecutables desde el botón de la aplicación.
  * Fecha: 2026-10-09
  * Copyright (c) 2026 Lucía Díaz Murcia
+ * Aportación: crear el archivo y hacerlo funcional
  */
 package com.example.ldiamur.btlealumnos2021app;
 
