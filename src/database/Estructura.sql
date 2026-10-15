@@ -11,5 +11,7 @@ CREATE TABLE IF NOT EXISTS mediciones (
   tipo ENUM('CO2', 'TEMPERATURA') NOT NULL,
   valor DOUBLE NOT NULL,
   lugar VARCHAR(100) NOT NULL DEFAULT 'Ubicación no disponible',
-  PRIMARY KEY (dispositivo_id, fecha)
+  PRIMARY KEY (dispositivo_id, fecha),
+  KEY idx_fecha (fecha),
+  KEY idx_fecha_dispositivo (fecha, dispositivo_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

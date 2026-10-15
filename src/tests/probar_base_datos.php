@@ -33,22 +33,31 @@ function probarBaseDatos(): void {
             ->execute(['co2' => $dispositivoCo2, 'temperatura' => $dispositivoTemperatura]);
         guardarMediciones($dispositivoCo2, 'CO2', 500, 'Murcia', $conexion);
         guardarMediciones($dispositivoTemperatura, 'TEMPERATURA', -19, 'Murcia', $conexion);
-        $mediciones = mostrarMediciones($conexion);
-        $porTipo = [];
-        foreach ($mediciones as $medicion) {
-            if (in_array($medicion['dispositivo_id'], [$dispositivoCo2, $dispositivoTemperatura], true)) {
-                $porTipo[$medicion['dispositivo_id']] = $medicion;
-            }
+
+        foreach ([$dispositivoCo2, $dispositivoTemperatura] as $dispositivo) {
+            $stmt = $conexion->prepare('SELECT dispositivo_id, tipo, valor, lugar, DATE_FORMAT(fecha, \'%Y-%m-%dT%H:%i:%s.%f\') AS fecha FROM mediciones WHERE dispositivo_id = :dispositivo_id ORDER BY fecha DESC LIMIT 1');
+            $stmt->execute(['dispositivo_id' => $dispositivo]);
+            $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+            comprobar($fila !== false, 'Debe existir la medición de prueba');
+            $medicion = normalizarFilaMedicion($fila);
+            comprobar(!empty($medicion['fecha']), 'La fecha debe generarse en servidor');
+            comprobar($medicion['lugar'] === 'Murcia', 'Debe conservar el lugar');
         }
-        comprobar(isset($porTipo[$dispositivoCo2]), 'Debe existir la medición CO2 de prueba');
-        comprobar(isset($porTipo[$dispositivoTemperatura]), 'Debe existir la medición de temperatura de prueba');
-        comprobar((float) $porTipo[$dispositivoCo2]['valor'] === 500.0, 'CO2 debe valer 500');
-        comprobar((float) $porTipo[$dispositivoTemperatura]['valor'] === -19.0, 'Temperatura debe valer -19');
-        comprobar($porTipo[$dispositivoCo2]['tipo'] === 'CO2', 'Tipo CO2 no coincide');
-        comprobar($porTipo[$dispositivoTemperatura]['tipo'] === 'TEMPERATURA', 'Tipo temperatura no coincide');
-        comprobar(!empty($porTipo[$dispositivoCo2]['fecha']), 'La fecha debe generarse en servidor para CO2');
-        comprobar(!empty($porTipo[$dispositivoTemperatura]['fecha']), 'La fecha debe generarse en servidor para TEMPERATURA');
-        comprobar($porTipo[$dispositivoCo2]['lugar'] === 'Murcia', 'CO2 debe conservar el lugar');
+
+        $stmtCo2 = $conexion->prepare('SELECT valor, tipo FROM mediciones WHERE dispositivo_id = :dispositivo_id ORDER BY fecha DESC LIMIT 1');
+        $stmtCo2->execute(['dispositivo_id' => $dispositivoCo2]);
+        $co2 = $stmtCo2->fetch(PDO::FETCH_ASSOC);
+        comprobar($co2 !== false, 'Debe existir la medición CO2 de prueba');
+        comprobar((float) $co2['valor'] === 500.0, 'CO2 debe valer 500');
+        comprobar($co2['tipo'] === 'CO2', 'Tipo CO2 no coincide');
+
+        $stmtTemp = $conexion->prepare('SELECT valor, tipo FROM mediciones WHERE dispositivo_id = :dispositivo_id ORDER BY fecha DESC LIMIT 1');
+        $stmtTemp->execute(['dispositivo_id' => $dispositivoTemperatura]);
+        $temp = $stmtTemp->fetch(PDO::FETCH_ASSOC);
+        comprobar($temp !== false, 'Debe existir la medición de temperatura de prueba');
+        comprobar((float) $temp['valor'] === -19.0, 'Temperatura debe valer -19');
+        comprobar($temp['tipo'] === 'TEMPERATURA', 'Tipo temperatura no coincide');
+
         echo "OK: pruebas de base de datos superadas\n";
     } finally {
         $conexion->prepare('DELETE FROM mediciones WHERE dispositivo_id IN (:co2, :temperatura)')
