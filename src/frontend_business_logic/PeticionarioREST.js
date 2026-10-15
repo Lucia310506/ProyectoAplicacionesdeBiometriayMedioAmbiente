@@ -11,7 +11,7 @@
 const URL_MEDICIONES = '/mediciones';
 
 // --------------------
-// mediciones: [ (id: N, tipo: Text, valor: R, fecha: DateTime) ] <-- pedirMediciones() --x
+// mediciones: [ (dispositivo_id: Text, tipo: Text, valor: R, lugar: Text, fecha: DateTime) ] <-- pedirMediciones() --x
 // Solicita el GET y valida el JSON y el estado HTTP.
 // --------------------
 
