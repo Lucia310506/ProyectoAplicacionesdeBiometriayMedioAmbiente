@@ -134,10 +134,35 @@ try {
     }
 
     if ($grupoSolicitado === 'all' || $grupoSolicitado === 'rest') {
+        $agregarResultado('rest', 'OPTIONS /mediciones devuelve 204', static function () use ($comprobar): void {
+            [$codigo, $respuesta] = atenderMediciones('OPTIONS', '');
+            $comprobar($codigo === 204, 'OPTIONS /mediciones debe responder 204');
+        });
+
+        $agregarResultado('rest', 'POST /mediciones devuelve 400 sin campos obligatorios', static function () use ($comprobar): void {
+            [$codigo] = atenderMediciones('POST', json_encode(['tipo' => 'CO2', 'valor' => 1]));
+            $comprobar($codigo === 400, 'El POST incompleto debe responder 400');
+        });
+
+        $agregarResultado('rest', 'POST /mediciones devuelve 400 con JSON incorrecto', static function () use ($comprobar): void {
+            [$codigo] = atenderMediciones('POST', '{json invalido');
+            $comprobar($codigo === 400, 'El JSON incorrecto debe responder 400');
+        });
+
+        $agregarResultado('rest', 'POST /mediciones devuelve 422 con tipo no admitido', static function () use ($comprobar): void {
+            [$codigo] = atenderMediciones('POST', json_encode(['dispositivo_id' => 'TEST-REST', 'tipo' => 'HUMEDAD', 'valor' => 1, 'lugar' => 'Murcia']));
+            $comprobar($codigo === 422, 'El tipo no admitido debe responder 422');
+        });
+
         $agregarResultado('rest', 'POST /mediciones devuelve 201', static function () use ($comprobar): void {
             $valor = 501.0;
             [$codigoPost] = atenderMediciones('POST', json_encode(['dispositivo_id' => 'TEST-REST', 'tipo' => 'CO2', 'valor' => $valor, 'lugar' => 'Murcia']));
             $comprobar($codigoPost === 201, 'POST /mediciones debe responder 201');
+        });
+
+        $agregarResultado('rest', 'GET /mediciones devuelve 200 y una lista', static function () use ($comprobar): void {
+            [$codigo, $respuesta] = atenderMediciones('GET', '');
+            $comprobar($codigo === 200 && is_array($respuesta), 'GET /mediciones debe responder una lista con código 200');
         });
 
         $agregarResultado('rest', 'GET /mediciones devuelve el alta REST', static function () use ($conexion, $comprobar): void {
