@@ -22,7 +22,6 @@ import android.util.Log;
 import org.json.JSONObject;
 
 public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
-    String lugarmedicion="Gandia";
 
     interface AbridorConexion {
         HttpURLConnection abrir(URL url) throws IOException;
@@ -105,7 +104,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
      * --------------------
      */
     public static String obtenerLugarMedicion() {
-        return "lugarmedicion";
+        return  "Gandia";
     }
 
     /*
@@ -160,7 +159,7 @@ public class PeticionarioREST extends AsyncTask<Void, Void, Boolean> {
                 connection.setFixedLengthStreamingMode(cuerpoUtf8.length);
                 OutputStream salida = connection.getOutputStream();
                 salida.write(cuerpoUtf8);
-                salida.flush();
+                salida.flush(); //fuerza el envío de los datos que están almacenados temporalmente en el búfer de salida hacia su destino
                 salida.close();
             }
 
