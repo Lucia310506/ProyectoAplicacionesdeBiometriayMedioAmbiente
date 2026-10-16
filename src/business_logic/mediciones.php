@@ -16,6 +16,7 @@ require_once __DIR__ . '/../database/ConexionMediciones.php';
 // --------------------
 
 function guardarMediciones(string $dispositivoId, string $tipo, float $valor, string $lugar, ?PDO $conexion = null): void {
+    //Comprobaciones
     if ($dispositivoId === '') {
         throw new InvalidArgumentException('dispositivo_id no puede estar vacío');
     }
@@ -28,6 +29,7 @@ function guardarMediciones(string $dispositivoId, string $tipo, float $valor, st
     if ($lugar === '') {
         throw new InvalidArgumentException('lugar no puede estar vacío');
     }
+    //Conectamos y asociamos 
     $conexion = $conexion ?? conectarBaseDatos(obtenerEntornoBaseDatos());
     $parametros = ['dispositivo_id' => $dispositivoId, 'tipo' => $tipo, 'valor' => $valor, 'lugar' => $lugar];
     $consultasInsert = [
@@ -52,10 +54,11 @@ function mostrarMediciones(?PDO $conexion = null): array {
                 DATE_FORMAT(Fecha, '%Y-%m-%dT%H:%i:%s.%f') AS fecha
          FROM Mediciones ORDER BY Fecha DESC, dispositivo_id DESC",
     ];
+
     $filas = ejecutarPrimeraConsultaValida($conexion, $consultasSelect, null);
     $mediciones = [];
     foreach ($filas as $fila) {
-        $mediciones[] = normalizarFilaMedicion($fila);
+        $mediciones[] = normalizarFilaMedicion($fila);//Sacamos valores
     }
     return $mediciones;
 }
@@ -69,8 +72,8 @@ function ejecutarPrimeraConsultaValida(PDO $conexion, array $consultas, ?array $
     $ultimoError = null;
     foreach ($consultas as $consulta) {
         try {
-            $sentencia = $conexion->prepare($consulta);
-            $sentencia->execute($parametros ?? []);
+            $sentencia = $conexion->prepare($consulta); //prepara la consulta 
+            $sentencia->execute($parametros ?? []);//ejecuta rellenando los parametros
             return $parametros === null ? $sentencia->fetchAll() : [];
         } catch (PDOException $error) {
             $ultimoError = $error;

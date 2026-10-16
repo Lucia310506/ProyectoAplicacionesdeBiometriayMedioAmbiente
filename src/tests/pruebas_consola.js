@@ -20,6 +20,7 @@
     if (typeof window.pedirMediciones === 'function' && typeof window.mostrarMediciones === 'function') {
       return;
     }
+    //Promesas: operación que terminará en el futuro
     await new Promise(resolve => setTimeout(resolve, 100));
     if (typeof window.pedirMediciones !== 'function') {
       throw new Error('pedirMediciones no está disponible en window');

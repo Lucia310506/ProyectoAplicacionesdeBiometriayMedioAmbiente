@@ -22,7 +22,7 @@ function atenderMediciones(string $metodo, string $cuerpo): array {
             return [204, null];
         }
         if ($metodo === 'POST') {
-            $datos = json_decode($cuerpo, true);
+            $datos = json_decode($cuerpo, true); // Convertir el cuerpo JSON de la petición POST en un array asociativo.
             if (!is_array($datos) || !isset($datos['dispositivo_id']) || (string) $datos['dispositivo_id'] === ''
                 || !isset($datos['tipo']) || !isset($datos['valor']) || !is_numeric($datos['valor'])
                 || !isset($datos['lugar']) || (string) $datos['lugar'] === '') {
@@ -35,6 +35,7 @@ function atenderMediciones(string $metodo, string $cuerpo): array {
             return [200, mostrarMediciones()];
         }
         return [405, ['error' => 'Método no permitido']];
+        // Devolver errores HTTP controlados según el tipo de excepción.
     } catch (InvalidArgumentException $error) {
         return [422, ['error' => $error->getMessage()]];
     } catch (Throwable $error) {
@@ -54,6 +55,6 @@ if (!defined('PRUEBA_REST')) {
         header('Allow: GET, POST, OPTIONS');
     }
     if ($respuesta !== null) {
-        echo json_encode($respuesta);
+        echo json_encode($respuesta); 
     }
 }

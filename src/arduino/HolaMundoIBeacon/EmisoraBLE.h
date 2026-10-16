@@ -100,7 +100,7 @@ public:
   // .........................................................
 // --------------------
 // --> detenerAnuncio() 
-// Detiene la radio solo si estÃƒÆ’Ã‚Â¡ anunciando.
+// Detiene la radio solo si está anunciando.
 // --------------------
   void detenerAnuncio() {
 
@@ -114,7 +114,7 @@ public:
  
 // --------------------
 // --> estaAnunciando() --> B
-// Consulta el estado de emisiÃƒÆ’Ã‚Â³n de Bluefruit.
+// Consulta el estado de emision de Bluefruit.
 // --------------------
   bool estaAnunciando() {
 	return Bluefruit.Advertising.isRunning();
