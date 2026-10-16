@@ -61,7 +61,7 @@ Lectura: SELECT → mediciones ordenadas por fecha y dispositivo_id descendentes
 | `valor` | `DOUBLE` | `NOT NULL` | Recibido como número y validado como finito por lógica PHP. |
 | `lugar` | `VARCHAR(100)` | `NOT NULL`, default `Ubicación no disponible` | Obtenido en la app o indicado en el JSON. |
 
-La tabla usa InnoDB y `utf8mb4`. No hay relaciones con otras tablas ni claves foráneas. El índice explícito es la clave primaria compuesta `(dispositivo_id, fecha)`.
+La tabla usa InnoDB y `utf8mb4`. No hay relaciones con otras tablas ni claves foráneas. El índice principal es la clave primaria compuesta `(dispositivo_id, fecha)`. Adicionalmente se usa `idx_fecha (fecha)` y `idx_fecha_dispositivo (fecha, dispositivo_id)` para ordenar por fecha.
 
 ### Ciclo de vida de una fila
 
