@@ -20,7 +20,7 @@ async function mostrarMediciones() {
   // Usa pedirMediciones expuesta globalmente por PeticionarioREST.js (window/global)
   const globalObj = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined' ? global : this);
   const pedirMediciones = globalObj.pedirMediciones;
-  const mediciones = await pedirMediciones();
+  const mediciones = await pedirMediciones(); //Peticionario REST
   if (!Array.isArray(mediciones)) {
     throw new Error('La lógica fake esperaba una lista de mediciones');
   }

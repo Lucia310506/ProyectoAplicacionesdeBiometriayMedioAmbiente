@@ -16,11 +16,11 @@ const URL_MEDICIONES = '/mediciones';
 // --------------------
 
 async function pedirMediciones() {
-  const respuesta = await fetch(URL_MEDICIONES);
+  const respuesta = await fetch(URL_MEDICIONES);// Realizar una petición HTTP al servidor y esperar su respuesta.
   const textoRespuesta = await respuesta.text();
   let mediciones;
   try {
-    mediciones = JSON.parse(textoRespuesta);
+    mediciones = JSON.parse(textoRespuesta);//Convertir en JSON
   } catch (error) {
     throw new Error(
       'El servidor no ha devuelto JSON. Comprueba Plesk, ConfiguracionProduccion.php y la URL ' + URL_MEDICIONES
@@ -35,7 +35,7 @@ async function pedirMediciones() {
 // Exponer globalmente para tests y uso directo en navegador (window) o vm/Node (global)
 const globalObj = (typeof window !== 'undefined') ? window : (typeof global !== 'undefined' ? global : this);
 globalObj.pedirMediciones = pedirMediciones;
-globalObj.URL_MEDICIONES = URL_MEDICIONES;
+globalObj.URL_MEDICIONES = URL_MEDICIONES; 
 
 // Also explicitly on window for browser tests
 if (typeof window !== 'undefined') {

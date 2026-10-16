@@ -20,7 +20,7 @@ header('Cache-Control: no-store');
  */
 function responder(int $codigo, array $respuesta): void {
     http_response_code($codigo);
-    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE);
+    echo json_encode($respuesta, JSON_UNESCAPED_UNICODE); //escribe ese texto en la respuesta HTTP y lo encripta con acentos
     exit;
 }
 
@@ -28,16 +28,16 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     responder(405, ['habilitado' => true, 'error' => 'Usa POST para ejecutar las pruebas.']);
 }
 $origen = $_SERVER['HTTP_ORIGIN'] ?? ($_SERVER['HTTP_REFERER'] ?? '');
-$hostOrigen = parse_url($origen, PHP_URL_HOST);
-$esquemaOrigen = parse_url($origen, PHP_URL_SCHEME);
-$puertoOrigen = parse_url($origen, PHP_URL_PORT);
-$hostCabecera = $_SERVER['HTTP_HOST'] ?? '';
-$hostSolicitud = parse_url('//' . $hostCabecera, PHP_URL_HOST);
-$puertoSolicitud = parse_url('//' . $hostCabecera, PHP_URL_PORT);
+$hostOrigen = parse_url($origen, PHP_URL_HOST); //extrae dominio
+$esquemaOrigen = parse_url($origen, PHP_URL_SCHEME); //extrae protocolo
+$puertoOrigen = parse_url($origen, PHP_URL_PORT); //extrae el puerto
+$hostCabecera = $_SERVER['HTTP_HOST'] ?? ''; //A que servidor se envio
+$hostSolicitud = parse_url('//' . $hostCabecera, PHP_URL_HOST); //cabecera del dominio que lo envia
+$puertoSolicitud = parse_url('//' . $hostCabecera, PHP_URL_PORT);//puerto que lo envia
 $esquemaSolicitud = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ($_SERVER['REQUEST_SCHEME'] ?? (!empty($_SERVER['HTTPS']) ? 'https' : 'http'));
-$esquemaSolicitud = strtolower(trim(explode(',', $esquemaSolicitud)[0]));
+$esquemaSolicitud = strtolower(trim(explode(',', $esquemaSolicitud)[0])); //toma el primero, elimina espacios y lo convierte a minúsculas.
 if (!$hostOrigen || !$hostSolicitud
-    || strcasecmp($hostOrigen, $hostSolicitud) !== 0
+    || strcasecmp($hostOrigen, $hostSolicitud) !== 0 //compara textos
     || strcasecmp((string) $esquemaOrigen, $esquemaSolicitud) !== 0
     || ($puertoOrigen ?: ($esquemaOrigen === 'https' ? 443 : 80))
         !== ($puertoSolicitud ?: ($esquemaSolicitud === 'https' ? 443 : 80))) {
@@ -55,9 +55,9 @@ require_once __DIR__ . '/../business_logic/mediciones.php';
 define('PRUEBA_REST', true);
 require_once __DIR__ . '/../communication/mediciones.php';
 
-$cuerpoSolicitud = json_decode((string) file_get_contents('php://input'), true);
+$cuerpoSolicitud = json_decode((string) file_get_contents('php://input'), true); //lee el cuerpo de la petición HTTP recibida(JSON) a php
 $grupoSolicitado = $cuerpoSolicitud['grupo'] ?? 'all';
-$gruposValidos = ['all', 'logica', 'baseDatos', 'rest'];
+$gruposValidos = ['all', 'logica', 'baseDatos', 'rest']; //defino grupos permitidos 
 if (!in_array($grupoSolicitado, $gruposValidos, true)) {
     $grupoSolicitado = 'all';
 }
@@ -80,7 +80,7 @@ $comprobar = static function (bool $condicion, string $mensaje): void {
 };
 try {
     $conexion = conectarBaseDatos($entorno);
-    $conexion->beginTransaction();
+    $conexion->beginTransaction(); //hace commit()
     $transaccionIniciada = true;
 
     if ($grupoSolicitado === 'all' || $grupoSolicitado === 'baseDatos') {
@@ -133,6 +133,7 @@ try {
         });
     }
 
+    //Posibles respuestas
     if ($grupoSolicitado === 'all' || $grupoSolicitado === 'rest') {
         $agregarResultado('rest', 'OPTIONS /mediciones devuelve 204', static function () use ($comprobar): void {
             [$codigo, $respuesta] = atenderMediciones('OPTIONS', '');
